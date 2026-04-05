@@ -1,6 +1,13 @@
 import Foundation
 import Observation
 
+enum CompanionTab: Hashable {
+    case chat
+    case vault
+    case apps
+    case runtime
+}
+
 @MainActor
 @Observable
 final class CompanionAppModel {
@@ -8,6 +15,7 @@ final class CompanionAppModel {
         didSet { connection.save() }
     }
 
+    var selectedTab: CompanionTab = .chat
     var appsCatalogURL = "https://apps.roachnet.org/app-store-catalog.json"
     var pairedMachineName: String?
     var sessionList: [CompanionChatSessionSummary] = []
@@ -39,7 +47,47 @@ final class CompanionAppModel {
 
     var categories: [String] {
         let catalogCategories = Set(catalogItems.map(\.category))
-        return ["Today"] + catalogCategories.sorted()
+        let preferredOrder = [
+            "Map Regions",
+            "Medicine",
+            "Survival",
+            "Education",
+            "DIY",
+            "Agriculture",
+            "Dev",
+            "ML",
+            "Audio",
+            "Infra",
+            "Wikipedia",
+            "Models",
+            "Travel",
+            "Science",
+            "Maker",
+            "Design",
+            "Deep Library",
+        ]
+
+        let ordered = preferredOrder.filter { catalogCategories.contains($0) }
+        let remainder = catalogCategories.subtracting(preferredOrder).sorted()
+        return ["Today"] + ordered + remainder
+    }
+
+    var activeModelName: String? {
+        currentSession?.model ?? runtime?.roachClaw.resolvedDefaultModel ?? runtime?.roachClaw.defaultModel
+    }
+
+    var spotlightItems: [StoreAppItem] {
+        if selectedCategory == "Today" {
+            let featured = catalogItems.filter { $0.featured == true }
+            if !featured.isEmpty {
+                return Array(featured.prefix(6))
+            }
+        }
+
+        let source = selectedCategory == "Today"
+            ? catalogItems
+            : catalogItems.filter { $0.category == selectedCategory }
+        return Array(source.prefix(6))
     }
 
     var visibleCatalogItems: [StoreAppItem] {
@@ -49,7 +97,7 @@ final class CompanionAppModel {
         if selectedCategory == "Today" {
             baseItems = catalogItems
                 .sorted { ($0.featured ?? false) && !($1.featured ?? false) }
-                .prefix(18)
+                .prefix(16)
                 .map { $0 }
         } else {
             baseItems = catalogItems.filter { $0.category == selectedCategory }
@@ -67,6 +115,56 @@ final class CompanionAppModel {
 
     var runtimeIssues: [CompanionIssue] {
         (runtime?.issues ?? []) + (vault?.issues ?? [])
+    }
+
+    func categoryDescription(for category: String) -> String {
+        switch category {
+        case "Today":
+            return "The fastest installs and the best lanes to start with."
+        case "Map Regions":
+            return "Regional atlas packs built for real routes, city grids, and empty stretches in between."
+        case "Medicine":
+            return "Field guides, drug references, treatment steps, and deeper medical shelves."
+        case "Survival":
+            return "Preparedness guides, winter planning, bug-out thinking, and field manuals."
+        case "Education":
+            return "Course packs, study shelves, and open learning lanes that feel like a small campus."
+        case "DIY":
+            return "Repair, woodworking, practical builds, and hands-on home/shop references."
+        case "Agriculture":
+            return "Food systems, gardening, homestead notes, and agricultural references."
+        case "Dev":
+            return "Programming docs, dev references, and coding shelves built to sit next to the editor."
+        case "ML":
+            return "Machine learning and AI references, model guides, and data science study packs."
+        case "Audio":
+            return "Music production, sound design, mixing, synthesis, and engineering references."
+        case "Infra":
+            return "Ops, networking, containers, servers, privacy, and infrastructure docs."
+        case "Wikipedia":
+            return "Right-sized encyclopedia lanes for broad reference without opening a browser maze."
+        case "Models":
+            return "Model packs, local AI defaults, and RoachClaw expansion lanes."
+        case "Travel":
+            return "Guides, route planning references, and location shelves that travel well."
+        case "Science":
+            return "Physics, chemistry, earth science, astronomy, and experiment-heavy references."
+        case "Maker":
+            return "Electronics, fabrication, hobby build docs, and tool-first learning lanes."
+        case "Design":
+            return "Typography, UI, visual design, and creative-tool learning/reference content."
+        case "Deep Library":
+            return "Larger archives and heavier shelves for broad browsing when storage is not tight."
+        default:
+            return "Install-ready content that lands straight in the paired RoachNet desktop."
+        }
+    }
+
+    func appCount(for category: String) -> Int {
+        if category == "Today" {
+            return spotlightItems.count
+        }
+        return catalogItems.filter { $0.category == category }.count
     }
 
     func bootstrapIfNeeded() async {
@@ -100,7 +198,7 @@ final class CompanionAppModel {
                 try? await loadSession(firstSession.id)
             }
 
-            bannerText = "Connected to \(bootstrap.machineName)."
+            bannerText = "Connected to your desktop."
             errorText = nil
         } catch {
             errorText = error.localizedDescription
@@ -154,6 +252,15 @@ final class CompanionAppModel {
         } catch {
             let fallback = makeLocalSession(title: "New Chat")
             currentSession = fallback
+            sessionList.insert(
+                CompanionChatSessionSummary(
+                    rawID: fallback.rawID,
+                    title: fallback.title,
+                    model: fallback.model,
+                    timestamp: fallback.timestamp
+                ),
+                at: 0
+            )
             bannerText = "New local chat ready."
             errorText = nil
         }

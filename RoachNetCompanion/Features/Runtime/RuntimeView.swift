@@ -11,13 +11,16 @@ struct RuntimeView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         connectionPanel
-                        runtimePanel
+                        machinePanel
                         roachClawPanel
                         servicesPanel
                         downloadsPanel
                         issuesPanel
                     }
                     .padding(16)
+                }
+                .refreshable {
+                    await model.refreshAll()
                 }
             }
             .navigationTitle("Runtime")
@@ -35,53 +38,59 @@ struct RuntimeView: View {
 
     private var connectionPanel: some View {
         RoachPanel {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Companion lane")
-                    .font(.headline)
-                    .foregroundStyle(RoachTheme.text)
+            VStack(alignment: .leading, spacing: 12) {
+                RoachSectionHeader(
+                    eyebrow: "Companion lane",
+                    title: model.connection.isConfigured ? "Phone to Mac link is live." : "Pair the desktop first.",
+                    detail: "Runtime status, service controls, and RoachClaw all run through the same companion bridge."
+                )
 
-                Text(model.connection.baseURL)
-                    .font(.subheadline.monospaced())
-                    .foregroundStyle(RoachTheme.text)
+                HStack(spacing: 10) {
+                    RoachMetricTile(
+                        label: "URL",
+                        value: model.connection.baseURL,
+                        accent: RoachTheme.tertiary
+                    )
 
-                Text(model.connection.isConfigured ? "Token loaded." : "Still needs a companion token.")
-                    .font(.caption)
-                    .foregroundStyle(RoachTheme.subduedText)
-
-                if let pairedMachineName = model.pairedMachineName {
-                    Text(pairedMachineName)
-                        .font(.caption.monospaced())
-                        .foregroundStyle(RoachTheme.secondary)
+                    RoachMetricTile(
+                        label: "Token",
+                        value: model.connection.isConfigured ? "Loaded" : "Missing",
+                        accent: model.connection.isConfigured ? RoachTheme.secondary : RoachTheme.primary
+                    )
                 }
 
-                if let hostname = model.runtime?.systemInfo?.os?.hostname {
-                    Text(hostname)
-                        .font(.caption.monospaced())
-                        .foregroundStyle(RoachTheme.secondary)
+                if model.pairedMachineName != nil {
+                    Text("Paired desktop linked.")
+                        .font(.caption)
+                        .foregroundStyle(RoachTheme.subduedText)
                 }
             }
         }
     }
 
-    private var runtimePanel: some View {
+    private var machinePanel: some View {
         RoachPanel {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Machine")
-                    .font(.headline)
-                    .foregroundStyle(RoachTheme.text)
+            VStack(alignment: .leading, spacing: 12) {
+                RoachSectionHeader(
+                    eyebrow: "Machine",
+                    title: model.runtime?.systemInfo?.hardwareProfile?.platformLabel ?? "RoachNet desktop",
+                    detail: model.runtime?.systemInfo?.hardwareProfile?.recommendedModelClass ?? "Model guidance is not available yet."
+                )
 
-                Text(model.runtime?.systemInfo?.hardwareProfile?.platformLabel ?? "RoachNet desktop")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(RoachTheme.text)
+                HStack(spacing: 10) {
+                    if let available = model.runtime?.systemInfo?.mem?.available {
+                        RoachMetricTile(
+                            label: "Memory",
+                            value: formattedBytes(Int64(available)),
+                            accent: RoachTheme.secondary
+                        )
+                    }
 
-                Text(model.runtime?.systemInfo?.hardwareProfile?.recommendedModelClass ?? "Model guidance unavailable.")
-                    .font(.subheadline)
-                    .foregroundStyle(RoachTheme.subduedText)
-
-                if let available = model.runtime?.systemInfo?.mem?.available {
-                    Text("Available memory: \(formattedBytes(Int64(available)))")
-                        .font(.caption)
-                        .foregroundStyle(RoachTheme.secondary)
+                    RoachMetricTile(
+                        label: "Services",
+                        value: "\(model.runtime?.services.count ?? 0)",
+                        accent: RoachTheme.tertiary
+                    )
                 }
 
                 if let notes = model.runtime?.systemInfo?.hardwareProfile?.notes, !notes.isEmpty {
@@ -99,35 +108,34 @@ struct RuntimeView: View {
 
     private var roachClawPanel: some View {
         RoachPanel {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("RoachClaw")
-                    .font(.headline)
-                    .foregroundStyle(RoachTheme.text)
+            VStack(alignment: .leading, spacing: 12) {
+                RoachSectionHeader(
+                    eyebrow: "RoachClaw",
+                    title: (model.runtime?.roachClaw.ready ?? false) ? "Local AI lane is ready." : "RoachClaw is warming up.",
+                    detail: model.runtime?.roachClaw.error ?? "Model selection, installed packs, and provider state all show here."
+                )
 
-                HStack {
-                    RoachBadge(
-                        title: (model.runtime?.roachClaw.ready ?? false) ? "Ready" : "Warming up",
+                HStack(spacing: 10) {
+                    RoachMetricTile(
+                        label: "State",
+                        value: (model.runtime?.roachClaw.ready ?? false) ? "Ready" : "Booting",
                         accent: (model.runtime?.roachClaw.ready ?? false) ? RoachTheme.secondary : RoachTheme.primary
                     )
 
-                    if let modelName = model.runtime?.roachClaw.resolvedDefaultModel ?? model.runtime?.roachClaw.defaultModel {
-                        RoachBadge(title: modelName, accent: RoachTheme.tertiary)
-                    }
-                }
-
-                if let error = model.runtime?.roachClaw.error {
-                    Text(error)
-                        .font(.subheadline)
-                        .foregroundStyle(RoachTheme.subduedText)
+                    RoachMetricTile(
+                        label: "Model",
+                        value: model.runtime?.roachClaw.resolvedDefaultModel ?? model.runtime?.roachClaw.defaultModel ?? "Not set",
+                        accent: RoachTheme.tertiary
+                    )
                 }
 
                 if let installedModels = model.runtime?.installedModels, !installedModels.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Installed models")
-                            .font(.subheadline.weight(.semibold))
+                            .font(.headline)
                             .foregroundStyle(RoachTheme.text)
 
-                        ForEach(installedModels) { model in
+                        ForEach(installedModels.prefix(6)) { model in
                             HStack {
                                 Text(model.name)
                                     .font(.caption.monospaced())
@@ -149,9 +157,11 @@ struct RuntimeView: View {
         if let services = model.runtime?.services, !services.isEmpty {
             RoachPanel {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Services")
-                        .font(.headline)
-                        .foregroundStyle(RoachTheme.text)
+                    RoachSectionHeader(
+                        eyebrow: "Services",
+                        title: "Control the desktop lane from here.",
+                        detail: "Restart or stop pieces of the runtime without leaving the phone."
+                    )
 
                     ForEach(services.prefix(6)) { service in
                         serviceRow(service)
@@ -166,9 +176,11 @@ struct RuntimeView: View {
         if let downloads = model.runtime?.downloads, !downloads.isEmpty {
             RoachPanel {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Download queue")
-                        .font(.headline)
-                        .foregroundStyle(RoachTheme.text)
+                    RoachSectionHeader(
+                        eyebrow: "Downloads",
+                        title: "Current install queue.",
+                        detail: "These are the active jobs on the paired desktop."
+                    )
 
                     ForEach(downloads.prefix(5)) { job in
                         VStack(alignment: .leading, spacing: 6) {
@@ -198,9 +210,11 @@ struct RuntimeView: View {
         if !model.runtimeIssues.isEmpty {
             RoachPanel {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Runtime notes")
-                        .font(.headline)
-                        .foregroundStyle(RoachTheme.text)
+                    RoachSectionHeader(
+                        eyebrow: "Runtime notes",
+                        title: "A few things need attention.",
+                        detail: nil
+                    )
 
                     ForEach(model.runtimeIssues) { issue in
                         VStack(alignment: .leading, spacing: 4) {

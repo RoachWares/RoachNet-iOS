@@ -14,14 +14,17 @@ struct AppsView: View {
                         featuredCard
                         searchField
                         categoryStrip
-
-                        LazyVGrid(columns: columns, spacing: 14) {
-                            ForEach(model.visibleCatalogItems) { item in
-                                AppCard(model: model, item: item)
-                            }
-                        }
+                        sectionIntro
+                        spotlightRow
+                        catalogGrid
                     }
                     .padding(16)
+                }
+                .refreshable {
+                    try? await model.loadCatalog()
+                    if model.connection.isConfigured {
+                        await model.refreshAll()
+                    }
                 }
             }
             .navigationTitle("Apps")
@@ -39,25 +42,28 @@ struct AppsView: View {
         return RoachPanel {
             if let item {
                 VStack(alignment: .leading, spacing: 14) {
-                    HStack {
+                    HStack(alignment: .top) {
                         StoreGlyph(
                             band: item.iconBand ?? "RoachNet",
                             monogram: item.iconMonogram ?? "APP",
                             accent: roachAccentColor(for: item.accent)
                         )
+
                         Spacer()
-                        if let status = item.status {
-                            RoachBadge(title: status, accent: roachAccentColor(for: item.accent))
+
+                        VStack(alignment: .trailing, spacing: 8) {
+                            RoachBadge(title: model.connection.isConfigured ? "Install-ready" : "Link Mac first", accent: model.connection.isConfigured ? RoachTheme.secondary : RoachTheme.primary)
+                            if let status = item.status {
+                                RoachBadge(title: status, accent: roachAccentColor(for: item.accent))
+                            }
                         }
                     }
 
-                    Text(item.title)
-                        .font(.title2.weight(.black))
-                        .foregroundStyle(RoachTheme.text)
-
-                    Text(item.summary)
-                        .font(.subheadline)
-                        .foregroundStyle(RoachTheme.subduedText)
+                    RoachSectionHeader(
+                        eyebrow: "Today",
+                        title: item.title,
+                        detail: item.summary
+                    )
 
                     HStack(spacing: 10) {
                         Button(item.installLabel ?? "Install to RoachNet") {
@@ -76,7 +82,7 @@ struct AppsView: View {
             } else {
                 EmptyStateView(
                     title: "Apps catalog",
-                    detail: "The RoachNet Apps lane pulls the same installs the website serves.",
+                    detail: "The companion app pulls the same install lanes that ship from apps.roachnet.org.",
                     actionTitle: nil,
                     action: nil
                 )
@@ -101,7 +107,9 @@ struct AppsView: View {
             HStack(spacing: 10) {
                 ForEach(model.categories, id: \.self) { category in
                     Button(category) {
-                        model.selectedCategory = category
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            model.selectedCategory = category
+                        }
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 14)
@@ -121,6 +129,128 @@ struct AppsView: View {
                 }
             }
         }
+    }
+
+    private var sectionIntro: some View {
+        RoachPanel {
+            VStack(alignment: .leading, spacing: 10) {
+                RoachSectionHeader(
+                    eyebrow: model.selectedCategory,
+                    title: model.selectedCategory == "Today" ? "The fast start shelf." : "\(model.selectedCategory) installs.",
+                    detail: model.categoryDescription(for: model.selectedCategory)
+                )
+
+                HStack(spacing: 10) {
+                    RoachMetricTile(
+                        label: "Apps",
+                        value: "\(model.appCount(for: model.selectedCategory))",
+                        accent: RoachTheme.secondary
+                    )
+
+                    RoachMetricTile(
+                        label: "Link",
+                        value: model.connection.isConfigured ? "Ready" : "Needs pairing",
+                        accent: model.connection.isConfigured ? RoachTheme.tertiary : RoachTheme.primary
+                    )
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var spotlightRow: some View {
+        if !model.spotlightItems.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(model.selectedCategory == "Today" ? "Quick installs" : "Spotlight")
+                    .font(.headline)
+                    .foregroundStyle(RoachTheme.text)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 14) {
+                        ForEach(model.spotlightItems) { item in
+                            SpotlightCard(model: model, item: item)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var catalogGrid: some View {
+        if model.catalogItems.isEmpty {
+            RoachPanel {
+                HStack(spacing: 12) {
+                    ProgressView()
+                        .tint(RoachTheme.primary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Loading Apps catalog")
+                            .font(.headline)
+                            .foregroundStyle(RoachTheme.text)
+                        Text("Pulling install metadata and shelf definitions.")
+                            .font(.subheadline)
+                            .foregroundStyle(RoachTheme.subduedText)
+                    }
+                    Spacer()
+                }
+            }
+        } else {
+            LazyVGrid(columns: columns, spacing: 14) {
+                ForEach(model.visibleCatalogItems) { item in
+                    AppCard(model: model, item: item)
+                }
+            }
+        }
+    }
+}
+
+private struct SpotlightCard: View {
+    @Bindable var model: CompanionAppModel
+    let item: StoreAppItem
+
+    var body: some View {
+        Button {
+            model.selectedStoreItem = item
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .top) {
+                    StoreGlyph(
+                        band: item.iconBand ?? item.category,
+                        monogram: item.iconMonogram ?? "APP",
+                        accent: roachAccentColor(for: item.accent)
+                    )
+
+                    Spacer()
+
+                    if let size = item.size {
+                        Text(size)
+                            .font(.caption2)
+                            .foregroundStyle(RoachTheme.subduedText)
+                    }
+                }
+
+                Text(item.title)
+                    .font(.headline)
+                    .foregroundStyle(RoachTheme.text)
+                    .lineLimit(2)
+
+                Text(item.subtitle)
+                    .font(.caption)
+                    .foregroundStyle(RoachTheme.subduedText)
+                    .lineLimit(2)
+            }
+            .frame(width: 220, alignment: .leading)
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(RoachTheme.surface.opacity(0.96))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .strokeBorder(RoachTheme.border, lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -162,6 +292,17 @@ private struct AppCard: View {
                         .lineLimit(3)
                 }
 
+                HStack(spacing: 8) {
+                    Text(item.category)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(RoachTheme.secondary)
+                    if let status = item.status {
+                        Text(status)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(roachAccentColor(for: item.accent))
+                    }
+                }
+
                 Spacer(minLength: 0)
 
                 HStack(spacing: 10) {
@@ -179,7 +320,7 @@ private struct AppCard: View {
                     .tint(RoachTheme.secondary)
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: 256, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: 270, alignment: .topLeading)
         }
     }
 }
@@ -210,13 +351,21 @@ private struct AppDetailSheet: View {
                                     }
                                 }
 
-                                Text(item.title)
-                                    .font(.title2.weight(.black))
-                                    .foregroundStyle(RoachTheme.text)
+                                RoachSectionHeader(
+                                    eyebrow: item.category,
+                                    title: item.title,
+                                    detail: item.summary
+                                )
 
-                                Text(item.summary)
-                                    .font(.body)
-                                    .foregroundStyle(RoachTheme.subduedText)
+                                HStack(spacing: 10) {
+                                    if let size = item.size {
+                                        RoachMetricTile(label: "Size", value: size, accent: RoachTheme.secondary)
+                                    }
+
+                                    if let status = item.status {
+                                        RoachMetricTile(label: "Shelf", value: status, accent: roachAccentColor(for: item.accent))
+                                    }
+                                }
 
                                 if !item.includes.isEmpty {
                                     VStack(alignment: .leading, spacing: 8) {

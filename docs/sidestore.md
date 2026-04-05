@@ -31,6 +31,7 @@ Use this when you want the RoachNet companion app on an iPhone or iPad without a
 - Keep the phone and Mac on the same network unless you have your own secure tunnel in front of the companion port.
 - Do not expose the companion token publicly.
 - If installs from the Apps catalog fail, verify the paired Mac runtime is healthy first.
+- The iOS app is just the companion surface. The real models, vault, and installs still live on the paired RoachNet desktop.
 
 ## Notes
 

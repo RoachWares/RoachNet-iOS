@@ -11,9 +11,26 @@ struct VaultView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         if let vault = model.vault {
+                            summaryPanel(vault)
                             notesPanel(vault)
                             knowledgePanel(vault)
                             archivesPanel(vault)
+                        } else if model.connection.isConfigured, model.isBootstrapping {
+                            RoachPanel {
+                                HStack(spacing: 12) {
+                                    ProgressView()
+                                        .tint(RoachTheme.primary)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Loading Vault")
+                                            .font(.headline)
+                                            .foregroundStyle(RoachTheme.text)
+                                        Text("Pulling RoachBrain, files, and archive summaries from the paired Mac.")
+                                            .font(.subheadline)
+                                            .foregroundStyle(RoachTheme.subduedText)
+                                    }
+                                    Spacer()
+                                }
+                            }
                         } else {
                             EmptyStateView(
                                 title: "Vault stays on the Mac",
@@ -26,17 +43,40 @@ struct VaultView: View {
                     }
                     .padding(16)
                 }
+                .refreshable {
+                    await model.refreshAll()
+                }
             }
             .navigationTitle("Vault")
+        }
+    }
+
+    private func summaryPanel(_ vault: CompanionVaultSummary) -> some View {
+        RoachPanel {
+            VStack(alignment: .leading, spacing: 12) {
+                RoachSectionHeader(
+                    eyebrow: "Vault",
+                    title: "The Mac shelf, from the phone.",
+                    detail: "RoachBrain notes, indexed files, and site archives stay browseable without opening the full desktop shell."
+                )
+
+                HStack(spacing: 10) {
+                    RoachMetricTile(label: "RoachBrain", value: "\(vault.roachBrain.count)", accent: RoachTheme.primary)
+                    RoachMetricTile(label: "Files", value: "\(vault.knowledgeFiles.count)", accent: RoachTheme.secondary)
+                    RoachMetricTile(label: "Archives", value: "\(vault.siteArchives.count)", accent: RoachTheme.tertiary)
+                }
+            }
         }
     }
 
     private func notesPanel(_ vault: CompanionVaultSummary) -> some View {
         RoachPanel {
             VStack(alignment: .leading, spacing: 12) {
-                Text("RoachBrain")
-                    .font(.headline)
-                    .foregroundStyle(RoachTheme.text)
+                RoachSectionHeader(
+                    eyebrow: "RoachBrain",
+                    title: "Pinned memory and recent notes.",
+                    detail: vault.roachBrain.isEmpty ? "No captured memory yet." : nil
+                )
 
                 if vault.roachBrain.isEmpty {
                     Text("No captured memory yet.")
@@ -74,9 +114,11 @@ struct VaultView: View {
     private func knowledgePanel(_ vault: CompanionVaultSummary) -> some View {
         RoachPanel {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Knowledge files")
-                    .font(.headline)
-                    .foregroundStyle(RoachTheme.text)
+                RoachSectionHeader(
+                    eyebrow: "Knowledge files",
+                    title: "Indexed docs in the vault.",
+                    detail: vault.knowledgeFiles.isEmpty ? "No indexed files yet." : nil
+                )
 
                 if vault.knowledgeFiles.isEmpty {
                     Text("No indexed files yet.")
@@ -96,9 +138,11 @@ struct VaultView: View {
     private func archivesPanel(_ vault: CompanionVaultSummary) -> some View {
         RoachPanel {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Site archives")
-                    .font(.headline)
-                    .foregroundStyle(RoachTheme.text)
+                RoachSectionHeader(
+                    eyebrow: "Site archives",
+                    title: "Offline captures and saved shelves.",
+                    detail: vault.siteArchives.isEmpty ? "No archives yet." : nil
+                )
 
                 if vault.siteArchives.isEmpty {
                     Text("No archives yet.")
@@ -120,4 +164,3 @@ struct VaultView: View {
         }
     }
 }
-

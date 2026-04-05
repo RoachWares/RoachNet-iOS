@@ -2,16 +2,21 @@
 
 RoachNet iOS is the chat-first iPhone and iPad companion for the RoachNet desktop runtime.
 
+It keeps the AI lane front and center, so you can continue RoachClaw chats, check runtime state, browse the vault, and push Apps installs back to the Mac from one small mobile surface.
+
 ## What it does
 
 - Continues RoachClaw chats from your Mac
 - Reads RoachBrain, vault files, and site archives from the paired install
 - Shows runtime health, models, downloads, and service state
 - Sends RoachNet Apps installs from the phone back to the Mac runtime
+- Stays sideload-friendly and open-source friendly with no closed SDK dependencies
 
 ## Pairing
 
 The phone app talks to the Mac over the token-gated companion lane.
+
+This `v0.1.0` release targets the companion-enabled RoachNet desktop runtime source lane. The Mac side needs the companion bridge env vars enabled before the phone can pair.
 
 Desktop runtime values:
 
@@ -66,6 +71,17 @@ Open the IPA in SideStore or AltStore and sign it with your Apple ID. The detail
 - Real device default: `http://<your-mac-ip>:38111`
 - The Mac runtime must have the companion lane enabled with a token
 - The same RoachNet Apps install intents used on `apps.roachnet.org` are forwarded through the companion lane into the desktop app
+
+## Release notes
+
+`v0.1.0` ships:
+
+- Chat-first iPhone/iPad shell
+- RoachClaw session history and local fallback session creation
+- Vault summaries for RoachBrain, indexed files, and archives
+- Runtime status and service controls
+- RoachNet Apps install handoff from phone to desktop
+- SideStore / AltStore friendly unsigned IPA packaging
 
 ## Repo layout
 

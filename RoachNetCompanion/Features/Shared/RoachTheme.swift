@@ -4,6 +4,7 @@ enum RoachTheme {
     static let background = Color(red: 0.03, green: 0.04, blue: 0.08)
     static let surface = Color(red: 0.07, green: 0.08, blue: 0.12)
     static let elevatedSurface = Color(red: 0.10, green: 0.11, blue: 0.16)
+    static let elevatedBorder = Color.white.opacity(0.14)
     static let border = Color.white.opacity(0.08)
     static let primary = Color(red: 0.89, green: 0.32, blue: 0.70)
     static let secondary = Color(red: 0.33, green: 0.96, blue: 0.71)
@@ -76,11 +77,37 @@ struct RoachPanel<Content: View>: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(RoachTheme.surface.opacity(0.96))
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                RoachTheme.surface.opacity(0.98),
+                                RoachTheme.elevatedSurface.opacity(0.94),
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(alignment: .topLeading) {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        RoachTheme.primary.opacity(0.24),
+                                        Color.clear,
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .center
+                                )
+                            )
+                            .mask(
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            )
+                    }
                     .overlay(
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .strokeBorder(RoachTheme.border, lineWidth: 1)
+                            .strokeBorder(RoachTheme.elevatedBorder, lineWidth: 1)
                     )
+                    .shadow(color: Color.black.opacity(0.24), radius: 22, x: 0, y: 14)
             )
     }
 }
@@ -116,7 +143,7 @@ struct StoreGlyph: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [accent.opacity(0.9), accent.opacity(0.35), RoachTheme.elevatedSurface],
+                        colors: [accent.opacity(0.92), accent.opacity(0.42), RoachTheme.elevatedSurface],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -126,6 +153,12 @@ struct StoreGlyph: View {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                 )
+                .overlay(alignment: .topTrailing) {
+                    Circle()
+                        .fill(Color.white.opacity(0.22))
+                        .frame(width: 12, height: 12)
+                        .padding(8)
+                }
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(band.uppercased())
@@ -137,6 +170,61 @@ struct StoreGlyph: View {
             }
             .padding(10)
         }
+    }
+}
+
+struct RoachSectionHeader: View {
+    let eyebrow: String
+    let title: String
+    let detail: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(eyebrow.uppercased())
+                .font(.caption.weight(.bold))
+                .foregroundStyle(RoachTheme.secondary)
+                .tracking(1.2)
+
+            Text(title)
+                .font(.title3.weight(.black))
+                .foregroundStyle(RoachTheme.text)
+
+            if let detail, !detail.isEmpty {
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(RoachTheme.subduedText)
+            }
+        }
+    }
+}
+
+struct RoachMetricTile: View {
+    let label: String
+    let value: String
+    let accent: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(accent.opacity(0.92))
+                .tracking(1)
+
+            Text(value)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(RoachTheme.text)
+                .lineLimit(2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(RoachTheme.elevatedSurface.opacity(0.92))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(accent.opacity(0.18), lineWidth: 1)
+                )
+        )
     }
 }
 

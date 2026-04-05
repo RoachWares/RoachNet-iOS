@@ -11,14 +11,12 @@ struct ConnectionSettingsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     RoachPanel {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Link to your Mac")
-                                .font(.title3.weight(.bold))
-                                .foregroundStyle(RoachTheme.text)
-
-                            Text("Point this app at the RoachNet companion lane running on your desktop.")
-                                .font(.subheadline)
-                                .foregroundStyle(RoachTheme.subduedText)
+                        VStack(alignment: .leading, spacing: 14) {
+                            RoachSectionHeader(
+                                eyebrow: "Pairing",
+                                title: "Link this phone to your Mac.",
+                                detail: "Point the app at the companion URL and token from your RoachNet desktop runtime."
+                            )
 
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Companion URL")
@@ -48,25 +46,33 @@ struct ConnectionSettingsView: View {
 
                     RoachPanel {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("What it reaches")
-                                .font(.headline)
-                                .foregroundStyle(RoachTheme.text)
-
-                            Text("Chats, RoachBrain, runtime status, and Apps installs all run through this one token-gated lane.")
-                                .font(.subheadline)
-                                .foregroundStyle(RoachTheme.subduedText)
+                            RoachSectionHeader(
+                                eyebrow: "What it opens",
+                                title: "Chat, vault, runtime, and installs.",
+                                detail: "The same token-gated bridge handles RoachClaw chat, RoachBrain reads, service controls, and Apps installs."
+                            )
 
                             RoachBadge(
                                 title: model.connection.isConfigured ? "Configured" : "Needs setup",
                                 accent: model.connection.isConfigured ? RoachTheme.secondary : RoachTheme.primary
                             )
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Simulator default: http://127.0.0.1:38111")
+                                Text("Phone default: http://<your-mac-ip>:38111")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
 
                     HStack(spacing: 12) {
-                        Button("Save") {
-                            model.connection.save()
-                            dismiss()
+                        Button("Save & Test") {
+                            Task {
+                                model.connection.save()
+                                await model.refreshAll()
+                                dismiss()
+                            }
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(RoachTheme.primary)
@@ -93,4 +99,3 @@ struct ConnectionSettingsView: View {
         }
     }
 }
-
