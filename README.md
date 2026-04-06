@@ -1,23 +1,47 @@
-# RoachNet iOS
+# RoachNetiOS
 
-RoachNet iOS is the chat-first iPhone and iPad companion for the RoachNet desktop runtime.
+Phone lane for RoachClaw, vault reads, runtime control, and RoachNet Apps installs.
 
-It keeps the AI lane front and center, so you can continue RoachClaw chats, check runtime state, browse the vault, and push Apps installs back to the Mac from one small mobile surface.
+RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls back to cached RoachBrain replies when the desktop or internet drops away.
 
-## What it does
+[RoachNet iOS page](https://roachnet.org/iOS/)  
+[IPA release](https://github.com/AHGRoach/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.1-unsigned.ipa)  
+[SideStore notes](./docs/sidestore.md)
 
-- Continues RoachClaw chats from your Mac
-- Reads RoachBrain, vault files, and site archives from the paired install
-- Shows runtime health, models, downloads, and service state
-- Surfaces RoachTail status so the private device lane stays visible on the phone
-- Sends RoachNet Apps installs from the phone back to the Mac runtime
-- Stays sideload-friendly and open-source friendly with no closed SDK dependencies
+## What It Does
+
+- Continues RoachClaw chats from the paired desktop lane
+- Reads cached vault and runtime state on the phone
+- Keeps an offline-capable RoachBrain fallback when the bridge is down
+- Shows runtime health, model state, downloads, and RoachTail status
+- Sends RoachNet Apps install intents back to the desktop runtime
+- Stays sideload-friendly and open-source friendly with no closed mobile SDKs
+
+## Install
+
+Builds are shipped as unsigned IPAs for SideStore or AltStore.
+
+```bash
+./scripts/build_unsigned_ipa.sh
+```
+
+Artifacts:
+
+- `dist/RoachNetiOS-v0.1.1-unsigned.ipa`
+- `dist/RoachNetiOS-v0.1.1-unsigned.ipa.sha256`
+
+Install flow:
+
+1. Download the IPA to Files.
+2. Share it to SideStore or AltStore.
+3. Let the store sign it with your Apple ID.
+4. Open `RoachNetiOS` and pair the desktop lane.
+
+Full sideload notes live in [docs/sidestore.md](docs/sidestore.md).
 
 ## Pairing
 
-The phone app talks to the Mac over the token-gated companion lane.
-
-This `v0.1.1` release targets the companion-enabled RoachNet desktop runtime source lane. The Mac side needs the companion bridge env vars enabled before the phone can pair.
+The phone app talks to the desktop over the token-gated companion lane and the RoachTail peer-token flow.
 
 Desktop runtime values:
 
@@ -26,12 +50,12 @@ Desktop runtime values:
 - `ROACHNET_COMPANION_PORT=38111`
 - `ROACHNET_COMPANION_TOKEN=<long random token>`
 
-Phone values:
+Device values:
 
-- `http://<your-mac-ip>:38111`
-- the same token
+- Real device: `http://<your-mac-ip>:38111`
+- Simulator: `http://127.0.0.1:38111`
 
-On the simulator, `http://127.0.0.1:38111` is the default so local testing works faster.
+The same install intents used on `apps.roachnet.org` are forwarded through the companion lane into the desktop app.
 
 ## Build
 
@@ -48,44 +72,11 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
   build
 ```
 
-## Unsigned IPA
+## Repo Layout
 
-Build an unsigned release IPA for SideStore or AltStore:
-
-```bash
-cd RoachNet-iOS
-./scripts/build_unsigned_ipa.sh
-```
-
-That writes:
-
-- `dist/RoachNetiOS-v0.1.1-unsigned.ipa`
-- `dist/RoachNetiOS-v0.1.1-unsigned.ipa.sha256`
-
-## Install
-
-Open the IPA in SideStore or AltStore and sign it with your Apple ID. The detailed flow is in [docs/sidestore.md](docs/sidestore.md).
-
-## Pairing notes
-
-- Simulator default: `http://127.0.0.1:38111`
-- Real device default: `http://<your-mac-ip>:38111`
-- The Mac runtime must have the companion lane enabled with a token
-- The same RoachNet Apps install intents used on `apps.roachnet.org` are forwarded through the companion lane into the desktop app
-
-## Release notes
-
-`v0.1.1` ships:
-
-- Faster first paint from cached state
-- Preview mode for the unpaired phone lane
-- Saved Apps and recent install rows in the mobile store
-- RoachTail-aware runtime status with peer and bridge visibility
-- Chat, vault, Apps, and runtime surfaces tuned for the current desktop lane
-- SideStore / AltStore friendly unsigned IPA packaging
-
-## Repo layout
-
-- `RoachNetCompanion/` native SwiftUI app
-- `scripts/` project generation and release packaging
-- `docs/` sideloading and pairing notes
+- `RoachNetCompanion/`
+  Native SwiftUI app, offline RoachBrain lane, chat, Apps, vault, and runtime views
+- `scripts/`
+  Xcode project generation and unsigned IPA packaging
+- `docs/`
+  SideStore notes and pairing guidance
