@@ -12,7 +12,9 @@ APP_PATH="$BUILD_ROOT/Release-iphoneos/RoachNetCompanion.app"
 IPA_PATH="$DIST_DIR/RoachNetiOS-v${VERSION}-unsigned.ipa"
 CHECKSUM_PATH="$IPA_PATH.sha256"
 
-ruby "$ROOT/scripts/generate_xcodeproj.rb"
+if [[ "${ROACHNET_REGENERATE_XCODEPROJ:-0}" == "1" ]]; then
+  ruby "$ROOT/scripts/generate_xcodeproj.rb"
+fi
 rm -rf "$BUILD_ROOT" "$DIST_DIR"
 mkdir -p "$BUILD_ROOT" "$DIST_DIR/Payload"
 
