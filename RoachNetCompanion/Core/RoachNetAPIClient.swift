@@ -310,6 +310,27 @@ struct RoachNetAPIClient {
         )
     }
 
+    func affectRoachSync(
+        action: String,
+        folderPath: String? = nil,
+        using connection: CompanionConnectionSettings
+    ) async throws -> CompanionActionResponse {
+        var body: [String: Any] = [
+            "action": action,
+        ]
+
+        if let folderPath, !folderPath.isEmpty {
+            body["folderPath"] = folderPath
+        }
+
+        return try await request(
+            "/api/companion/roachsync/affect",
+            method: "POST",
+            body: body,
+            using: connection
+        )
+    }
+
     func fetchCatalog(from catalogURL: String) async throws -> StoreCatalogResponse {
         guard let url = URL(string: catalogURL) else {
             throw RoachNetAPIError.invalidBaseURL

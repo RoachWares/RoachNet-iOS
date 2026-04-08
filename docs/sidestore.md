@@ -10,7 +10,7 @@ Use this when you want the RoachNet companion app on an iPhone or iPad without a
 
 ## Install with SideStore
 
-1. Download `RoachNetiOS-v0.1.1-unsigned.ipa` to Files on the device.
+1. Download `RoachNetiOS-v0.1.2-unsigned.ipa` to Files on the device.
 2. Open `SideStore`.
 3. Go to `My Apps`.
 4. Tap the add button.

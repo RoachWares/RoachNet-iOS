@@ -64,7 +64,7 @@ target.build_configurations.each do |config|
   config.build_settings['ASSETCATALOG_COMPILER_APPICON_NAME'] = 'AppIcon'
   config.build_settings['ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME'] = 'AccentColor'
   config.build_settings['CURRENT_PROJECT_VERSION'] = '1'
-  config.build_settings['MARKETING_VERSION'] = '0.1.1'
+  config.build_settings['MARKETING_VERSION'] = '0.1.2'
   config.build_settings['ENABLE_PREVIEWS'] = 'YES'
   config.build_settings['SWIFT_STRICT_CONCURRENCY'] = 'complete'
   config.build_settings['INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents'] = 'YES'

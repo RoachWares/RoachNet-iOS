@@ -12,6 +12,7 @@ struct RuntimeView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         connectionPanel
                         roachTailPanel
+                        roachSyncPanel
                         machinePanel
                         roachClawPanel
                         servicesPanel
@@ -197,6 +198,133 @@ struct RuntimeView: View {
                     if !roachTail.notes.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             ForEach(roachTail.notes.prefix(3), id: \.self) { note in
+                                Text(note)
+                                    .font(.caption)
+                                    .foregroundStyle(RoachTheme.subduedText)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var roachSyncPanel: some View {
+        if let roachSync = model.runtime?.roachSync {
+            RoachPanel {
+                VStack(alignment: .leading, spacing: 12) {
+                    RoachSectionHeader(
+                        eyebrow: "RoachSync",
+                        title: roachSync.enabled ? "Contained sync lane is \(roachSync.status)." : "Contained sync lane is off.",
+                        detail: "RoachSync keeps the vault and future shared state grouped under one private sync lane."
+                    )
+
+                    HStack(spacing: 10) {
+                        RoachMetricTile(
+                            label: "Network",
+                            value: roachSync.networkName,
+                            accent: RoachTheme.primary
+                        )
+
+                        RoachMetricTile(
+                            label: "Peers",
+                            value: "\(roachSync.peers.count)",
+                            accent: RoachTheme.secondary
+                        )
+
+                        RoachMetricTile(
+                            label: "State",
+                            value: roachSync.status.capitalized,
+                            accent: roachSync.enabled ? RoachTheme.tertiary : RoachTheme.primary
+                        )
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle(
+                            isOn: Binding(
+                                get: { model.runtime?.roachSync?.enabled ?? false },
+                                set: { nextValue in
+                                    Task {
+                                        await model.affectRoachSync(nextValue ? "enable" : "disable")
+                                    }
+                                }
+                            )
+                        ) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("RoachSync")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(RoachTheme.text)
+                                Text(roachSync.enabled ? "Contained sync lane is armed." : "Contained sync lane is off.")
+                                    .font(.caption)
+                                    .foregroundStyle(RoachTheme.subduedText)
+                            }
+                        }
+                        .toggleStyle(.switch)
+                        .tint(RoachTheme.secondary)
+                        .disabled(model.isActingRoachSync)
+
+                        HStack(spacing: 10) {
+                            Button {
+                                Task { await model.affectRoachSync("refresh") }
+                            } label: {
+                                Text("Refresh sync")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(model.isActingRoachSync)
+
+                            Button {
+                                Task { await model.affectRoachSync("clear-peers") }
+                            } label: {
+                                Text("Clear peers")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(model.isActingRoachSync || roachSync.peers.isEmpty)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Folder")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(RoachTheme.secondary)
+                        Text(roachSync.folderPath)
+                            .font(.caption.monospaced())
+                            .foregroundStyle(RoachTheme.text)
+                            .textSelection(.enabled)
+                    }
+
+                    if !roachSync.peers.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Synced devices")
+                                .font(.headline)
+                                .foregroundStyle(RoachTheme.text)
+
+                            ForEach(roachSync.peers.prefix(4)) { peer in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(peer.name)
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(RoachTheme.text)
+                                        Spacer()
+                                        Text(peer.status.capitalized)
+                                            .font(.caption)
+                                            .foregroundStyle(RoachTheme.secondary)
+                                    }
+
+                                    Text(peer.lastSeenAt.map(formattedRelativeDate) ?? "Contained sync lane ready")
+                                        .font(.caption)
+                                        .foregroundStyle(RoachTheme.subduedText)
+                                }
+                                .padding(.vertical, 2)
+                            }
+                        }
+                    }
+
+                    if !roachSync.notes.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            ForEach(roachSync.notes.prefix(3), id: \.self) { note in
                                 Text(note)
                                     .font(.caption)
                                     .foregroundStyle(RoachTheme.subduedText)

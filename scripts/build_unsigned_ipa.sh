@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROJECT="$ROOT/RoachNetCompanion.xcodeproj"
 SCHEME="RoachNetCompanion"
-VERSION="0.1.1"
+VERSION="0.1.2"
 BUILD_ROOT="$ROOT/build/release"
 DERIVED_DATA_PATH="$BUILD_ROOT/DerivedData"
 DIST_DIR="$ROOT/dist"
