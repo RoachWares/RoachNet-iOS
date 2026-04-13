@@ -6,6 +6,7 @@ RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls b
 
 [RoachNet iOS page](https://roachnet.org/iOS/)  
 [IPA release](https://github.com/AHGRoach/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.2-unsigned.ipa)  
+[SideStore source](https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json)  
 [SideStore notes](./docs/sidestore.md)
 
 ## What It Does
@@ -19,7 +20,7 @@ RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls b
 
 ## Install
 
-Builds are shipped as unsigned IPAs for SideStore or AltStore.
+Builds are shipped as unsigned IPAs for SideStore or AltStore, and the preferred install lane is now the RoachNet SideStore source.
 
 ```bash
 ./scripts/build_unsigned_ipa.sh
@@ -32,9 +33,10 @@ Artifacts:
 
 Install flow:
 
-1. Download the IPA to Files.
-2. Share it to SideStore or AltStore.
-3. Let the store sign it with your Apple ID.
+1. Add the RoachNet source in SideStore:
+   `https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json`
+2. Install `RoachNetiOS` from the source, or fall back to the IPA if you want the direct file.
+3. Let SideStore or AltStore sign it with your Apple ID.
 4. Open `RoachNetiOS` and pair the desktop lane.
 
 Full sideload notes live in [docs/sidestore.md](docs/sidestore.md).

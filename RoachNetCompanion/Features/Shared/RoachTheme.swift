@@ -345,13 +345,19 @@ struct RoachBadge: View {
 
     var body: some View {
         Text(title)
-            .font(.caption.weight(.semibold))
+            .font(.caption.weight(.bold))
             .foregroundStyle(Color.white)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .background(
                 Capsule(style: .continuous)
-                    .fill(accent.opacity(0.22))
+                    .fill(
+                        LinearGradient(
+                            colors: [accent.opacity(0.24), accent.opacity(0.10)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .overlay(
                         Capsule(style: .continuous)
                             .strokeBorder(accent.opacity(0.45), lineWidth: 1)
@@ -366,10 +372,16 @@ struct RoachStatusPill: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Circle()
-                .fill(accent)
-                .frame(width: 8, height: 8)
-                .shadow(color: accent.opacity(0.42), radius: 8, x: 0, y: 0)
+            ZStack {
+                Circle()
+                    .fill(accent.opacity(0.18))
+                    .frame(width: 18, height: 18)
+
+                Circle()
+                    .fill(accent)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: accent.opacity(0.42), radius: 8, x: 0, y: 0)
+            }
 
             Text(title)
                 .font(.caption.weight(.semibold))
@@ -380,7 +392,16 @@ struct RoachStatusPill: View {
         .padding(.vertical, 8)
         .background(
             Capsule(style: .continuous)
-                .fill(RoachTheme.elevatedSurface.opacity(0.92))
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            RoachTheme.elevatedSurface.opacity(0.94),
+                            RoachTheme.surface.opacity(0.90),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
                     Capsule(style: .continuous)
                         .strokeBorder(accent.opacity(0.20), lineWidth: 1)
@@ -442,6 +463,7 @@ struct RoachFloatingTabBar: View {
     @Binding var selection: CompanionTab
     let items: [RoachTabBarItem]
     @Namespace private var selectionMotion
+    @State private var drift = false
 
     var body: some View {
         HStack(spacing: 8) {
@@ -537,11 +559,21 @@ struct RoachFloatingTabBar: View {
                         )
                         .blendMode(.screen)
                 )
+                .overlay(alignment: .topTrailing) {
+                    RoachAmbientOrb(accent: items.first(where: { $0.tab == selection })?.accent ?? RoachTheme.secondary, size: 76)
+                        .offset(x: drift ? 4 : -10, y: drift ? -8 : 10)
+                        .opacity(0.48)
+                }
                 .overlay(
                     RoachGlassChrome(accent: RoachTheme.secondary, cornerRadius: 26)
                 )
                 .shadow(color: Color.black.opacity(0.26), radius: 28, x: 0, y: 16)
         )
+        .onAppear {
+            withAnimation(.easeInOut(duration: 6.8).repeatForever(autoreverses: true)) {
+                drift = true
+            }
+        }
     }
 }
 
@@ -606,6 +638,19 @@ struct RoachShellDock: View {
                 )
                 .overlay {
                     RoachGlassChrome(accent: accent, cornerRadius: 24)
+                }
+                .overlay(alignment: .topLeading) {
+                    Capsule(style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [accent.opacity(0.92), RoachTheme.secondary.opacity(0.22), Color.clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: 110, height: 3)
+                        .padding(.top, 12)
+                        .padding(.leading, 16)
                 }
                 .overlay(alignment: .topTrailing) {
                     RoachAmbientOrb(accent: accent, size: 88)
@@ -807,18 +852,24 @@ struct RoachSignalTile: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
-                Image(systemName: systemImage)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.white)
-                    .frame(width: 28, height: 28)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(accent.opacity(0.22))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .strokeBorder(accent.opacity(0.34), lineWidth: 1)
-                            )
-                    )
+                ZStack {
+                    Circle()
+                        .fill(accent.opacity(0.16))
+                        .frame(width: 34, height: 34)
+
+                    Image(systemName: systemImage)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.white)
+                        .frame(width: 28, height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(accent.opacity(0.22))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .strokeBorder(accent.opacity(0.34), lineWidth: 1)
+                                )
+                        )
+                }
 
                 Text(label.uppercased())
                     .font(.caption2.weight(.bold))
@@ -840,6 +891,9 @@ struct RoachSignalTile: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(accent.opacity(0.18), lineWidth: 1)
+                )
+                .overlay(
+                    RoachGlassChrome(accent: accent, cornerRadius: 18)
                 )
         )
     }

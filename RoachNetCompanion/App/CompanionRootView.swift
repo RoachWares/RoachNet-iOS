@@ -79,6 +79,17 @@ struct CompanionRootView: View {
         ZStack {
             RoachBackdrop()
 
+            RadialGradient(
+                colors: [
+                    shellAccent.opacity(0.18),
+                    .clear,
+                ],
+                center: .topTrailing,
+                startRadius: 16,
+                endRadius: 280
+            )
+            .ignoresSafeArea()
+
             TabView(selection: $model.selectedTab) {
                 ChatView(model: model)
                     .tag(CompanionTab.chat)
@@ -96,6 +107,7 @@ struct CompanionRootView: View {
             .animation(shellSpring, value: model.selectedTab)
             .safeAreaPadding(.bottom, 108)
         }
+        .animation(shellSpring, value: model.selectedTab)
         .safeAreaInset(edge: .top, spacing: 0) {
             RoachShellDock(
                 title: shellTitle,

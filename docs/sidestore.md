@@ -5,16 +5,17 @@ Use this when you want the RoachNet companion app on an iPhone or iPad without a
 ## What you need
 
 1. A working SideStore or AltStore setup on the device.
-2. The unsigned RoachNet IPA from a GitHub release, or one you built locally with `./scripts/build_unsigned_ipa.sh`.
+2. The RoachNet SideStore source or the unsigned RoachNet IPA from a GitHub release.
 3. A Mac running RoachNet with the companion lane enabled.
 
 ## Install with SideStore
 
-1. Download `RoachNetiOS-v0.1.2-unsigned.ipa` to Files on the device.
-2. Open `SideStore`.
-3. Go to `My Apps`.
-4. Tap the add button.
-5. Pick the RoachNet IPA from Files.
+1. In Safari on the device, open:
+   `https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json`
+2. Copy or add that source URL inside SideStore.
+3. Install `RoachNetiOS` from the source list.
+4. If you want the direct file instead, download `RoachNetiOS-v0.1.2-unsigned.ipa` to Files.
+5. In SideStore, go to `My Apps`, tap the add button, and pick the IPA from Files.
 6. Let SideStore sign and install it with your Apple ID.
 
 ## First launch
@@ -38,3 +39,5 @@ Use this when you want the RoachNet companion app on an iPhone or iPad without a
 - Free Apple accounts still inherit Apple’s normal sideload limits.
 - Reinstalling the same IPA through SideStore should preserve app data in normal cases.
 - SideStore documentation: https://docs.sidestore.io/
+- RoachNet SideStore source: https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json
+- RoachNet SideStore repo: https://github.com/AHGRoach/RoachNet-SideStore

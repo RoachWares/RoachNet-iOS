@@ -7,127 +7,127 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1308E8CA6F07836253CAD1D9 /* RoachNetCompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957E84297471D1D29CED6AA6 /* RoachNetCompanionApp.swift */; };
-		24E42AD0F072FA225769EF53 /* CompanionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5312B1E70423E25ED99B9609 /* CompanionSupport.swift */; };
-		2553D76C944BE2A5FE1A6287 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8D50E9BCF6F7928171CA81 /* Foundation.framework */; };
-		33FF226FE4BAC62B58585B01 /* AppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FDE60D0E3C56E79F27CDE50 /* AppsView.swift */; };
-		3AD2382ADFBACE7FB709D262 /* RoachTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4835053FC48208452E23A3 /* RoachTheme.swift */; };
-		42568C294FBF7FA982629108 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02066A89FA912B8ECF25CF5 /* ChatView.swift */; };
-		5ABBC98576FC4DEAC4D56415 /* RoachNetAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA5EEEBE3EE735A0092B066 /* RoachNetAPIClient.swift */; };
-		6A206860EDD35BDF4928C412 /* ConnectionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D8F74037D20FEC29785442A /* ConnectionSettingsView.swift */; };
-		7A42CA00EA4AA10078D378CF /* CompanionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C245BDE256C176F5FA53CBF8 /* CompanionModels.swift */; };
-		840F7F14B474CEAF4E30DE14 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7DC5676626074121866C93C /* Assets.xcassets */; };
-		BA83D9E37368AB0F3EE1D07B /* CompanionRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96BA0C86A6682AE9F3AB0765 /* CompanionRootView.swift */; };
-		BB0E6386D79288372B118CE3 /* VaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB868173AB286F738EAF81E /* VaultView.swift */; };
-		D3620EC809D0F62B7FB3FD6F /* RuntimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69AD5058D3899FF1DCC0531F /* RuntimeView.swift */; };
-		F4D3E02B9AA1D33A82C2EC65 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF4171E5F45B35D7CDC9460 /* AppModel.swift */; };
+		23CBE9FAAB61456E1BDF7A7D /* RuntimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6468E721BF60A9597B3AC5DF /* RuntimeView.swift */; };
+		4D94E6737DA94F5623323862 /* RoachNetAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35699DDD7B574B8F813D06E2 /* RoachNetAPIClient.swift */; };
+		53EB55C5240855DEBD6A2896 /* CompanionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90CC00F1664E29244966F60D /* CompanionModels.swift */; };
+		8F118EC7AD4722F79BF51DD9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6E1ACF704DCDC39E59B396C /* Foundation.framework */; };
+		A71E3FEDD5D5D05032229213 /* RoachNetCompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EB88E5B69279CD11550B08 /* RoachNetCompanionApp.swift */; };
+		AE9952B6C0441B11B053E8F9 /* CompanionRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6385DAAA5E9E1263102CB1D8 /* CompanionRootView.swift */; };
+		B4D8B289E0250877255CC858 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB45CF6E1F088F83989BFB57 /* Assets.xcassets */; };
+		CF33A3DFE1A32F69716C054F /* CompanionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E16A7E8E16E36C4629B9ECE /* CompanionSupport.swift */; };
+		D1B144FC5926B001D1F0152D /* ConnectionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4950314D04711C11627C321 /* ConnectionSettingsView.swift */; };
+		D4BCCA06D7196E4B627D27B8 /* RoachTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4945A389B783D93E3F00454F /* RoachTheme.swift */; };
+		EE7E459C3EDF9AFBFA782F72 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31D4FE60A1211BDEF6F91A7 /* ChatView.swift */; };
+		EF91928349E813965D59C1EF /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F067D51EE15AC6DC06FBBB61 /* AppModel.swift */; };
+		F6A8FF3A1D46EDCBDAFCD098 /* AppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFA838206A9FBC1BC781A1E8 /* AppsView.swift */; };
+		F9D47686EBBB1CB2BDEE3275 /* VaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95726BE0F40AB11A0A25559E /* VaultView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1EB868173AB286F738EAF81E /* VaultView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VaultView.swift; path = RoachNetCompanion/Features/Vault/VaultView.swift; sourceTree = "<group>"; };
-		4DD7A807623C8AB1267417A7 /* generate_xcodeproj.rb */ = {isa = PBXFileReference; includeInIndex = 1; name = generate_xcodeproj.rb; path = scripts/generate_xcodeproj.rb; sourceTree = "<group>"; };
-		5312B1E70423E25ED99B9609 /* CompanionSupport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionSupport.swift; path = RoachNetCompanion/Core/CompanionSupport.swift; sourceTree = "<group>"; };
-		69AD5058D3899FF1DCC0531F /* RuntimeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RuntimeView.swift; path = RoachNetCompanion/Features/Runtime/RuntimeView.swift; sourceTree = "<group>"; };
-		7FDE60D0E3C56E79F27CDE50 /* AppsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppsView.swift; path = RoachNetCompanion/Features/Apps/AppsView.swift; sourceTree = "<group>"; };
-		8D8F74037D20FEC29785442A /* ConnectionSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionSettingsView.swift; path = RoachNetCompanion/Features/Shared/ConnectionSettingsView.swift; sourceTree = "<group>"; };
-		957E84297471D1D29CED6AA6 /* RoachNetCompanionApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachNetCompanionApp.swift; path = RoachNetCompanion/App/RoachNetCompanionApp.swift; sourceTree = "<group>"; };
-		96BA0C86A6682AE9F3AB0765 /* CompanionRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionRootView.swift; path = RoachNetCompanion/App/CompanionRootView.swift; sourceTree = "<group>"; };
-		A7DC5676626074121866C93C /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = RoachNetCompanion/Assets.xcassets; sourceTree = "<group>"; };
-		AE4F79DEBBA74E436EFE0526 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = RoachNetCompanion/Info.plist; sourceTree = "<group>"; };
-		B02066A89FA912B8ECF25CF5 /* ChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatView.swift; path = RoachNetCompanion/Features/Chat/ChatView.swift; sourceTree = "<group>"; };
-		BBF4171E5F45B35D7CDC9460 /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppModel.swift; path = RoachNetCompanion/App/AppModel.swift; sourceTree = "<group>"; };
-		C245BDE256C176F5FA53CBF8 /* CompanionModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionModels.swift; path = RoachNetCompanion/Core/CompanionModels.swift; sourceTree = "<group>"; };
-		CB8D50E9BCF6F7928171CA81 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		DBA5EEEBE3EE735A0092B066 /* RoachNetAPIClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachNetAPIClient.swift; path = RoachNetCompanion/Core/RoachNetAPIClient.swift; sourceTree = "<group>"; };
-		DC4835053FC48208452E23A3 /* RoachTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachTheme.swift; path = RoachNetCompanion/Features/Shared/RoachTheme.swift; sourceTree = "<group>"; };
-		DEC0552FD6E569051FA4CDEF /* RoachNetCompanion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoachNetCompanion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E16A7E8E16E36C4629B9ECE /* CompanionSupport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionSupport.swift; path = RoachNetCompanion/Core/CompanionSupport.swift; sourceTree = "<group>"; };
+		35699DDD7B574B8F813D06E2 /* RoachNetAPIClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachNetAPIClient.swift; path = RoachNetCompanion/Core/RoachNetAPIClient.swift; sourceTree = "<group>"; };
+		4945A389B783D93E3F00454F /* RoachTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachTheme.swift; path = RoachNetCompanion/Features/Shared/RoachTheme.swift; sourceTree = "<group>"; };
+		6385DAAA5E9E1263102CB1D8 /* CompanionRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionRootView.swift; path = RoachNetCompanion/App/CompanionRootView.swift; sourceTree = "<group>"; };
+		6468E721BF60A9597B3AC5DF /* RuntimeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RuntimeView.swift; path = RoachNetCompanion/Features/Runtime/RuntimeView.swift; sourceTree = "<group>"; };
+		72554530DD152D386F0E6DF0 /* RoachNetCompanion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoachNetCompanion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E89F2F2313C21D3C04C9D1A /* generate_xcodeproj.rb */ = {isa = PBXFileReference; includeInIndex = 1; name = generate_xcodeproj.rb; path = scripts/generate_xcodeproj.rb; sourceTree = "<group>"; };
+		90CC00F1664E29244966F60D /* CompanionModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionModels.swift; path = RoachNetCompanion/Core/CompanionModels.swift; sourceTree = "<group>"; };
+		92EB88E5B69279CD11550B08 /* RoachNetCompanionApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachNetCompanionApp.swift; path = RoachNetCompanion/App/RoachNetCompanionApp.swift; sourceTree = "<group>"; };
+		95726BE0F40AB11A0A25559E /* VaultView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VaultView.swift; path = RoachNetCompanion/Features/Vault/VaultView.swift; sourceTree = "<group>"; };
+		A6E1ACF704DCDC39E59B396C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		AB45CF6E1F088F83989BFB57 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = RoachNetCompanion/Assets.xcassets; sourceTree = "<group>"; };
+		AFA838206A9FBC1BC781A1E8 /* AppsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppsView.swift; path = RoachNetCompanion/Features/Apps/AppsView.swift; sourceTree = "<group>"; };
+		D165AD0F62E6491BDD35599C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = RoachNetCompanion/Info.plist; sourceTree = "<group>"; };
+		D31D4FE60A1211BDEF6F91A7 /* ChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatView.swift; path = RoachNetCompanion/Features/Chat/ChatView.swift; sourceTree = "<group>"; };
+		E4950314D04711C11627C321 /* ConnectionSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionSettingsView.swift; path = RoachNetCompanion/Features/Shared/ConnectionSettingsView.swift; sourceTree = "<group>"; };
+		F067D51EE15AC6DC06FBBB61 /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppModel.swift; path = RoachNetCompanion/App/AppModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		CDD7D6B15DF3826DA01EC48B /* Frameworks */ = {
+		60727E70CDEE7995BB96D8DC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2553D76C944BE2A5FE1A6287 /* Foundation.framework in Frameworks */,
+				8F118EC7AD4722F79BF51DD9 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		19646D89196A153BF90CF0D2 /* Products */ = {
+		729ABA9EFBD6C432B56BFD35 /* RoachNetCompanion */ = {
 			isa = PBXGroup;
 			children = (
-				DEC0552FD6E569051FA4CDEF /* RoachNetCompanion.app */,
+				F067D51EE15AC6DC06FBBB61 /* AppModel.swift */,
+				6385DAAA5E9E1263102CB1D8 /* CompanionRootView.swift */,
+				92EB88E5B69279CD11550B08 /* RoachNetCompanionApp.swift */,
+				90CC00F1664E29244966F60D /* CompanionModels.swift */,
+				1E16A7E8E16E36C4629B9ECE /* CompanionSupport.swift */,
+				35699DDD7B574B8F813D06E2 /* RoachNetAPIClient.swift */,
+				AFA838206A9FBC1BC781A1E8 /* AppsView.swift */,
+				D31D4FE60A1211BDEF6F91A7 /* ChatView.swift */,
+				6468E721BF60A9597B3AC5DF /* RuntimeView.swift */,
+				E4950314D04711C11627C321 /* ConnectionSettingsView.swift */,
+				4945A389B783D93E3F00454F /* RoachTheme.swift */,
+				95726BE0F40AB11A0A25559E /* VaultView.swift */,
+				D165AD0F62E6491BDD35599C /* Info.plist */,
+				AB45CF6E1F088F83989BFB57 /* Assets.xcassets */,
 			);
-			name = Products;
+			name = RoachNetCompanion;
 			sourceTree = "<group>";
 		};
-		1ABC3593477170C26314F3F3 /* iOS */ = {
+		7F9B6695B777F9B4A6881B19 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				CB8D50E9BCF6F7928171CA81 /* Foundation.framework */,
-			);
-			name = iOS;
-			sourceTree = "<group>";
-		};
-		87C6734AFAA577B6F0AA6CC3 = {
-			isa = PBXGroup;
-			children = (
-				19646D89196A153BF90CF0D2 /* Products */,
-				D61FDD7EFC926BD4BFF76C90 /* Frameworks */,
-				FA3D3A9FDA5FAF984106209C /* RoachNetCompanion */,
-				B8982B4DAC0681C5E2595A64 /* scripts */,
-			);
-			sourceTree = "<group>";
-		};
-		B8982B4DAC0681C5E2595A64 /* scripts */ = {
-			isa = PBXGroup;
-			children = (
-				4DD7A807623C8AB1267417A7 /* generate_xcodeproj.rb */,
-			);
-			name = scripts;
-			sourceTree = "<group>";
-		};
-		D61FDD7EFC926BD4BFF76C90 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				1ABC3593477170C26314F3F3 /* iOS */,
+				9AFF786BF0FA9A4FCD3BD0A0 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		FA3D3A9FDA5FAF984106209C /* RoachNetCompanion */ = {
+		9AFF786BF0FA9A4FCD3BD0A0 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				BBF4171E5F45B35D7CDC9460 /* AppModel.swift */,
-				96BA0C86A6682AE9F3AB0765 /* CompanionRootView.swift */,
-				957E84297471D1D29CED6AA6 /* RoachNetCompanionApp.swift */,
-				C245BDE256C176F5FA53CBF8 /* CompanionModels.swift */,
-				5312B1E70423E25ED99B9609 /* CompanionSupport.swift */,
-				DBA5EEEBE3EE735A0092B066 /* RoachNetAPIClient.swift */,
-				7FDE60D0E3C56E79F27CDE50 /* AppsView.swift */,
-				B02066A89FA912B8ECF25CF5 /* ChatView.swift */,
-				69AD5058D3899FF1DCC0531F /* RuntimeView.swift */,
-				8D8F74037D20FEC29785442A /* ConnectionSettingsView.swift */,
-				DC4835053FC48208452E23A3 /* RoachTheme.swift */,
-				1EB868173AB286F738EAF81E /* VaultView.swift */,
-				AE4F79DEBBA74E436EFE0526 /* Info.plist */,
-				A7DC5676626074121866C93C /* Assets.xcassets */,
+				A6E1ACF704DCDC39E59B396C /* Foundation.framework */,
 			);
-			name = RoachNetCompanion;
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		A0B7E4C6D5E59455A63F266D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				72554530DD152D386F0E6DF0 /* RoachNetCompanion.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DB3EE57602C8747E8CD1A1FC /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				8E89F2F2313C21D3C04C9D1A /* generate_xcodeproj.rb */,
+			);
+			name = scripts;
+			sourceTree = "<group>";
+		};
+		ED0C6AE979FA56309C448432 = {
+			isa = PBXGroup;
+			children = (
+				A0B7E4C6D5E59455A63F266D /* Products */,
+				7F9B6695B777F9B4A6881B19 /* Frameworks */,
+				729ABA9EFBD6C432B56BFD35 /* RoachNetCompanion */,
+				DB3EE57602C8747E8CD1A1FC /* scripts */,
+			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		639D0D30BD378CCA7B0D2910 /* RoachNetCompanion */ = {
+		BF6B8F432CAE728C00011AED /* RoachNetCompanion */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F4C52D1DC5B3A2F3CFC41CCE /* Build configuration list for PBXNativeTarget "RoachNetCompanion" */;
+			buildConfigurationList = 0489CAA37F994784D79FE63F /* Build configuration list for PBXNativeTarget "RoachNetCompanion" */;
 			buildPhases = (
-				8E652547929C6BCA82C6D2C5 /* Sources */,
-				CDD7D6B15DF3826DA01EC48B /* Frameworks */,
-				BF0FAFE925A8EB6422B38AFD /* Resources */,
+				BF36EDD95F43E2E77CC710D0 /* Sources */,
+				60727E70CDEE7995BB96D8DC /* Frameworks */,
+				9E0FD7F81A7FC139AAD4BFE6 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -135,20 +135,20 @@
 			);
 			name = RoachNetCompanion;
 			productName = RoachNetCompanion;
-			productReference = DEC0552FD6E569051FA4CDEF /* RoachNetCompanion.app */;
+			productReference = 72554530DD152D386F0E6DF0 /* RoachNetCompanion.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		B144E0981A6C27B4B86CB6AE /* Project object */ = {
+		35C778502A3DC50A16DBEA2A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1640;
 				ORGANIZATIONNAME = "AHG Records LLC";
 			};
-			buildConfigurationList = 673EBFFA02350AFDF9735C9A /* Build configuration list for PBXProject "RoachNetCompanion" */;
+			buildConfigurationList = FBB60DF0FD9F86761CD56D2A /* Build configuration list for PBXProject "RoachNetCompanion" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -156,53 +156,53 @@
 				en,
 				Base,
 			);
-			mainGroup = 87C6734AFAA577B6F0AA6CC3;
+			mainGroup = ED0C6AE979FA56309C448432;
 			minimizedProjectReferenceProxies = 0;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 19646D89196A153BF90CF0D2 /* Products */;
+			productRefGroup = A0B7E4C6D5E59455A63F266D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				639D0D30BD378CCA7B0D2910 /* RoachNetCompanion */,
+				BF6B8F432CAE728C00011AED /* RoachNetCompanion */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		BF0FAFE925A8EB6422B38AFD /* Resources */ = {
+		9E0FD7F81A7FC139AAD4BFE6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				840F7F14B474CEAF4E30DE14 /* Assets.xcassets in Resources */,
+				B4D8B289E0250877255CC858 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		8E652547929C6BCA82C6D2C5 /* Sources */ = {
+		BF36EDD95F43E2E77CC710D0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4D3E02B9AA1D33A82C2EC65 /* AppModel.swift in Sources */,
-				BA83D9E37368AB0F3EE1D07B /* CompanionRootView.swift in Sources */,
-				1308E8CA6F07836253CAD1D9 /* RoachNetCompanionApp.swift in Sources */,
-				7A42CA00EA4AA10078D378CF /* CompanionModels.swift in Sources */,
-				24E42AD0F072FA225769EF53 /* CompanionSupport.swift in Sources */,
-				5ABBC98576FC4DEAC4D56415 /* RoachNetAPIClient.swift in Sources */,
-				33FF226FE4BAC62B58585B01 /* AppsView.swift in Sources */,
-				42568C294FBF7FA982629108 /* ChatView.swift in Sources */,
-				D3620EC809D0F62B7FB3FD6F /* RuntimeView.swift in Sources */,
-				6A206860EDD35BDF4928C412 /* ConnectionSettingsView.swift in Sources */,
-				3AD2382ADFBACE7FB709D262 /* RoachTheme.swift in Sources */,
-				BB0E6386D79288372B118CE3 /* VaultView.swift in Sources */,
+				EF91928349E813965D59C1EF /* AppModel.swift in Sources */,
+				AE9952B6C0441B11B053E8F9 /* CompanionRootView.swift in Sources */,
+				A71E3FEDD5D5D05032229213 /* RoachNetCompanionApp.swift in Sources */,
+				53EB55C5240855DEBD6A2896 /* CompanionModels.swift in Sources */,
+				CF33A3DFE1A32F69716C054F /* CompanionSupport.swift in Sources */,
+				4D94E6737DA94F5623323862 /* RoachNetAPIClient.swift in Sources */,
+				F6A8FF3A1D46EDCBDAFCD098 /* AppsView.swift in Sources */,
+				EE7E459C3EDF9AFBFA782F72 /* ChatView.swift in Sources */,
+				23CBE9FAAB61456E1BDF7A7D /* RuntimeView.swift in Sources */,
+				D1B144FC5926B001D1F0152D /* ConnectionSettingsView.swift in Sources */,
+				D4BCCA06D7196E4B627D27B8 /* RoachTheme.swift in Sources */,
+				F9D47686EBBB1CB2BDEE3275 /* VaultView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		52245D80F554150A49826329 /* Debug */ = {
+		2C66FC9C1B5DF18515DE3C9C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -263,7 +263,7 @@
 			};
 			name = Debug;
 		};
-		65AE6D20A59E33D837FEF1CA /* Debug */ = {
+		6C0333EAF87D3668205DDBB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -287,7 +287,7 @@
 			};
 			name = Debug;
 		};
-		6DEF1136DA26FBF28DB5CCD2 /* Release */ = {
+		8436436542487511FD578676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -312,7 +312,7 @@
 			};
 			name = Release;
 		};
-		EC20818E497042EA3EBAC438 /* Release */ = {
+		A17D44562DC2A8B92C565528 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -369,25 +369,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		673EBFFA02350AFDF9735C9A /* Build configuration list for PBXProject "RoachNetCompanion" */ = {
+		0489CAA37F994784D79FE63F /* Build configuration list for PBXNativeTarget "RoachNetCompanion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				52245D80F554150A49826329 /* Debug */,
-				EC20818E497042EA3EBAC438 /* Release */,
+				8436436542487511FD578676 /* Release */,
+				6C0333EAF87D3668205DDBB2 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F4C52D1DC5B3A2F3CFC41CCE /* Build configuration list for PBXNativeTarget "RoachNetCompanion" */ = {
+		FBB60DF0FD9F86761CD56D2A /* Build configuration list for PBXProject "RoachNetCompanion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6DEF1136DA26FBF28DB5CCD2 /* Release */,
-				65AE6D20A59E33D837FEF1CA /* Debug */,
+				2C66FC9C1B5DF18515DE3C9C /* Debug */,
+				A17D44562DC2A8B92C565528 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = B144E0981A6C27B4B86CB6AE /* Project object */;
+	rootObject = 35C778502A3DC50A16DBEA2A /* Project object */;
 }
