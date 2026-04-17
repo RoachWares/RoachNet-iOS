@@ -8,7 +8,7 @@ enum RoachTheme {
     static let glassHighlight = Color.white.opacity(0.10)
     static let elevatedBorder = Color.white.opacity(0.14)
     static let border = Color.white.opacity(0.08)
-    static let primary = Color(red: 0.89, green: 0.32, blue: 0.70)
+    static let primary = Color(red: 0.5686, green: 0.2196, blue: 0.8471)
     static let secondary = Color(red: 0.33, green: 0.96, blue: 0.71)
     static let tertiary = Color(red: 0.36, green: 0.59, blue: 1.0)
     static let text = Color.white.opacity(0.94)
@@ -44,84 +44,99 @@ private struct RoachAmbientOrb: View {
 }
 
 struct RoachBackdrop: View {
-    @State private var sweep = false
-
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    RoachTheme.background,
-                    RoachTheme.backgroundRaised,
-                    Color(red: 0.05, green: 0.03, blue: 0.08),
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        TimelineView(.animation(minimumInterval: 1.0 / 24.0, paused: false)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate
+            let primaryDriftX = CGFloat(sin(t * 0.18)) * 16
+            let primaryDriftY = CGFloat(cos(t * 0.14)) * 12
+            let tertiaryDriftX = CGFloat(cos(t * 0.16)) * 12
+            let tertiaryDriftY = CGFloat(sin(t * 0.12)) * 10
+            let bandDriftX = CGFloat(sin(t * 0.09)) * 24
+            let bandDriftY = CGFloat(cos(t * 0.08)) * 14
 
-            RadialGradient(
-                colors: [
-                    RoachTheme.primary.opacity(0.24),
-                    .clear,
-                ],
-                center: .topTrailing,
-                startRadius: 12,
-                endRadius: 320
-            )
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        RoachTheme.background,
+                        RoachTheme.backgroundRaised,
+                        Color(red: 0.05, green: 0.03, blue: 0.08),
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
 
-            RadialGradient(
-                colors: [
-                    RoachTheme.secondary.opacity(0.18),
-                    .clear,
-                ],
-                center: .bottomLeading,
-                startRadius: 12,
-                endRadius: 300
-            )
+                RadialGradient(
+                    colors: [
+                        RoachTheme.primary.opacity(0.24),
+                        .clear,
+                    ],
+                    center: .topTrailing,
+                    startRadius: 12,
+                    endRadius: 320
+                )
 
-            GeometryReader { proxy in
-                Path { path in
-                    let step: CGFloat = 28
-                    stride(from: CGFloat.zero, through: proxy.size.width, by: step).forEach { x in
-                        path.move(to: CGPoint(x: x, y: 0))
-                        path.addLine(to: CGPoint(x: x, y: proxy.size.height))
-                    }
-                    stride(from: CGFloat.zero, through: proxy.size.height, by: step).forEach { y in
-                        path.move(to: CGPoint(x: 0, y: y))
-                        path.addLine(to: CGPoint(x: proxy.size.width, y: y))
-                    }
-                }
-                .stroke(Color.white.opacity(0.025), lineWidth: 0.5)
-            }
+                RadialGradient(
+                    colors: [
+                        RoachTheme.secondary.opacity(0.18),
+                        .clear,
+                    ],
+                    center: .bottomLeading,
+                    startRadius: 12,
+                    endRadius: 300
+                )
 
-            GeometryReader { proxy in
-                RoundedRectangle(cornerRadius: 120, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.clear,
-                                RoachTheme.secondary.opacity(0.16),
-                                RoachTheme.tertiary.opacity(0.12),
-                                Color.clear,
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: proxy.size.width * 0.74, height: 180)
+                Circle()
+                    .fill(RoachTheme.primary.opacity(0.14))
+                    .frame(width: 188, height: 188)
                     .blur(radius: 44)
-                    .rotationEffect(.degrees(-16))
-                    .offset(
-                        x: sweep ? proxy.size.width * 0.26 : -proxy.size.width * 0.36,
-                        y: sweep ? proxy.size.height * 0.10 : -proxy.size.height * 0.12
-                    )
-                    .opacity(0.42)
+                    .offset(x: 54 + primaryDriftX, y: -88 + primaryDriftY)
+
+                Circle()
+                    .fill(RoachTheme.tertiary.opacity(0.10))
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 30)
+                    .offset(x: -62 + tertiaryDriftX, y: 164 + tertiaryDriftY)
+
+                GeometryReader { proxy in
+                    Path { path in
+                        let step: CGFloat = 28
+                        stride(from: CGFloat.zero, through: proxy.size.width, by: step).forEach { x in
+                            path.move(to: CGPoint(x: x, y: 0))
+                            path.addLine(to: CGPoint(x: x, y: proxy.size.height))
+                        }
+                        stride(from: CGFloat.zero, through: proxy.size.height, by: step).forEach { y in
+                            path.move(to: CGPoint(x: 0, y: y))
+                            path.addLine(to: CGPoint(x: proxy.size.width, y: y))
+                        }
+                    }
+                    .stroke(Color.white.opacity(0.025), lineWidth: 0.5)
+                }
+
+                GeometryReader { proxy in
+                    RoundedRectangle(cornerRadius: 120, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.clear,
+                                    RoachTheme.secondary.opacity(0.16),
+                                    RoachTheme.tertiary.opacity(0.12),
+                                    Color.clear,
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: proxy.size.width * 0.48, height: 116)
+                        .blur(radius: 22)
+                        .rotationEffect(.degrees(-9))
+                        .offset(
+                            x: (-proxy.size.width * 0.04) + bandDriftX,
+                            y: (-proxy.size.height * 0.01) + bandDriftY
+                        )
+                        .opacity(0.18)
+                }
             }
-        }
-        .ignoresSafeArea()
-        .onAppear {
-            withAnimation(.easeInOut(duration: 16).repeatForever(autoreverses: true)) {
-                sweep = true
-            }
+            .ignoresSafeArea()
         }
     }
 }
@@ -129,7 +144,6 @@ struct RoachBackdrop: View {
 private struct RoachGlassChrome: View {
     let accent: Color
     let cornerRadius: CGFloat
-    @State private var drift = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -161,14 +175,29 @@ private struct RoachGlassChrome: View {
                             endPoint: .trailing
                         )
                     )
-                    .frame(width: proxy.size.width * 0.56, height: max(88, proxy.size.height * 0.44))
-                    .blur(radius: 28)
-                    .rotationEffect(.degrees(-16))
-                    .offset(
-                        x: drift ? proxy.size.width * 0.34 : -proxy.size.width * 0.28,
-                        y: drift ? proxy.size.height * 0.12 : -proxy.size.height * 0.10
+                    .frame(width: proxy.size.width * 0.38, height: max(66, proxy.size.height * 0.24))
+                    .blur(radius: 14)
+                    .rotationEffect(.degrees(-8))
+                    .offset(x: proxy.size.width * 0.02, y: -proxy.size.height * 0.02)
+                    .opacity(0.18)
+
+                RoundedRectangle(cornerRadius: 999, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.clear,
+                                Color.white.opacity(0.18),
+                                accent.opacity(0.16),
+                                Color.clear,
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
-                    .opacity(0.46)
+                    .frame(width: min(proxy.size.width * 0.42, 148), height: 1.25)
+                    .rotationEffect(.degrees(-10))
+                    .offset(x: proxy.size.width * 0.04, y: proxy.size.height * 0.60)
+                    .opacity(0.28)
 
                 Capsule(style: .continuous)
                     .fill(
@@ -178,18 +207,13 @@ private struct RoachGlassChrome: View {
                             endPoint: .trailing
                         )
                     )
-                    .frame(width: min(proxy.size.width * 0.42, 180), height: 3)
+                    .frame(width: min(proxy.size.width * 0.24, 108), height: 2)
                     .padding(.leading, 16)
                     .padding(.top, 12)
             }
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         }
         .allowsHitTesting(false)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 7).repeatForever(autoreverses: true)) {
-                drift = true
-            }
-        }
     }
 }
 
@@ -263,7 +287,6 @@ struct RoachPanel<Content: View>: View {
 struct RoachHeroPanel<Content: View>: View {
     let accent: Color
     let content: Content
-    @State private var drift = false
 
     init(accent: Color = RoachTheme.primary, @ViewBuilder content: () -> Content) {
         self.accent = accent
@@ -300,6 +323,25 @@ struct RoachHeroPanel<Content: View>: View {
                                 )
                             )
                     }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.clear,
+                                        Color.white.opacity(0.08),
+                                        accent.opacity(0.12),
+                                        Color.clear,
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: 180, height: 1.5)
+                            .rotationEffect(.degrees(-12))
+                            .offset(x: 18, y: 92)
+                            .blur(radius: 0.1)
+                    }
                     .overlay(
                         RoundedRectangle(cornerRadius: 28, style: .continuous)
                             .strokeBorder(
@@ -320,22 +362,12 @@ struct RoachHeroPanel<Content: View>: View {
                     }
                     .overlay(alignment: .topTrailing) {
                         RoachAmbientOrb(accent: accent, size: 132)
-                            .offset(x: drift ? 10 : -20, y: drift ? -12 : 16)
-                            .opacity(0.82)
-                    }
-                    .overlay(alignment: .bottomLeading) {
-                        RoachAmbientOrb(accent: RoachTheme.secondary, size: 94)
-                            .offset(x: drift ? -14 : 10, y: drift ? 18 : 42)
-                            .opacity(0.44)
+                            .offset(x: -4, y: 6)
+                            .opacity(0.28)
                     }
                     .shadow(color: Color.black.opacity(0.26), radius: 28, x: 0, y: 16)
                     .shadow(color: accent.opacity(0.08), radius: 34, x: 0, y: 20)
             )
-            .onAppear {
-                withAnimation(.easeInOut(duration: 7.2).repeatForever(autoreverses: true)) {
-                    drift = true
-                }
-            }
     }
 }
 
@@ -462,32 +494,26 @@ struct RoachTabBarItem: Identifiable {
 struct RoachFloatingTabBar: View {
     @Binding var selection: CompanionTab
     let items: [RoachTabBarItem]
-    @Namespace private var selectionMotion
-    @State private var drift = false
 
     var body: some View {
         HStack(spacing: 8) {
             ForEach(items) { item in
                 Button {
-                    withAnimation(.spring(response: 0.34, dampingFraction: 0.84)) {
-                        selection = item.tab
-                    }
+                    selection = item.tab
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: item.systemImage)
                             .font(.system(size: 14, weight: .semibold))
                             .frame(width: 18, height: 18)
 
-                        if selection == item.tab {
-                            Text(item.title)
-                                .font(.caption.weight(.bold))
-                                .lineLimit(1)
-                                .transition(.move(edge: .trailing).combined(with: .opacity))
-                        }
+                        Text(item.title)
+                            .font(.caption.weight(.bold))
+                            .lineLimit(1)
+                            .opacity(selection == item.tab ? 1 : 0.72)
                     }
                     .foregroundStyle(selection == item.tab ? Color.white : RoachTheme.subduedText)
                     .frame(maxWidth: .infinity)
-                    .padding(.horizontal, selection == item.tab ? 12 : 9)
+                    .padding(.horizontal, 12)
                     .padding(.vertical, 11)
                     .background {
                         Capsule(style: .continuous)
@@ -506,20 +532,17 @@ struct RoachFloatingTabBar: View {
                                     )
                             }
                             .overlay {
-                                if selection == item.tab {
-                                    Capsule(style: .continuous)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    item.accent.opacity(0.22),
-                                                    Color.clear,
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
+                                Capsule(style: .continuous)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                item.accent.opacity(selection == item.tab ? 0.22 : 0.04),
+                                                Color.clear,
+                                            ],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
                                         )
-                                        .matchedGeometryEffect(id: "roach-tab-pill", in: selectionMotion)
-                                }
+                                    )
                             }
                     }
                 }
@@ -559,21 +582,11 @@ struct RoachFloatingTabBar: View {
                         )
                         .blendMode(.screen)
                 )
-                .overlay(alignment: .topTrailing) {
-                    RoachAmbientOrb(accent: items.first(where: { $0.tab == selection })?.accent ?? RoachTheme.secondary, size: 76)
-                        .offset(x: drift ? 4 : -10, y: drift ? -8 : 10)
-                        .opacity(0.48)
-                }
                 .overlay(
                     RoachGlassChrome(accent: RoachTheme.secondary, cornerRadius: 26)
                 )
                 .shadow(color: Color.black.opacity(0.26), radius: 28, x: 0, y: 16)
         )
-        .onAppear {
-            withAnimation(.easeInOut(duration: 6.8).repeatForever(autoreverses: true)) {
-                drift = true
-            }
-        }
     }
 }
 
@@ -583,8 +596,6 @@ struct RoachShellDock: View {
     let accent: Color
     let status: String
     let secondaryStatus: String
-    @State private var drift = false
-
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(alignment: .center, spacing: 14) {
@@ -648,22 +659,15 @@ struct RoachShellDock: View {
                                 endPoint: .trailing
                             )
                         )
-                        .frame(width: 110, height: 3)
+                        .frame(width: 84, height: 2)
                         .padding(.top, 12)
                         .padding(.leading, 16)
                 }
                 .overlay(alignment: .topTrailing) {
-                    RoachAmbientOrb(accent: accent, size: 88)
-                        .offset(x: drift ? 8 : -12, y: drift ? -6 : 12)
-                        .opacity(0.7)
+                    EmptyView()
                 }
                 .shadow(color: Color.black.opacity(0.22), radius: 24, x: 0, y: 14)
         )
-        .onAppear {
-            withAnimation(.easeInOut(duration: 6.4).repeatForever(autoreverses: true)) {
-                drift = true
-            }
-        }
     }
 
     private var shellMark: some View {
@@ -690,9 +694,8 @@ struct RoachShellDock: View {
 
     private var shellCopy: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.bold))
-                .tracking(1.2)
+            Text(title)
+                .font(.caption.weight(.bold))
                 .foregroundStyle(accent.opacity(0.94))
 
             Text(detail)

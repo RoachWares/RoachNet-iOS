@@ -14,7 +14,7 @@ Use this when you want the RoachNet companion app on an iPhone or iPad without a
    `https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json`
 2. Copy or add that source URL inside SideStore.
 3. Install `RoachNetiOS` from the source list.
-4. If you want the direct file instead, download `RoachNetiOS-v0.1.2-unsigned.ipa` to Files.
+4. If you want the direct file instead, download `RoachNetiOS-v0.1.3-unsigned.ipa` to Files.
 5. In SideStore, go to `My Apps`, tap the add button, and pick the IPA from Files.
 6. Let SideStore sign and install it with your Apple ID.
 

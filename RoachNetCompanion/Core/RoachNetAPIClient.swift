@@ -404,6 +404,8 @@ struct RoachNetAPIClient {
         content: String,
         history: [CompanionChatMessage] = [],
         model: String? = nil,
+        images: [String] = [],
+        visionSummary: String? = nil,
         using connection: CompanionConnectionSettings
     ) async throws -> CompanionSendMessageResponse {
         var body: [String: Any] = ["content": content]
@@ -412,6 +414,12 @@ struct RoachNetAPIClient {
         }
         if let model, !model.isEmpty {
             body["model"] = model
+        }
+        if !images.isEmpty {
+            body["images"] = images
+        }
+        if let visionSummary, !visionSummary.isEmpty {
+            body["visionSummary"] = visionSummary
         }
         if !history.isEmpty {
             body["messages"] = history.map { message in

@@ -3,8 +3,6 @@ import SwiftUI
 struct CompanionRootView: View {
     @State private var model = CompanionAppModel()
     @State private var didPresentInitialSettings = false
-    private let shellSpring = Animation.spring(response: 0.32, dampingFraction: 0.86)
-
     private var tabItems: [RoachTabBarItem] {
         [
             RoachTabBarItem(tab: .chat, title: "Chat", systemImage: "message.fill", accent: RoachTheme.primary),
@@ -25,54 +23,6 @@ struct CompanionRootView: View {
         case .runtime:
             return RoachTheme.secondary
         }
-    }
-
-    private var shellTitle: String {
-        switch model.selectedTab {
-        case .chat:
-            return "RoachClaw"
-        case .vault:
-            return "Vault"
-        case .apps:
-            return "Apps"
-        case .runtime:
-            return "Runtime"
-        }
-    }
-
-    private var shellDetail: String {
-        switch model.selectedTab {
-        case .chat:
-            return model.connection.isConfigured
-                ? "Your threads travel with the account. The device bridge stays opt-in."
-                : "Offline-ready chat stays useful even before you link the desktop."
-        case .vault:
-            return "Notes, files, and references stay close to the phone instead of disappearing into tabs."
-        case .apps:
-            return "Queue packs cleanly, keep install state visible, and send the good stuff back to your RoachNet box."
-        case .runtime:
-            return "RoachTail, RoachSync, account state, and the machine health all live in one readable shell."
-        }
-    }
-
-    private var shellStatus: String {
-        model.connection.isConfigured ? model.connection.securityLabel : "Offline ready"
-    }
-
-    private var shellSecondaryStatus: String {
-        if let activeModelName = model.activeModelName, !activeModelName.isEmpty {
-            return activeModelName
-        }
-
-        if model.runtime?.account?.linked == true {
-            return "Account linked"
-        }
-
-        if model.queuedInstallCount > 0 {
-            return "\(model.queuedInstallCount) queued"
-        }
-
-        return "Local-first"
     }
 
     var body: some View {
@@ -104,26 +54,12 @@ struct CompanionRootView: View {
                     .tag(CompanionTab.runtime)
             }
             .toolbar(.hidden, for: .tabBar)
-            .animation(shellSpring, value: model.selectedTab)
-            .safeAreaPadding(.bottom, 108)
-        }
-        .animation(shellSpring, value: model.selectedTab)
-        .safeAreaInset(edge: .top, spacing: 0) {
-            RoachShellDock(
-                title: shellTitle,
-                detail: shellDetail,
-                accent: shellAccent,
-                status: shellStatus,
-                secondaryStatus: shellSecondaryStatus
-            )
-            .padding(.horizontal, 16)
-            .padding(.top, 10)
-            .padding(.bottom, 4)
+            .safeAreaPadding(.bottom, 96)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             RoachFloatingTabBar(selection: $model.selectedTab, items: tabItems)
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
+                .padding(.top, 6)
                 .padding(.bottom, 10)
         }
         .task {

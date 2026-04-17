@@ -41,7 +41,7 @@ struct RuntimeView: View {
                                 RoachSectionHeader(
                                     eyebrow: "Runtime",
                                     title: "Contained stack. No mystery boxes.",
-                                    detail: "RoachTail, RoachSync, account state, and the local runtime stay in one control surface."
+                                    detail: "RoachTail, RoachSync, account state, and the local runtime stay in one readable control surface."
                                 )
 
                                 if let lastRefreshAt = model.lastRefreshAt {
@@ -75,7 +75,7 @@ struct RuntimeView: View {
                             RoachSectionHeader(
                                 eyebrow: "Runtime",
                                 title: "Contained stack. No mystery boxes.",
-                                detail: "RoachTail, RoachSync, account state, and the local runtime stay in one control surface."
+                                detail: "RoachTail, RoachSync, account state, and the local runtime stay in one readable control surface."
                             )
 
                             if let lastRefreshAt = model.lastRefreshAt {
@@ -241,7 +241,7 @@ struct RuntimeView: View {
                     RoachSectionHeader(
                         eyebrow: "RoachTail",
                         title: roachTail.enabled ? "Private device lane is \(roachTail.status)." : "Private device lane is off.",
-                        detail: "RoachTail is the private overlay for mobile control, chat carryover, and remote installs."
+                        detail: "RoachTail is the private overlay for mobile control, thread carryover, and remote installs."
                     )
 
                     RoachMetricRow {
@@ -696,7 +696,7 @@ struct RuntimeView: View {
                 RoachSectionHeader(
                     eyebrow: "RoachClaw",
                     title: (model.runtime?.roachClaw.ready ?? false) ? "Local AI lane is ready." : "RoachClaw is warming up.",
-                    detail: model.runtime?.roachClaw.error ?? "Model selection, installed packs, and provider state all show here."
+                    detail: model.runtime?.roachClaw.error ?? "Model selection, installed packs, and provider state all show here without leaving the phone."
                 )
 
                 RoachMetricRow {

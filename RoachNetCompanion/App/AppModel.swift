@@ -1,5 +1,312 @@
+import AVFoundation
 import Foundation
 import Observation
+import Speech
+import UIKit
+import Vision
+
+struct CompanionVisionAttachment: Identifiable, Equatable {
+    let id: String
+    let filename: String
+    let imageData: Data
+    let previewData: Data
+    let pixelWidth: Int
+    let pixelHeight: Int
+    let summary: String
+    let ocrText: String
+
+    var previewImage: UIImage? {
+        UIImage(data: previewData) ?? UIImage(data: imageData)
+    }
+
+    var imageBase64: String {
+        imageData.base64EncodedString()
+    }
+}
+
+@MainActor
+final class CompanionSpeechController: NSObject {
+    enum SpeechError: LocalizedError {
+        case unavailable
+        case speechPermissionDenied
+        case microphonePermissionDenied
+        case startupFailed(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .unavailable:
+                return "RoachNetiOS could not bring up the local voice lane."
+            case .speechPermissionDenied:
+                return "Allow Speech Recognition for RoachNetiOS so it can capture voice prompts."
+            case .microphonePermissionDenied:
+                return "Allow Microphone access for RoachNetiOS so it can hear the prompt."
+            case .startupFailed(let detail):
+                return "RoachNetiOS could not start the voice lane: \(detail)"
+            }
+        }
+    }
+
+    private let audioEngine = AVAudioEngine()
+    private let synthesizer = AVSpeechSynthesizer()
+    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+    private var recognitionTask: SFSpeechRecognitionTask?
+    private var transcriptionUpdate: ((String) -> Void)?
+    private var transcriptionFinish: ((String) -> Void)?
+    private var speechFinish: ((Bool) -> Void)?
+    private var currentTranscript = ""
+    private var didFinalizeTranscript = false
+    private lazy var recognizer: SFSpeechRecognizer? = {
+        SFSpeechRecognizer(locale: Locale(identifier: "en-US")) ?? SFSpeechRecognizer()
+    }()
+
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+
+    func startTranscription(
+        onUpdate: @escaping (String) -> Void,
+        onFinish: @escaping (String) -> Void
+    ) async throws {
+        guard let recognizer, recognizer.isAvailable else {
+            throw SpeechError.unavailable
+        }
+
+        try await requestPermissions()
+        stopTranscription(commitResult: false)
+
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .defaultToSpeaker])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        } catch {
+            throw SpeechError.startupFailed(error.localizedDescription)
+        }
+
+        currentTranscript = ""
+        didFinalizeTranscript = false
+        transcriptionUpdate = onUpdate
+        transcriptionFinish = onFinish
+
+        let request = SFSpeechAudioBufferRecognitionRequest()
+        request.shouldReportPartialResults = true
+        if recognizer.supportsOnDeviceRecognition {
+            request.requiresOnDeviceRecognition = true
+        }
+        recognitionRequest = request
+
+        let inputNode = audioEngine.inputNode
+        let format = inputNode.outputFormat(forBus: 0)
+        inputNode.removeTap(onBus: 0)
+        inputNode.installTap(onBus: 0, bufferSize: 1_024, format: format) { [weak self] buffer, _ in
+            self?.recognitionRequest?.append(buffer)
+        }
+
+        recognitionTask = recognizer.recognitionTask(with: request) { [weak self] result, error in
+            guard let self else { return }
+            Task { @MainActor in
+                if let result {
+                    self.currentTranscript = result.bestTranscription.formattedString
+                    self.transcriptionUpdate?(self.currentTranscript)
+                    if result.isFinal {
+                        self.didFinalizeTranscript = true
+                        self.finishTranscription(notify: true)
+                        return
+                    }
+                }
+
+                if error != nil {
+                    self.finishTranscription(notify: true)
+                }
+            }
+        }
+
+        do {
+            audioEngine.prepare()
+            try audioEngine.start()
+        } catch {
+            inputNode.removeTap(onBus: 0)
+            recognitionTask?.cancel()
+            recognitionTask = nil
+            recognitionRequest = nil
+            throw SpeechError.startupFailed(error.localizedDescription)
+        }
+    }
+
+    func stopTranscription(commitResult: Bool = true) {
+        finishTranscription(notify: commitResult && !didFinalizeTranscript)
+    }
+
+    func speak(_ text: String, completion: @escaping (Bool) -> Void) {
+        stopSpeaking()
+
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            completion(false)
+            return
+        }
+
+        let utterance = AVSpeechUtterance(string: trimmed)
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.rate = 0.48
+        utterance.pitchMultiplier = 0.95
+        utterance.volume = 0.92
+        speechFinish = completion
+        synthesizer.speak(utterance)
+    }
+
+    func stopSpeaking() {
+        guard synthesizer.isSpeaking else {
+            speechFinish?(false)
+            speechFinish = nil
+            return
+        }
+
+        synthesizer.stopSpeaking(at: .immediate)
+    }
+
+    private func requestPermissions() async throws {
+        let speechAuth = await Self.requestSpeechAuthorization()
+        guard speechAuth == .authorized else {
+            throw SpeechError.speechPermissionDenied
+        }
+
+        let microphoneAllowed = await Self.requestMicrophoneAuthorization()
+        guard microphoneAllowed else {
+            throw SpeechError.microphonePermissionDenied
+        }
+    }
+
+    private func finishTranscription(notify: Bool) {
+        if audioEngine.isRunning {
+            audioEngine.stop()
+        }
+        audioEngine.inputNode.removeTap(onBus: 0)
+        recognitionRequest?.endAudio()
+        recognitionTask?.cancel()
+        recognitionRequest = nil
+        recognitionTask = nil
+
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+
+        let transcript = currentTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finishHandler = transcriptionFinish
+        currentTranscript = ""
+        didFinalizeTranscript = false
+        transcriptionUpdate = nil
+        transcriptionFinish = nil
+
+        if notify {
+            finishHandler?(transcript)
+        }
+    }
+
+    private static func requestSpeechAuthorization() async -> SFSpeechRecognizerAuthorizationStatus {
+        await withCheckedContinuation { continuation in
+            SFSpeechRecognizer.requestAuthorization { status in
+                continuation.resume(returning: status)
+            }
+        }
+    }
+
+    private static func requestMicrophoneAuthorization() async -> Bool {
+        await withCheckedContinuation { continuation in
+            if #available(iOS 17.0, *) {
+                AVAudioApplication.requestRecordPermission { granted in
+                    continuation.resume(returning: granted)
+                }
+            } else {
+                AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                    continuation.resume(returning: granted)
+                }
+            }
+        }
+    }
+
+    private func finishSpeechPlayback(_ finished: Bool) {
+        let completion = speechFinish
+        speechFinish = nil
+        completion?(finished)
+    }
+}
+
+extension CompanionSpeechController: AVSpeechSynthesizerDelegate {
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        Task { @MainActor [weak self] in
+            self?.finishSpeechPlayback(true)
+        }
+    }
+
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        Task { @MainActor [weak self] in
+            self?.finishSpeechPlayback(false)
+        }
+    }
+}
+
+enum CompanionVisionController {
+    enum VisionError: LocalizedError {
+        case invalidImage
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidImage:
+                return "RoachNetiOS could not read that image."
+            }
+        }
+    }
+
+    static func prepareAttachment(from data: Data, filename: String?) async throws -> CompanionVisionAttachment {
+        guard let image = UIImage(data: data), let cgImage = image.cgImage else {
+            throw VisionError.invalidImage
+        }
+
+        let previewData = image.jpegData(compressionQuality: 0.82) ?? data
+        let ocrText = await recognizeText(in: cgImage)
+        let resolvedFilename = filename?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+            ? filename!
+            : "Vision Capture"
+        let clippedOCR = String(ocrText.prefix(480))
+        let summary: String
+
+        if clippedOCR.isEmpty {
+            summary = "Image \(resolvedFilename) is \(cgImage.width)x\(cgImage.height). No dense text was detected locally, so use the image itself as the main visual context."
+        } else {
+            summary = "Image \(resolvedFilename) is \(cgImage.width)x\(cgImage.height). OCR highlights: \(clippedOCR)"
+        }
+
+        return CompanionVisionAttachment(
+            id: UUID().uuidString.lowercased(),
+            filename: resolvedFilename,
+            imageData: data,
+            previewData: previewData,
+            pixelWidth: cgImage.width,
+            pixelHeight: cgImage.height,
+            summary: summary,
+            ocrText: clippedOCR
+        )
+    }
+
+    private static func recognizeText(in cgImage: CGImage) async -> String {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let request = VNRecognizeTextRequest()
+                request.recognitionLevel = .accurate
+                request.usesLanguageCorrection = true
+
+                do {
+                    try VNImageRequestHandler(cgImage: cgImage, options: [:]).perform([request])
+                    let lines = (request.results ?? [])
+                        .compactMap { $0.topCandidates(1).first?.string.trimmingCharacters(in: .whitespacesAndNewlines) }
+                        .filter { !$0.isEmpty }
+                    continuation.resume(returning: Array(lines.prefix(8)).joined(separator: "\n"))
+                } catch {
+                    continuation.resume(returning: "")
+                }
+            }
+        }
+    }
+}
 
 enum CompanionTab: Hashable {
     case chat
@@ -34,9 +341,12 @@ final class CompanionAppModel {
     var selectedCategory = "Today"
     var selectedStoreItem: StoreAppItem?
     var draft = ""
+    var draftVisionAttachment: CompanionVisionAttachment?
     var searchText = ""
     var isBootstrapping = false
     var isSending = false
+    var isDictatingDraft = false
+    var speakingMessageID: String?
     var installingItemIDs = Set<String>()
     var actingServiceNames = Set<String>()
     var isActingRoachTail = false
@@ -48,6 +358,7 @@ final class CompanionAppModel {
 
     private static let roachTailPeerStorageKey = "RoachNetCompanionRoachTailPeerID"
     private let client = RoachNetAPIClient()
+    private let speechController = CompanionSpeechController()
     private let forceDemoMode = CompanionLaunchOptions.forceDemoMode
     private let roachTailPeerID: String = {
         if let existing = UserDefaults.standard.string(forKey: roachTailPeerStorageKey), !existing.isEmpty {
@@ -115,6 +426,27 @@ final class CompanionAppModel {
 
     var activeModelName: String? {
         currentSession?.model ?? runtime?.roachClaw.resolvedDefaultModel ?? runtime?.roachClaw.defaultModel
+    }
+
+    var canSendDraft: Bool {
+        !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || draftVisionAttachment != nil
+    }
+
+    var voiceStatusLabel: String {
+        if isDictatingDraft {
+            return "Listening"
+        }
+        if speakingMessageID != nil {
+            return "Speaking"
+        }
+        return "Tap to talk"
+    }
+
+    var visionStatusLabel: String {
+        if let draftVisionAttachment {
+            return "\(draftVisionAttachment.pixelWidth)x\(draftVisionAttachment.pixelHeight)"
+        }
+        return "Attach a frame"
     }
 
     var favoriteItems: [StoreAppItem] {
@@ -435,15 +767,28 @@ final class CompanionAppModel {
 
     func sendDraft() async {
         let trimmedDraft = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedDraft.isEmpty else { return }
+        let activeVisionAttachment = draftVisionAttachment
+        guard !trimmedDraft.isEmpty || activeVisionAttachment != nil else { return }
 
-        let draftToSend = trimmedDraft
+        if isDictatingDraft {
+            speechController.stopTranscription(commitResult: false)
+        }
+        if speakingMessageID != nil {
+            speechController.stopSpeaking()
+            speakingMessageID = nil
+        }
+
+        let draftToSend = trimmedDraft.isEmpty && activeVisionAttachment != nil
+            ? "Tell me what matters in this image."
+            : trimmedDraft
+        let outboundContent = composeOutboundPrompt(prompt: draftToSend, attachment: activeVisionAttachment)
+        let visibleContent = composeVisiblePrompt(prompt: draftToSend, attachment: activeVisionAttachment)
         let existingMessages = currentSession?.messages ?? []
         let activeSession = currentSession ?? makeLocalSession(title: "New Chat")
         let localMessage = CompanionChatMessage(
             rawID: FlexibleIdentifier("draft-\(UUID().uuidString)"),
             role: "user",
-            content: draftToSend,
+            content: visibleContent,
             createdAt: Date()
         )
 
@@ -455,6 +800,7 @@ final class CompanionAppModel {
             messages: existingMessages + [localMessage]
         )
         draft = ""
+        draftVisionAttachment = nil
         isSending = true
         defer {
             isSending = false
@@ -465,8 +811,11 @@ final class CompanionAppModel {
             do {
                 let response = try await client.sendMessage(
                     sessionID: activeSession.id.hasPrefix("local-") ? nil : activeSession.id,
-                    content: draftToSend,
+                    content: outboundContent,
                     history: existingMessages,
+                    model: activeModelName,
+                    images: activeVisionAttachment.map { [$0.imageBase64] } ?? [],
+                    visionSummary: activeVisionAttachment?.summary,
                     using: connection
                 )
 
@@ -489,7 +838,7 @@ final class CompanionAppModel {
         let assistantMessage = CompanionChatMessage(
             rawID: FlexibleIdentifier("offline-\(UUID().uuidString.lowercased())"),
             role: "assistant",
-            content: localOfflineAssistantReply(for: draftToSend),
+            content: localOfflineAssistantReply(for: outboundContent),
             createdAt: Date()
         )
 
@@ -510,6 +859,68 @@ final class CompanionAppModel {
             )
         )
         errorText = nil
+    }
+
+    func toggleDraftDictation() async {
+        if isDictatingDraft {
+            speechController.stopTranscription()
+            return
+        }
+
+        errorText = nil
+        bannerText = "Listening on-device."
+
+        do {
+            try await speechController.startTranscription { [weak self] transcript in
+                self?.draft = transcript
+            } onFinish: { [weak self] transcript in
+                self?.draft = transcript
+                self?.isDictatingDraft = false
+                self?.bannerText = transcript.isEmpty ? "Voice lane closed." : "Voice prompt ready."
+            }
+            isDictatingDraft = true
+        } catch {
+            isDictatingDraft = false
+            errorText = error.localizedDescription
+            bannerText = "Voice lane unavailable."
+        }
+    }
+
+    func toggleSpeech(for message: CompanionChatMessage) {
+        if speakingMessageID == message.id {
+            speechController.stopSpeaking()
+            speakingMessageID = nil
+            bannerText = "Reply playback stopped."
+            return
+        }
+
+        errorText = nil
+        speakingMessageID = message.id
+        bannerText = "Reading back the reply."
+        speechController.speak(message.content) { [weak self] finished in
+            Task { @MainActor in
+                guard let self else { return }
+                self.speakingMessageID = nil
+                self.bannerText = finished ? "Reply playback finished." : "Reply playback stopped."
+            }
+        }
+    }
+
+    func clearDraftVisionAttachment() {
+        draftVisionAttachment = nil
+        bannerText = "Vision capture removed."
+        errorText = nil
+    }
+
+    func attachVisionImage(data: Data, filename: String? = nil) async {
+        do {
+            draftVisionAttachment = try await CompanionVisionController.prepareAttachment(from: data, filename: filename)
+            bannerText = "Vision capture armed."
+            errorText = nil
+        } catch {
+            errorText = error.localizedDescription
+            bannerText = "Vision capture failed."
+        }
     }
 
     func install(_ item: StoreAppItem) async {
@@ -838,7 +1249,7 @@ final class CompanionAppModel {
     }
 
     private var currentAppVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.2"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.3"
     }
 
     private func submitInstallIntent(title: String, intent: StoreInstallIntent, matchedItemID: String?) async {
@@ -915,6 +1326,36 @@ final class CompanionAppModel {
         if !flushedTitles.isEmpty {
             bannerText = "\(flushedTitles.count) queued install\(flushedTitles.count == 1 ? "" : "s") reached RoachNet."
         }
+    }
+
+    private func composeOutboundPrompt(
+        prompt: String,
+        attachment: CompanionVisionAttachment?
+    ) -> String {
+        guard let attachment else { return prompt }
+
+        return """
+        \(prompt)
+
+        Vision context from iPhone:
+        \(attachment.summary)
+
+        If the active model supports images, use the attached image directly. If it does not, fall back to the OCR summary above and stay explicit about that limit.
+        """
+    }
+
+    private func composeVisiblePrompt(
+        prompt: String,
+        attachment: CompanionVisionAttachment?
+    ) -> String {
+        guard let attachment else { return prompt }
+
+        return """
+        \(prompt)
+
+        [Vision attachment: \(attachment.filename)]
+        \(attachment.summary)
+        """
     }
 
     private func localOfflineAssistantReply(for prompt: String) -> String {
