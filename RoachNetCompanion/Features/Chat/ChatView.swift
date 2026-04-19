@@ -23,7 +23,7 @@ struct ChatView: View {
 
     private var headerDetail: String {
         if model.runtime?.account?.linked == true {
-            return "Hosted lane open. The private route stays opt-in."
+            return "Hosted lane open. The private route still stays opt-in."
         }
 
         if model.pairedMachineName != nil {

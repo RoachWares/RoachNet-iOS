@@ -688,6 +688,21 @@ final class CompanionAppModel {
         }
     }
 
+    func openPairedRoute(_ routePath: String) {
+        guard let baseURL = connection.resolvedBaseURL else {
+            settingsPresented = true
+            bannerText = "Pair the Mac before opening that shelf."
+            return
+        }
+
+        guard let url = URL(string: routePath, relativeTo: baseURL)?.absoluteURL else {
+            errorText = "Could not open that paired shelf."
+            return
+        }
+
+        UIApplication.shared.open(url)
+    }
+
     func loadCatalog() async throws {
         let response = try await client.fetchCatalog(from: appsCatalogURL)
         catalogItems = response.items

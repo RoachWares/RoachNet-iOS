@@ -707,6 +707,42 @@ enum CompanionDemoState {
                 lastAccessedAt: Date().addingTimeInterval(-4_200)
             ),
         ],
+        atlasShelves: [
+            CompanionVaultShelfItem(
+                id: "great-lakes",
+                title: "Great Lakes",
+                detail: "Regional atlas pack ready for the paired desktop map shelf.",
+                kind: "atlas",
+                status: "Ready on shelf",
+                actionLabel: "Open atlas",
+                routePath: "/maps",
+                installed: true
+            ),
+        ],
+        studyShelves: [
+            CompanionVaultShelfItem(
+                id: "field-medicine",
+                title: "Field Medicine",
+                detail: "Offline study shelf mirrored from the desktop coursework lane.",
+                kind: "study",
+                status: "Ready · core",
+                actionLabel: "Open study shelf",
+                routePath: "/docs/home",
+                installed: true
+            ),
+        ],
+        referenceShelves: [
+            CompanionVaultShelfItem(
+                id: "wikipedia-mini",
+                title: "Wikipedia Mini",
+                detail: "Contained offline reference package for the paired reading lane.",
+                kind: "reference",
+                status: "Current reference",
+                actionLabel: "Open reference",
+                routePath: "/docs/home",
+                installed: true
+            ),
+        ],
         issues: []
     )
 }

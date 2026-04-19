@@ -885,11 +885,107 @@ struct RoachBrainMemorySummary: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
+struct CompanionVaultShelfItem: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let title: String
+    let detail: String
+    let kind: String
+    let status: String
+    let actionLabel: String?
+    let routePath: String?
+    let installed: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case detail
+        case kind
+        case status
+        case actionLabel
+        case routePath
+        case installed
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? container.decode(String.self, forKey: .id)) ?? UUID().uuidString
+        title = (try? container.decode(String.self, forKey: .title)) ?? "Vault shelf"
+        detail = (try? container.decode(String.self, forKey: .detail)) ?? ""
+        kind = (try? container.decode(String.self, forKey: .kind)) ?? "shelf"
+        status = (try? container.decode(String.self, forKey: .status)) ?? "Ready"
+        actionLabel = try? container.decodeIfPresent(String.self, forKey: .actionLabel)
+        routePath = try? container.decodeIfPresent(String.self, forKey: .routePath)
+        installed = (try? container.decode(Bool.self, forKey: .installed)) ?? false
+    }
+
+    init(
+        id: String,
+        title: String,
+        detail: String,
+        kind: String,
+        status: String,
+        actionLabel: String? = nil,
+        routePath: String? = nil,
+        installed: Bool
+    ) {
+        self.id = id
+        self.title = title
+        self.detail = detail
+        self.kind = kind
+        self.status = status
+        self.actionLabel = actionLabel
+        self.routePath = routePath
+        self.installed = installed
+    }
+}
+
 struct CompanionVaultSummary: Codable, Hashable, Sendable {
     let knowledgeFiles: [String]
     let siteArchives: [CompanionSiteArchive]
     let roachBrain: [RoachBrainMemorySummary]
+    let atlasShelves: [CompanionVaultShelfItem]
+    let studyShelves: [CompanionVaultShelfItem]
+    let referenceShelves: [CompanionVaultShelfItem]
     let issues: [CompanionIssue]
+
+    enum CodingKeys: String, CodingKey {
+        case knowledgeFiles
+        case siteArchives
+        case roachBrain
+        case atlasShelves
+        case studyShelves
+        case referenceShelves
+        case issues
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        knowledgeFiles = (try? container.decode([String].self, forKey: .knowledgeFiles)) ?? []
+        siteArchives = (try? container.decode([CompanionSiteArchive].self, forKey: .siteArchives)) ?? []
+        roachBrain = (try? container.decode([RoachBrainMemorySummary].self, forKey: .roachBrain)) ?? []
+        atlasShelves = (try? container.decode([CompanionVaultShelfItem].self, forKey: .atlasShelves)) ?? []
+        studyShelves = (try? container.decode([CompanionVaultShelfItem].self, forKey: .studyShelves)) ?? []
+        referenceShelves = (try? container.decode([CompanionVaultShelfItem].self, forKey: .referenceShelves)) ?? []
+        issues = (try? container.decode([CompanionIssue].self, forKey: .issues)) ?? []
+    }
+
+    init(
+        knowledgeFiles: [String],
+        siteArchives: [CompanionSiteArchive],
+        roachBrain: [RoachBrainMemorySummary],
+        atlasShelves: [CompanionVaultShelfItem] = [],
+        studyShelves: [CompanionVaultShelfItem] = [],
+        referenceShelves: [CompanionVaultShelfItem] = [],
+        issues: [CompanionIssue]
+    ) {
+        self.knowledgeFiles = knowledgeFiles
+        self.siteArchives = siteArchives
+        self.roachBrain = roachBrain
+        self.atlasShelves = atlasShelves
+        self.studyShelves = studyShelves
+        self.referenceShelves = referenceShelves
+        self.issues = issues
+    }
 }
 
 struct CompanionBootstrapResponse: Codable, Sendable {

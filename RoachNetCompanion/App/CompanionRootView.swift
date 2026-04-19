@@ -5,7 +5,7 @@ struct CompanionRootView: View {
     @State private var didPresentInitialSettings = false
     private var tabItems: [RoachTabBarItem] {
         [
-            RoachTabBarItem(tab: .chat, title: "Chat", systemImage: "message.fill", accent: RoachTheme.primary),
+            RoachTabBarItem(tab: .chat, title: "RoachClaw", systemImage: "message.fill", accent: RoachTheme.primary),
             RoachTabBarItem(tab: .vault, title: "Vault", systemImage: "archivebox.fill", accent: RoachTheme.secondary),
             RoachTabBarItem(tab: .apps, title: "Apps", systemImage: "square.grid.2x2.fill", accent: RoachTheme.tertiary),
             RoachTabBarItem(tab: .runtime, title: "Runtime", systemImage: "switch.2", accent: RoachTheme.secondary),

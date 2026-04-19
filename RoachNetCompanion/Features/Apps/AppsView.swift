@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AppsView: View {
     @Bindable var model: CompanionAppModel
-    private let columns = [GridItem(.adaptive(minimum: 148), spacing: 14)]
+    private let columns = [GridItem(.adaptive(minimum: 172), spacing: 14)]
 
     var body: some View {
         NavigationStack {
@@ -48,8 +48,8 @@ struct AppsView: View {
                 HStack(alignment: .top, spacing: 12) {
                     RoachSectionHeader(
                         eyebrow: "Apps",
-                        title: "Curated installs, same shelf.",
-                        detail: "Maps, courses, models, and references, with the same install handoff the desktop already understands."
+                        title: "Bring the useful parts home.",
+                        detail: "Maps, courses, models, and references move through the same install handoff the desktop already understands."
                     )
 
                     Spacer(minLength: 8)
@@ -184,24 +184,18 @@ struct AppsView: View {
                         .padding(.vertical, 1)
                     }
 
-                    HStack(spacing: 10) {
-                        Button(displayInstallLabel(for: item)) {
-                            Task { await model.install(item) }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(RoachTheme.primary)
-
-                        Button("Details") {
-                            model.selectedStoreItem = item
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(RoachTheme.secondary)
-                    }
+                    StoreActionStrip(
+                        model: model,
+                        item: item,
+                        accent: RoachTheme.primary,
+                        includesFavorite: false,
+                        preferHorizontal: true
+                    )
                 }
             } else {
                 EmptyStateView(
                     title: "Apps catalog",
-                    detail: "The companion app pulls the same install lanes that ship from apps.roachnet.org.",
+                    detail: "The companion app pulls the same install lanes that ship from apps.roachnet.org, just closer to hand.",
                     actionTitle: nil,
                     action: nil
                 )
@@ -259,7 +253,7 @@ struct AppsView: View {
         VStack(alignment: .leading, spacing: 8) {
             RoachSectionHeader(
                 eyebrow: model.selectedCategory,
-                title: model.selectedCategory == "Today" ? "The fast start shelf." : "\(model.selectedCategory) installs.",
+                title: model.selectedCategory == "Today" ? "The fast start shelf." : "\(model.selectedCategory) brought closer.",
                 detail: model.categoryDescription(for: model.selectedCategory)
             )
 
@@ -538,28 +532,11 @@ private struct AppCard: View {
 
                 Spacer(minLength: 0)
 
-                HStack(spacing: 10) {
-                    Button {
-                        model.toggleFavorite(item)
-                    } label: {
-                        Image(systemName: model.isFavorite(item) ? "heart.fill" : "heart")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary)
-
-                    Button(displayInstallLabel(for: item)) {
-                        Task { await model.install(item) }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(roachAccentColor(for: item.accent))
-                    .disabled(model.installingItemIDs.contains(item.id))
-
-                    Button("More") {
-                        model.selectedStoreItem = item
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(RoachTheme.secondary)
-                }
+                StoreActionStrip(
+                    model: model,
+                    item: item,
+                    accent: roachAccentColor(for: item.accent)
+                )
             }
             .frame(maxWidth: .infinity, minHeight: 246, alignment: .topLeading)
         }
@@ -634,6 +611,7 @@ private struct AppDetailSheet: View {
                                 }
                                 .buttonStyle(.borderedProminent)
                                 .tint(RoachTheme.primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
                     }
@@ -649,6 +627,89 @@ private struct AppDetailSheet: View {
                 }
             }
         }
+    }
+}
+
+private struct StoreActionStrip: View {
+    @Bindable var model: CompanionAppModel
+    let item: StoreAppItem
+    let accent: Color
+    var includesFavorite = true
+    var preferHorizontal = false
+
+    private var isInstalling: Bool {
+        model.installingItemIDs.contains(item.id)
+    }
+
+    var body: some View {
+        Group {
+            if preferHorizontal {
+                ViewThatFits(in: .horizontal) {
+                    horizontalLayout
+                    verticalLayout
+                }
+            } else {
+                verticalLayout
+            }
+        }
+    }
+
+    private var horizontalLayout: some View {
+        HStack(spacing: 10) {
+            installButton
+            detailsButton
+            if includesFavorite {
+                favoriteButton
+                    .frame(width: 46)
+            }
+        }
+    }
+
+    private var verticalLayout: some View {
+        VStack(spacing: 8) {
+            installButton
+
+            HStack(spacing: 8) {
+                detailsButton
+                if includesFavorite {
+                    favoriteButton
+                        .frame(width: 46)
+                }
+            }
+        }
+    }
+
+    private var installButton: some View {
+        Button {
+            Task { await model.install(item) }
+        } label: {
+            Label(isInstalling ? "Installing…" : displayInstallLabel(for: item), systemImage: isInstalling ? "hourglass" : "square.and.arrow.down")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(accent)
+        .disabled(isInstalling)
+    }
+
+    private var detailsButton: some View {
+        Button("Details") {
+            model.selectedStoreItem = item
+        }
+        .buttonStyle(.bordered)
+        .tint(RoachTheme.secondary)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var favoriteButton: some View {
+        Button {
+            model.toggleFavorite(item)
+        } label: {
+            Image(systemName: model.isFavorite(item) ? "heart.fill" : "heart")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary)
     }
 }
 
