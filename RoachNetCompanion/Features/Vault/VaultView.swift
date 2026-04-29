@@ -291,15 +291,21 @@ struct VaultView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(vault.knowledgeFiles.prefix(8), id: \.self) { file in
-                                        CompanionVaultShelfCard(
-                                            eyebrow: fileShelfEyebrow(for: file),
-                                            title: URL(fileURLWithPath: file).lastPathComponent,
-                                            detail: file,
-                                            systemImage: fileShelfIcon(for: file),
-                                            accent: fileShelfAccent(for: file),
-                                            tags: [fileShelfAction(for: file), "Vault lane"]
-                                        )
-                                        .frame(width: shelfCardWidth)
+                                        Button {
+                                            model.openPairedRoute("/knowledge-base")
+                                        } label: {
+                                            CompanionVaultShelfCard(
+                                                eyebrow: fileShelfEyebrow(for: file),
+                                                title: URL(fileURLWithPath: file).lastPathComponent,
+                                                detail: file,
+                                                systemImage: fileShelfIcon(for: file),
+                                                accent: fileShelfAccent(for: file),
+                                                tags: [fileShelfAction(for: file), "Open on Mac"]
+                                            )
+                                            .frame(width: shelfCardWidth)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(!model.connection.isConfigured)
                                     }
                                 }
                             }
@@ -320,15 +326,21 @@ struct VaultView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     ForEach(vault.siteArchives.prefix(6)) { archive in
-                                        CompanionVaultShelfCard(
-                                            eyebrow: "Captured web",
-                                            title: archive.title ?? archive.slug,
-                                            detail: archive.note ?? archive.sourceUrl ?? "Offline capture ready.",
-                                            systemImage: "globe.badge.chevron.backward",
-                                            accent: RoachTheme.tertiary,
-                                            tags: ["Offline shelf", "Vault lane"]
-                                        )
-                                        .frame(width: shelfCardWidth)
+                                        Button {
+                                            model.openPairedRoute("/site-archives")
+                                        } label: {
+                                            CompanionVaultShelfCard(
+                                                eyebrow: "Captured web",
+                                                title: archive.title ?? archive.slug,
+                                                detail: archive.note ?? archive.sourceUrl ?? "Offline capture ready.",
+                                                systemImage: "globe.badge.chevron.backward",
+                                                accent: RoachTheme.tertiary,
+                                                tags: ["Offline shelf", "Open on Mac"]
+                                            )
+                                            .frame(width: shelfCardWidth)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(!model.connection.isConfigured)
                                     }
                                 }
                             }
@@ -463,6 +475,7 @@ private struct CompanionVaultShelfCard: View {
     let systemImage: String
     let accent: Color
     let tags: [String]
+    @State private var isAlive = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -515,5 +528,17 @@ private struct CompanionVaultShelfCard: View {
                         .strokeBorder(accent.opacity(0.22), lineWidth: 1)
                 )
         )
+        .scaleEffect(isAlive ? 1.012 : 0.992)
+        .rotation3DEffect(
+            .degrees(isAlive ? 1.8 : -1.2),
+            axis: (x: 0.0, y: 1.0, z: 0.0),
+            perspective: 0.55
+        )
+        .shadow(color: accent.opacity(isAlive ? 0.22 : 0.10), radius: isAlive ? 18 : 10, x: 0, y: isAlive ? 10 : 5)
+        .task {
+            withAnimation(.easeInOut(duration: 2.7).repeatForever(autoreverses: true)) {
+                isAlive = true
+            }
+        }
     }
 }

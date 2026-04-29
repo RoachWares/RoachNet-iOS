@@ -609,8 +609,28 @@ private struct AppDetailSheet: View {
                                 Button(displayInstallLabel(for: item)) {
                                     Task { await model.install(item) }
                                 }
-                                .buttonStyle(.borderedProminent)
-                                .tint(RoachTheme.primary)
+                                .font(.subheadline.weight(.black))
+                                .foregroundStyle(Color.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 13)
+                                .background(
+                                    Capsule(style: .continuous)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    roachAccentColor(for: item.accent).opacity(0.96),
+                                                    RoachTheme.primary.opacity(0.72),
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                )
+                                .overlay(
+                                    Capsule(style: .continuous)
+                                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                                )
+                                .buttonStyle(.plain)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
@@ -684,20 +704,53 @@ private struct StoreActionStrip: View {
             Task { await model.install(item) }
         } label: {
             Label(isInstalling ? "Installing…" : displayInstallLabel(for: item), systemImage: isInstalling ? "hourglass" : "square.and.arrow.down")
+                .font(.caption.weight(.black))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
                 .frame(maxWidth: .infinity)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 11)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [accent.opacity(0.95), accent.opacity(0.62)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                )
+                .overlay(
+                    Capsule(style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                )
         }
-        .buttonStyle(.borderedProminent)
-        .tint(accent)
+        .buttonStyle(.plain)
+        .foregroundStyle(Color.white)
         .disabled(isInstalling)
+        .opacity(isInstalling ? 0.72 : 1)
     }
 
     private var detailsButton: some View {
         Button("Details") {
             model.selectedStoreItem = item
         }
-        .buttonStyle(.bordered)
-        .tint(RoachTheme.secondary)
+        .font(.caption.weight(.bold))
+        .lineLimit(1)
+        .minimumScaleFactor(0.78)
         .frame(maxWidth: .infinity)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            Capsule(style: .continuous)
+                .fill(RoachTheme.elevatedSurface.opacity(0.95))
+        )
+        .overlay(
+            Capsule(style: .continuous)
+                .strokeBorder(RoachTheme.secondary.opacity(0.32), lineWidth: 1)
+        )
+        .foregroundStyle(RoachTheme.text)
+        .buttonStyle(.plain)
     }
 
     private var favoriteButton: some View {
@@ -708,8 +761,17 @@ private struct StoreActionStrip: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.bordered)
-        .tint(model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary)
+        .frame(height: 38)
+        .background(
+            Circle()
+                .fill((model.isFavorite(item) ? RoachTheme.primary : RoachTheme.elevatedSurface).opacity(0.94))
+        )
+        .overlay(
+            Circle()
+                .strokeBorder((model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary).opacity(0.34), lineWidth: 1)
+        )
+        .foregroundStyle(model.isFavorite(item) ? Color.white : RoachTheme.text)
+        .buttonStyle(.plain)
     }
 }
 
