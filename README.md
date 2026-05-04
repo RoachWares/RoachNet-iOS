@@ -5,8 +5,8 @@ Phone lane for RoachClaw, vault reads, runtime control, and RoachNet Apps instal
 RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls back to cached RoachBrain replies when the desktop or internet drops away.
 
 [RoachNet iOS page](https://roachnet.org/iOS/)<br>
-[IPA release](https://github.com/AHGRoach/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.4-unsigned.ipa)<br>
-[SideStore source](https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json)<br>
+[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.4-unsigned.ipa)<br>
+[SideStore source](https://raw.githubusercontent.com/RoachWares/RoachNet-SideStore/main/apps.json)<br>
 [SideStore notes](./docs/sidestore.md)
 
 ## What It Does
@@ -34,7 +34,7 @@ Artifacts:
 Install flow:
 
 1. Add the RoachNet source in SideStore:
-   `https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json`
+   `https://raw.githubusercontent.com/RoachWares/RoachNet-SideStore/main/apps.json`
 2. Install `RoachNetiOS` from the source, or fall back to the IPA if you want the direct file.
 3. Let SideStore or AltStore sign it with your Apple ID.
 4. Open `RoachNetiOS` and pair the desktop lane.
@@ -62,7 +62,7 @@ The same install intents used on `apps.roachnet.org` are forwarded through the c
 ## Build
 
 ```bash
-git clone https://github.com/AHGRoach/RoachNet-iOS.git
+git clone https://github.com/RoachWares/RoachNet-iOS.git
 cd RoachNet-iOS
 ruby scripts/generate_xcodeproj.rb
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \

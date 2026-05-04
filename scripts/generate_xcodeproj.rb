@@ -12,7 +12,7 @@ FileUtils.rm_rf(PROJECT_PATH)
 
 project = Xcodeproj::Project.new(PROJECT_PATH)
 project.root_object.attributes['LastUpgradeCheck'] = '1640'
-project.root_object.attributes['ORGANIZATIONNAME'] = 'AHG Records LLC'
+project.root_object.attributes['ORGANIZATIONNAME'] = 'RoachWares LLC'
 
 main_group = project.main_group
 app_group = main_group.new_group('RoachNetCompanion')
@@ -54,7 +54,7 @@ end
 
 target.build_configurations.each do |config|
   config.build_settings['PRODUCT_NAME'] = TARGET_NAME
-  config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.ahgrecords.RoachNetCompanion'
+  config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.roachwares.RoachNetCompanion'
   config.build_settings['INFOPLIST_FILE'] = 'RoachNetCompanion/Info.plist'
   config.build_settings['GENERATE_INFOPLIST_FILE'] = 'NO'
   config.build_settings['SWIFT_VERSION'] = '5.0'
