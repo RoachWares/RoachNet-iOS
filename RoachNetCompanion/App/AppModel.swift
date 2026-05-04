@@ -1264,7 +1264,7 @@ final class CompanionAppModel {
     }
 
     private var currentAppVersion: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.3"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.4"
     }
 
     private func submitInstallIntent(title: String, intent: StoreInstallIntent, matchedItemID: String?) async {

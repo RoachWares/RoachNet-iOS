@@ -4,9 +4,9 @@ Phone lane for RoachClaw, vault reads, runtime control, and RoachNet Apps instal
 
 RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls back to cached RoachBrain replies when the desktop or internet drops away.
 
-[RoachNet iOS page](https://roachnet.org/iOS/)  
-[IPA release](https://github.com/AHGRoach/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.3-unsigned.ipa)  
-[SideStore source](https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json)  
+[RoachNet iOS page](https://roachnet.org/iOS/)<br>
+[IPA release](https://github.com/AHGRoach/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.4-unsigned.ipa)<br>
+[SideStore source](https://raw.githubusercontent.com/AHGRoach/RoachNet-SideStore/main/apps.json)<br>
 [SideStore notes](./docs/sidestore.md)
 
 ## What It Does
@@ -28,8 +28,8 @@ Builds are shipped as unsigned IPAs for SideStore or AltStore, and the preferred
 
 Artifacts:
 
-- `dist/RoachNetiOS-v0.1.3-unsigned.ipa`
-- `dist/RoachNetiOS-v0.1.3-unsigned.ipa.sha256`
+- `dist/RoachNetiOS-v0.1.4-unsigned.ipa`
+- `dist/RoachNetiOS-v0.1.4-unsigned.ipa.sha256`
 
 Install flow:
 
