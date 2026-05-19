@@ -70,5 +70,6 @@ target.build_configurations.each do |config|
   config.build_settings['INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents'] = 'YES'
 end
 
+project.predictabilize_uuids
 project.save
 puts "Generated #{PROJECT_PATH}"
