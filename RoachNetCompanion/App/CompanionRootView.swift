@@ -3,6 +3,8 @@ import SwiftUI
 struct CompanionRootView: View {
     @State private var model = CompanionAppModel()
     @State private var didPresentInitialSettings = false
+    @State private var tabBarMinY: CGFloat = .infinity
+    @State private var keyboardVisible = false
     private var tabItems: [RoachTabBarItem] {
         [
             RoachTabBarItem(tab: .home, title: "Home", systemImage: "house", accent: RoachTheme.secondary),
@@ -37,6 +39,7 @@ struct CompanionRootView: View {
             RoachBackdrop()
 
             selectedContent
+                .environment(\.roachTabBarMinY, tabBarMinY)
                 .id(model.selectedTab)
                 .padding(.bottom, bottomAvoidance)
                 .transition(.asymmetric(
@@ -54,10 +57,26 @@ struct CompanionRootView: View {
                 .allowsHitTesting(false)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            RoachFloatingTabBar(selection: $model.selectedTab, items: tabItems)
-                .padding(.horizontal, 16)
-                .padding(.top, 2)
-                .padding(.bottom, 2)
+            // The tab bar steps aside while the keyboard is up so the composer gets the room.
+            if !keyboardVisible {
+                RoachFloatingTabBar(selection: $model.selectedTab, items: tabItems)
+                    .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minY } action: { minY in
+                        tabBarMinY = minY
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 2)
+                    .padding(.bottom, 2)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            withAnimation(.easeOut(duration: 0.2)) {
+                keyboardVisible = true
+                tabBarMinY = .infinity
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation(.easeOut(duration: 0.2)) { keyboardVisible = false }
         }
         .task {
             if

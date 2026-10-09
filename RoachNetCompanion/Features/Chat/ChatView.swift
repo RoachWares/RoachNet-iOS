@@ -6,6 +6,7 @@ struct ChatView: View {
     @Bindable var model: CompanionAppModel
     @FocusState private var composerFocused: Bool
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var tabBarOverlap: CGFloat = 0
 
     private var promptSuggestions: [String] {
         [
@@ -49,11 +50,17 @@ struct ChatView: View {
                     banner
                     content
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    composer
                 }
                 .padding(.horizontal, isCompact ? 14 : 16)
                 .padding(.top, isCompact ? 8 : 12)
-                .padding(.bottom, 6)
+                // The composer is pinned to the bottom of the safe area (above the floating
+                // tab bar and the keyboard) so a long thread can never push it off screen.
+                .safeAreaInset(edge: .bottom, spacing: isCompact ? 8 : 12) {
+                    composer
+                        .padding(.horizontal, isCompact ? 14 : 16)
+                        .padding(.bottom, 6 + tabBarOverlap)
+                }
+                .roachTabBarOverlap($tabBarOverlap)
             }
             .navigationBarHidden(true)
             .sheet(isPresented: Binding(
@@ -448,21 +455,35 @@ struct ChatView: View {
                     visionAttachmentPreview(attachment)
                 }
 
-                voiceControlStrip
+                if horizontalSizeClass == .compact {
+                    // iPhone: one row. The full voice strip only shows while dictating.
+                    if model.isDictatingDraft {
+                        voiceControlStrip
+                    }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .bottom, spacing: 12) {
+                    HStack(alignment: .bottom, spacing: 8) {
                         composerUtilityButtons
+                        compactMicButton
                         composerField
                         composerSendButton
                     }
+                } else {
+                    voiceControlStrip
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        composerUtilityButtons
-
+                    ViewThatFits(in: .horizontal) {
                         HStack(alignment: .bottom, spacing: 12) {
+                            composerUtilityButtons
                             composerField
                             composerSendButton
+                        }
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            composerUtilityButtons
+
+                            HStack(alignment: .bottom, spacing: 12) {
+                                composerField
+                                composerSendButton
+                            }
                         }
                     }
                 }
@@ -492,6 +513,25 @@ struct ChatView: View {
             }
             .buttonStyle(.plain)
         }
+    }
+
+    private var compactMicButton: some View {
+        Button {
+            Task { await model.toggleDraftDictation() }
+        } label: {
+            Image(systemName: model.isDictatingDraft ? "stop.fill" : "mic.fill")
+                .font(RoachType.subheadline(.semibold))
+                .foregroundStyle(model.isDictatingDraft ? Color.black : RoachTheme.secondary)
+                .frame(width: 38, height: 38)
+                .background(
+                    Circle()
+                        .fill(model.isDictatingDraft ? RoachTheme.secondary : RoachTheme.elevatedSurface)
+                        .overlay(Circle().strokeBorder(RoachTheme.border, lineWidth: 1))
+                )
+        }
+        .buttonStyle(RoachPressableButtonStyle(scale: 0.94))
+        .accessibilityLabel(model.isDictatingDraft ? "Stop local speech capture" : "Start local speech capture")
+        .accessibilityIdentifier("chat.mic")
     }
 
     private var voiceControlStrip: some View {
@@ -676,12 +716,14 @@ struct ChatView: View {
                         .font(.system(size: 22, weight: .semibold))
                 }
 
-                Text(model.isSending ? "Sending" : "Send")
-                    .font(RoachType.subheadline(.bold))
+                if horizontalSizeClass != .compact {
+                    Text(model.isSending ? "Sending" : "Send")
+                        .font(RoachType.subheadline(.bold))
+                }
             }
             .foregroundStyle(Color.white)
-            .padding(.horizontal, 15)
-            .padding(.vertical, 12)
+            .padding(.horizontal, horizontalSizeClass == .compact ? 9 : 15)
+            .padding(.vertical, horizontalSizeClass == .compact ? 8 : 12)
             .background(
                 Capsule(style: .continuous)
                     .fill(RoachTheme.primary)
@@ -690,6 +732,7 @@ struct ChatView: View {
         }
         .buttonStyle(RoachPressableButtonStyle(scale: 0.972))
         .accessibilityIdentifier("chat.send")
+        .accessibilityLabel(model.isSending ? "Sending" : "Send")
         .disabled(model.isSending || !model.canSendDraft)
         .opacity(model.isSending || !model.canSendDraft ? 0.62 : 1)
     }

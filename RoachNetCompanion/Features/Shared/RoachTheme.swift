@@ -473,10 +473,59 @@ struct RoachTabBarItem: Identifiable {
 }
 
 enum RoachCompanionChrome {
-    /// The tab bar is a `safeAreaInset`, so scrolling content already flows under it;
-    /// these only add breathing room at the end of a scroll view.
+    /// Tabs clear the floating tab bar with `roachTabBarScrollClearance()` /
+    /// `roachTabBarOverlap(_:)`; these only add breathing room at the end of a scroll view.
     static let tabBarAvoidance: CGFloat = 0
     static let bottomContentClearance: CGFloat = 28
+}
+
+extension EnvironmentValues {
+    /// Global top edge of the floating tab bar, published by the root view.
+    @Entry var roachTabBarMinY: CGFloat = .infinity
+}
+
+/// The tab bar's safe-area inset doesn't reach views inside a `NavigationStack`, so
+/// a tab measures how far its own frame runs under the tab bar and clears that much.
+/// When the inset does arrive (or the keyboard is up) the overlap is simply zero.
+struct RoachTabBarOverlap: ViewModifier {
+    @Environment(\.roachTabBarMinY) private var tabBarMinY
+    @Binding var overlap: CGFloat
+    @State private var frameMaxY: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).maxY } action: { maxY in
+                frameMaxY = maxY
+                update()
+            }
+            .onChange(of: tabBarMinY) { _, _ in update() }
+    }
+
+    private func update() {
+        let value = tabBarMinY.isFinite ? max(0, (frameMaxY - tabBarMinY).rounded()) : 0
+        if abs(value - overlap) >= 1 { overlap = value }
+    }
+}
+
+/// Scroll views: keep the last row reachable above the floating tab bar.
+struct RoachTabBarScrollClearance: ViewModifier {
+    @State private var overlap: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .contentMargins(.bottom, overlap, for: .scrollContent)
+            .modifier(RoachTabBarOverlap(overlap: $overlap))
+    }
+}
+
+extension View {
+    func roachTabBarOverlap(_ overlap: Binding<CGFloat>) -> some View {
+        modifier(RoachTabBarOverlap(overlap: overlap))
+    }
+
+    func roachTabBarScrollClearance() -> some View {
+        modifier(RoachTabBarScrollClearance())
+    }
 }
 
 /// The v4 floating capsule tab bar: mono caps labels, the current tab in a signal-deep

@@ -15,6 +15,15 @@ struct AppsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
                         storeHeader
+                        if model.catalogError != nil {
+                            HStack(spacing: 8) {
+                                RoachDot(accent: RoachTheme.amber)
+                                Text("The Apps catalog is offline. Showing the last shelf this phone loaded.")
+                                    .font(RoachType.caption(.semibold))
+                                    .foregroundStyle(RoachTheme.subduedText)
+                            }
+                            .accessibilityIdentifier("apps.catalogOffline")
+                        }
                         searchField
                         appHandoffPanel
                         categoryStrip
@@ -29,9 +38,7 @@ struct AppsView: View {
                     .padding(16)
                     .padding(.bottom, RoachCompanionChrome.bottomContentClearance)
                 }
-                .safeAreaInset(edge: .bottom, spacing: 0) {
-                    Color.clear.frame(height: RoachCompanionChrome.tabBarAvoidance)
-                }
+                .roachTabBarScrollClearance()
                 .refreshable {
                     try? await model.loadCatalog()
                     if model.connection.isConfigured {

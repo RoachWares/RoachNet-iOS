@@ -21,6 +21,7 @@ struct HomeView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollIndicators(.hidden)
+        .roachTabBarScrollClearance()
         .refreshable { await model.refreshAll() }
         .accessibilityIdentifier("screen.home")
     }

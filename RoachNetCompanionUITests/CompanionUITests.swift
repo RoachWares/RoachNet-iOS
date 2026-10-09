@@ -47,6 +47,25 @@ final class CompanionUITests: XCTestCase {
         app.buttons["org.done"].tap()
     }
 
+    /// The RoachClaw composer must sit above the floating tab bar and take typing.
+    func testChatComposerSitsAboveTheTabBar() throws {
+        let tab = app.buttons["tab.roachclaw"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 15))
+        tab.tap()
+        sleep(1)
+
+        let composer = app.textFields["chat.composer"].firstMatch
+        XCTAssertTrue(composer.waitForExistence(timeout: 10), "Composer missing")
+        let tabBar = app.buttons["tab.home"].firstMatch
+        print("composer frame \(composer.frame), tab bar button frame \(tabBar.frame), window \(app.windows.firstMatch.frame)")
+        XCTAssertLessThanOrEqual(composer.frame.maxY, tabBar.frame.minY, "Composer is hidden behind the tab bar")
+        XCTAssertTrue(composer.isHittable, "Composer can't be tapped")
+        composer.tap()
+        composer.typeText("Check the water filter")
+        XCTAssertTrue(app.buttons["chat.send"].firstMatch.isHittable, "Send can't be tapped with the keyboard up")
+        snapshot("10-roachclaw-typing")
+    }
+
     func testConnectionSheetOffersRoachTailPairing() throws {
         let connection = app.buttons["home.connection"]
         XCTAssertTrue(connection.waitForExistence(timeout: 15))

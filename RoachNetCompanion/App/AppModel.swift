@@ -478,6 +478,8 @@ final class CompanionAppModel {
     var errorText: String?
     var historyPresented = false
     var settingsPresented = false
+    /// Set when the web Apps catalog couldn't be reached; the shelf keeps its cached items.
+    var catalogError: String?
     var orgPresented = false
 
     // RoachClaw Org (desktop 1.1+)
@@ -858,15 +860,24 @@ final class CompanionAppModel {
                 vault = bootstrap.vault
                 sessionList = bootstrap.sessions
 
-                if
-                    currentSession == nil || sessionList.contains(where: { $0.id == currentSession?.id }) == false,
-                    let firstSession = bootstrap.sessions.first
-                {
-                    try? await loadSession(firstSession.id)
+                if currentSession == nil || sessionList.contains(where: { $0.id == currentSession?.id }) == false {
+                    if let firstSession = bootstrap.sessions.first {
+                        try? await loadSession(firstSession.id)
+                    } else if currentSession?.id.hasPrefix("local-") != true {
+                        // A paired Mac with no threads yet: drop the preview thread instead of
+                        // sending the first message into a session the Mac has never heard of.
+                        currentSession = nil
+                    }
                 }
             }
 
-            try await loadCatalog()
+            // The Apps catalog comes from the web. Being offline must not knock a paired
+            // phone back into preview mode, so a catalog miss keeps the cached shelf.
+            do {
+                try await loadCatalog()
+            } catch where connection.isConfigured {
+                catalogError = error.localizedDescription
+            }
 
             if connection.isConfigured {
                 await flushPendingInstallQueue()
@@ -892,7 +903,11 @@ final class CompanionAppModel {
             if catalogItems.isEmpty {
                 try? await loadCatalog()
             }
-            applyDemoStateIfNeeded()
+            // Preview data is only for a phone that has never been paired. A paired phone
+            // keeps its last real state and shows the error instead.
+            if !connection.isConfigured {
+                applyDemoStateIfNeeded()
+            }
         }
     }
 
@@ -914,6 +929,7 @@ final class CompanionAppModel {
     func loadCatalog() async throws {
         let response = try await client.fetchCatalog(from: appsCatalogURL)
         catalogItems = response.items
+        catalogError = nil
 
         if selectedCategory != "Today", !categories.contains(selectedCategory) {
             selectedCategory = "Today"
@@ -1992,7 +2008,15 @@ final class CompanionAppModel {
 
         connection.save()
         selectedTab = .runtime
-        bannerText = "RoachTail pairing data loaded."
         errorText = nil
+        if connection.token.isEmpty {
+            // A pair link without a token still needs the "Pair with RoachTail" step, so
+            // open the connection sheet with the details filled in instead of leaving the
+            // user to find it.
+            bannerText = nil
+            settingsPresented = true
+        } else {
+            bannerText = "RoachTail pairing data loaded."
+        }
     }
 }
