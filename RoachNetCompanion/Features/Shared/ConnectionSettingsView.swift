@@ -57,7 +57,7 @@ struct ConnectionSettingsView: View {
 
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Companion URL")
-                                    .font(.caption.weight(.semibold))
+                                    .font(RoachType.caption(.semibold))
                                     .foregroundStyle(RoachTheme.subduedText)
 
                                 TextField("http://RoachNet:38111", text: $model.connection.baseURL)
@@ -69,7 +69,7 @@ struct ConnectionSettingsView: View {
 
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("RoachTail join code")
-                                    .font(.caption.weight(.semibold))
+                                    .font(RoachType.caption(.semibold))
                                     .foregroundStyle(RoachTheme.subduedText)
 
                                 TextField("ROACH-ABCDE-12345", text: $model.connection.pairCode)
@@ -80,14 +80,14 @@ struct ConnectionSettingsView: View {
 
                                 if let scannerError, !scannerError.isEmpty {
                                     Text(scannerError)
-                                        .font(.caption)
+                                        .font(RoachType.caption)
                                         .foregroundStyle(RoachTheme.primary)
                                 }
                             }
 
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Companion token")
-                                    .font(.caption.weight(.semibold))
+                                    .font(RoachType.caption(.semibold))
                                     .foregroundStyle(RoachTheme.subduedText)
 
                                 SecureField("Paste the RoachNet companion token", text: $model.connection.token)
@@ -123,7 +123,7 @@ struct ConnectionSettingsView: View {
                                         : "Pair once with the join code to mint a private RoachTail bridge token for this device."
                                 )
                             }
-                            .font(.caption)
+                            .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
@@ -146,7 +146,7 @@ struct ConnectionSettingsView: View {
                                 Text("Companion tokens live in the iOS Keychain instead of plain user defaults.")
                                 Text("Remote bridges must be HTTPS. Plain HTTP is limited to trusted local RoachNet lanes such as RoachTail, localhost, and private network hosts.")
                             }
-                            .font(.caption)
+                            .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
@@ -174,7 +174,7 @@ struct ConnectionSettingsView: View {
                                     Text(account.savedAppsSyncEnabled ? "Saved app picks can follow the account lane." : "Saved app picks stay local until sync is armed.")
                                     Text(account.hostedChatEnabled ? "Hosted RoachClaw is allowed for this account." : "Hosted RoachClaw is off for this account.")
                                 }
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
 
                                 if !account.notes.isEmpty {
@@ -183,7 +183,7 @@ struct ConnectionSettingsView: View {
                                             Text(note)
                                         }
                                     }
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                                 }
                             } else {
@@ -191,7 +191,7 @@ struct ConnectionSettingsView: View {
                                     Text("The website lane is where account auth, hosted RoachClaw, and future synced settings live.")
                                     Text("Desktop data still stays grouped inside the contained RoachNet folder and the RoachTail/RoachSync lanes.")
                                 }
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
                             }
 
@@ -200,14 +200,14 @@ struct ConnectionSettingsView: View {
                                     Text("Open account lane")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .buttonStyle(RoachButtonStyle(kind: .primary, size: .compact))
                                 .tint(RoachTheme.primary)
 
                                 Link(destination: CompanionAppModel.apiDocsURL) {
                                     Text("API docs")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .tint(RoachTheme.secondary)
                             }
                         }
@@ -219,7 +219,7 @@ struct ConnectionSettingsView: View {
                                 scannerError = nil
                                 scannerPresented = true
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.tertiary)
 
                             Button("Pair with RoachTail") {
@@ -230,7 +230,7 @@ struct ConnectionSettingsView: View {
                                     }
                                 }
                             }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(RoachButtonStyle(kind: .signal, size: .compact))
                             .tint(RoachTheme.secondary)
 
                             Button("Save & Test") {
@@ -240,7 +240,7 @@ struct ConnectionSettingsView: View {
                                     dismiss()
                                 }
                             }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(RoachButtonStyle(kind: .primary, size: .compact))
                             .tint(RoachTheme.primary)
 
                             Button("Refresh") {
@@ -248,7 +248,7 @@ struct ConnectionSettingsView: View {
                                     await model.refreshAll()
                                 }
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.secondary)
                         }
 
@@ -257,7 +257,7 @@ struct ConnectionSettingsView: View {
                                 scannerError = nil
                                 scannerPresented = true
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.tertiary)
 
                             Button("Pair with RoachTail") {
@@ -268,7 +268,7 @@ struct ConnectionSettingsView: View {
                                     }
                                 }
                             }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(RoachButtonStyle(kind: .signal, size: .compact))
                             .tint(RoachTheme.secondary)
 
                             Button("Save & Test") {
@@ -278,7 +278,7 @@ struct ConnectionSettingsView: View {
                                     dismiss()
                                 }
                             }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(RoachButtonStyle(kind: .primary, size: .compact))
                             .tint(RoachTheme.primary)
 
                             Button("Refresh") {
@@ -286,7 +286,7 @@ struct ConnectionSettingsView: View {
                                     await model.refreshAll()
                                 }
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.secondary)
                         }
                     }
@@ -303,7 +303,7 @@ struct ConnectionSettingsView: View {
                                 model.clearConnection()
                                 dismiss()
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.primary)
                         }
                     }
@@ -326,15 +326,15 @@ struct ConnectionSettingsView: View {
                     } else {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("QR scanning is not available on this device right now.")
-                                .font(.headline)
+                                .font(RoachType.headline())
                                 .foregroundStyle(RoachTheme.text)
                             Text("Paste the bridge URL and RoachTail join code manually, or retry on a camera-capable device.")
-                                .font(.body)
+                                .font(RoachType.body)
                                 .foregroundStyle(RoachTheme.subduedText)
                             Button("Close") {
                                 scannerPresented = false
                             }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(RoachButtonStyle(kind: .signal, size: .compact))
                             .tint(RoachTheme.secondary)
                         }
                         .padding(24)

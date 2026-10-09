@@ -900,6 +900,36 @@ struct CompanionRoachTailPairResponse: Codable, Hashable, Sendable {
     let peerId: String
     let bridgeUrl: String?
     let state: CompanionRoachTailStatus?
+
+    enum CodingKeys: String, CodingKey {
+        case success, message, token, peerToken, peerId, bridgeUrl, state
+    }
+
+    /// Accepts both the v1.0.5 shape (`token`, `peerId`) and the 1.0.6 native shape
+    /// (`peerToken`, peer id inside `state`), so pairing works with either desktop.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        success = try? c.decodeIfPresent(Bool.self, forKey: .success)
+        message = try? c.decodeIfPresent(String.self, forKey: .message)
+        let token = (try? c.decodeIfPresent(String.self, forKey: .token)) ?? (try? c.decodeIfPresent(String.self, forKey: .peerToken)) ?? nil
+        guard let token, !token.isEmpty else {
+            throw DecodingError.keyNotFound(CodingKeys.token, .init(codingPath: c.codingPath, debugDescription: "The desktop did not return a RoachTail peer token."))
+        }
+        self.token = token
+        peerId = (try? c.decodeIfPresent(String.self, forKey: .peerId)) ?? ""
+        bridgeUrl = try? c.decodeIfPresent(String.self, forKey: .bridgeUrl)
+        state = try? c.decodeIfPresent(CompanionRoachTailStatus.self, forKey: .state)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(success, forKey: .success)
+        try c.encodeIfPresent(message, forKey: .message)
+        try c.encode(token, forKey: .token)
+        try c.encode(peerId, forKey: .peerId)
+        try c.encodeIfPresent(bridgeUrl, forKey: .bridgeUrl)
+        try c.encodeIfPresent(state, forKey: .state)
+    }
 }
 
 struct CompanionRoachTailPairingPayload: Codable, Hashable, Sendable {

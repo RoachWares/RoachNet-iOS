@@ -139,7 +139,7 @@ struct AppsView: View {
             }
         } label: {
             Label(model.connection.isConfigured ? "Refresh bridge" : "Pair the Mac", systemImage: model.connection.isConfigured ? "arrow.clockwise" : "qrcode.viewfinder")
-                .font(.caption.weight(.black))
+                .font(RoachType.caption(.black))
                 .lineLimit(1)
                 .minimumScaleFactor(0.76)
                 .frame(minWidth: 132)
@@ -174,9 +174,9 @@ struct AppsView: View {
                         model.selectedTab = .chat
                     } label: {
                         Image(systemName: "message.fill")
-                            .font(.headline)
+                            .font(RoachType.headline())
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                     .tint(RoachTheme.secondary)
                 }
 
@@ -267,17 +267,17 @@ struct AppsView: View {
 
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Today".uppercased())
-                                .font(.caption.weight(.bold))
+                                .font(RoachType.caption(.bold))
                                 .foregroundStyle(RoachTheme.secondary)
                                 .tracking(1.2)
 
                             Text(item.title)
-                                .font(.system(size: 20, weight: .black, design: .rounded))
+                                .font(RoachType.display(20))
                                 .foregroundStyle(RoachTheme.text)
                                 .lineLimit(2)
 
                             Text(item.summary)
-                                .font(.subheadline)
+                                .font(RoachType.subheadline())
                                 .foregroundStyle(RoachTheme.subduedText)
                                 .lineLimit(2)
                         }
@@ -391,7 +391,7 @@ struct AppsView: View {
         if !model.favoriteItems.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Saved")
-                    .font(.headline)
+                    .font(RoachType.headline())
                     .foregroundStyle(RoachTheme.text)
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -410,7 +410,7 @@ struct AppsView: View {
         if !model.recentInstallItems.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Recently sent")
-                    .font(.headline)
+                    .font(RoachType.headline())
                     .foregroundStyle(RoachTheme.text)
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -429,12 +429,12 @@ struct AppsView: View {
         if !model.pendingInstallQueue.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Queued for desktop")
-                    .font(.headline)
+                    .font(RoachType.headline())
                     .foregroundStyle(RoachTheme.text)
 
                 HStack {
                     Text("These will flush after the companion bridge comes back.")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
 
                     Spacer(minLength: 8)
@@ -445,7 +445,7 @@ struct AppsView: View {
                         Label("Clear", systemImage: "trash")
                             .labelStyle(.iconOnly)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                     .tint(RoachTheme.primary)
                     .accessibilityLabel("Clear queued installs")
                 }
@@ -456,7 +456,7 @@ struct AppsView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 HStack(alignment: .top, spacing: 8) {
                                     Text(item.title)
-                                        .font(.subheadline.weight(.semibold))
+                                        .font(RoachType.subheadline(.semibold))
                                         .foregroundStyle(RoachTheme.text)
                                         .lineLimit(2)
 
@@ -466,7 +466,7 @@ struct AppsView: View {
                                         model.removeQueuedInstall(item)
                                     } label: {
                                         Image(systemName: "xmark")
-                                            .font(.caption.weight(.bold))
+                                            .font(RoachType.caption(.bold))
                                     }
                                     .buttonStyle(.plain)
                                     .foregroundStyle(RoachTheme.subduedText)
@@ -474,7 +474,7 @@ struct AppsView: View {
                                 }
 
                                 Text("Queued \(formattedRelativeDate(item.createdAt))")
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                             .frame(width: 180, alignment: .leading)
@@ -499,7 +499,7 @@ struct AppsView: View {
         if !model.spotlightItems.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text(model.selectedCategory == "Today" ? "Quick installs" : "Spotlight")
-                    .font(.headline)
+                    .font(RoachType.headline())
                     .foregroundStyle(RoachTheme.text)
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -522,10 +522,10 @@ struct AppsView: View {
                         .tint(RoachTheme.primary)
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Loading Apps catalog")
-                            .font(.headline)
+                            .font(RoachType.headline())
                             .foregroundStyle(RoachTheme.text)
                         Text("Pulling install metadata and shelf definitions.")
-                            .font(.subheadline)
+                            .font(RoachType.subheadline())
                             .foregroundStyle(RoachTheme.subduedText)
                     }
                     Spacer()
@@ -552,7 +552,7 @@ private struct InstallFlowStep: View {
     var body: some View {
         HStack(spacing: 9) {
             Image(systemName: systemImage)
-                .font(.caption.weight(.bold))
+                .font(RoachType.caption(.bold))
                 .foregroundStyle(Color.white)
                 .frame(width: 30, height: 30)
                 .background(
@@ -567,11 +567,11 @@ private struct InstallFlowStep: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title.uppercased())
-                    .font(.caption2.weight(.black))
+                    .font(RoachType.caption2(.black))
                     .foregroundStyle(accent)
                     .tracking(0.8)
                 Text(detail)
-                    .font(.caption.weight(.semibold))
+                    .font(RoachType.caption(.semibold))
                     .foregroundStyle(RoachTheme.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.74)
@@ -605,14 +605,14 @@ private struct CompactStoreStat: View {
                     .shadow(color: accent.opacity(0.35), radius: 8, x: 0, y: 0)
 
                 Text(title)
-                    .font(.caption.weight(.bold))
+                    .font(RoachType.caption(.bold))
                     .foregroundStyle(RoachTheme.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
 
             Text(detail)
-                .font(.caption2)
+                .font(RoachType.caption2)
                 .foregroundStyle(RoachTheme.subduedText)
                 .lineLimit(2)
         }
@@ -650,18 +650,18 @@ private struct SpotlightCard: View {
 
                     if let size = item.size {
                         Text(size)
-                            .font(.caption2)
+                            .font(RoachType.caption2)
                             .foregroundStyle(RoachTheme.subduedText)
                     }
                 }
 
                 Text(item.title)
-                    .font(.headline)
+                    .font(RoachType.headline())
                     .foregroundStyle(RoachTheme.text)
                     .lineLimit(2)
 
                 Text(item.subtitle)
-                    .font(.caption)
+                    .font(RoachType.caption)
                     .foregroundStyle(RoachTheme.subduedText)
                     .lineLimit(2)
             }
@@ -696,35 +696,35 @@ private struct AppCard: View {
                     Spacer()
                     if let size = item.size {
                         Text(size)
-                            .font(.caption)
+                            .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(item.title)
-                        .font(.headline)
+                        .font(RoachType.headline())
                         .foregroundStyle(RoachTheme.text)
                         .lineLimit(2)
 
                     Text(item.subtitle)
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
                         .lineLimit(2)
 
                     Text(item.summary)
-                        .font(.subheadline)
+                        .font(RoachType.subheadline())
                         .foregroundStyle(RoachTheme.subduedText)
                         .lineLimit(2)
                 }
 
                 HStack(spacing: 8) {
                     Text(item.category)
-                        .font(.caption2.weight(.bold))
+                        .font(RoachType.caption2(.bold))
                         .foregroundStyle(RoachTheme.secondary)
                     if let status = item.status {
                         Text(status)
-                            .font(.caption2.weight(.bold))
+                            .font(RoachType.caption2(.bold))
                             .foregroundStyle(roachAccentColor(for: item.accent))
                     }
                 }
@@ -767,9 +767,9 @@ private struct AppDetailSheet: View {
                                         model.toggleFavorite(item)
                                     } label: {
                                         Image(systemName: model.isFavorite(item) ? "heart.fill" : "heart")
-                                            .font(.headline)
+                                            .font(RoachType.headline())
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                     .tint(model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary)
                                     if let source = item.source {
                                         RoachBadge(title: source, accent: roachAccentColor(for: item.accent))
@@ -795,15 +795,15 @@ private struct AppDetailSheet: View {
                                 if let machineFit = item.machineFit {
                                     HStack(alignment: .top, spacing: 10) {
                                         Image(systemName: "desktopcomputer")
-                                            .font(.headline)
+                                            .font(RoachType.headline())
                                             .foregroundStyle(roachAccentColor(for: item.accent))
 
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text("Mac fit")
-                                                .font(.caption.weight(.bold))
+                                                .font(RoachType.caption(.bold))
                                                 .foregroundStyle(RoachTheme.secondary)
                                             Text(machineFit)
-                                                .font(.caption)
+                                                .font(RoachType.caption)
                                                 .foregroundStyle(RoachTheme.subduedText)
                                         }
                                     }
@@ -821,7 +821,7 @@ private struct AppDetailSheet: View {
                                 if !item.includes.isEmpty {
                                     VStack(alignment: .leading, spacing: 8) {
                                         Text("Inside")
-                                            .font(.headline)
+                                            .font(RoachType.headline())
                                             .foregroundStyle(RoachTheme.text)
 
                                         ForEach(item.includes, id: \.self) { line in
@@ -834,7 +834,7 @@ private struct AppDetailSheet: View {
                                 Button(displayInstallLabel(for: item)) {
                                     Task { await model.install(item) }
                                 }
-                                .font(.subheadline.weight(.black))
+                                .font(RoachType.subheadline(.black))
                                 .foregroundStyle(Color.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 13)
@@ -861,7 +861,7 @@ private struct AppDetailSheet: View {
                                 if let installURL = model.installDeepLink(for: item) {
                                     ShareLink(item: installURL) {
                                         Label("Share install link", systemImage: "square.and.arrow.up")
-                                            .font(.subheadline.weight(.bold))
+                                            .font(RoachType.subheadline(.bold))
                                             .frame(maxWidth: .infinity)
                                             .padding(.vertical, 12)
                                             .background(
@@ -947,7 +947,7 @@ private struct StoreActionStrip: View {
             Task { await model.install(item) }
         } label: {
             Label(isInstalling ? "Installing…" : displayInstallLabel(for: item), systemImage: isInstalling ? "hourglass" : "square.and.arrow.down")
-                .font(.caption.weight(.black))
+                .font(RoachType.caption(.black))
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
                 .frame(maxWidth: .infinity)
@@ -979,7 +979,7 @@ private struct StoreActionStrip: View {
         Button("Details") {
             model.selectedStoreItem = item
         }
-        .font(.caption.weight(.bold))
+        .font(RoachType.caption(.bold))
         .lineLimit(1)
         .minimumScaleFactor(0.78)
         .frame(maxWidth: .infinity)
@@ -1002,7 +1002,7 @@ private struct StoreActionStrip: View {
             model.toggleFavorite(item)
         } label: {
             Image(systemName: model.isFavorite(item) ? "heart.fill" : "heart")
-                .font(.headline)
+                .font(RoachType.headline())
                 .frame(maxWidth: .infinity)
         }
         .frame(height: 38)
@@ -1032,10 +1032,10 @@ private extension AppsView {
             model.toggleFavorite(item)
         } label: {
             Image(systemName: model.isFavorite(item) ? "heart.fill" : "heart")
-                .font(.headline)
+                .font(RoachType.headline())
                 .foregroundStyle(Color.white)
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
         .tint(model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary)
     }
 }

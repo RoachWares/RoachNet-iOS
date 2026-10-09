@@ -157,21 +157,21 @@ struct ChatView: View {
         if let errorText = model.errorText {
             bannerShell(accent: RoachTheme.primary) {
                 Text(errorText)
-                    .font(.subheadline)
+                    .font(RoachType.subheadline())
                     .foregroundStyle(Color.white)
             }
         } else if let bannerText = model.bannerText, horizontalSizeClass != .compact {
             HStack(spacing: 10) {
                 Image(systemName: "bolt.fill")
-                    .font(.caption.weight(.bold))
+                    .font(RoachType.caption(.bold))
                     .foregroundStyle(RoachTheme.secondary)
                 Text(bannerText)
-                    .font(.caption.weight(.semibold))
+                    .font(RoachType.caption(.semibold))
                     .foregroundStyle(RoachTheme.text)
                     .lineLimit(2)
                 Spacer(minLength: 0)
                 Text("Live")
-                    .font(.caption2.weight(.bold))
+                    .font(RoachType.caption2(.bold))
                     .foregroundStyle(RoachTheme.secondary)
             }
             .padding(.horizontal, 14)
@@ -216,7 +216,7 @@ struct ChatView: View {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(currentSession.title.isEmpty ? "Current thread" : currentSession.title)
-                        .font(horizontalSizeClass == .compact ? .subheadline.weight(.semibold) : .headline.weight(.semibold))
+                        .font(horizontalSizeClass == .compact ? RoachType.subheadline(.semibold) : RoachType.headline(.semibold))
                         .foregroundStyle(RoachTheme.text)
                         .lineLimit(horizontalSizeClass == .compact ? 1 : 2)
 
@@ -226,7 +226,7 @@ struct ChatView: View {
 
                             if let timestamp = currentSession.messages.last?.createdAt ?? currentSession.timestamp {
                                 Text(formattedRelativeDate(timestamp))
-                                    .font(.caption.weight(.semibold))
+                                    .font(RoachType.caption(.semibold))
                                     .foregroundStyle(RoachTheme.subduedText)
                                     .lineLimit(1)
                             }
@@ -249,7 +249,7 @@ struct ChatView: View {
                         model.toggleSpeech(for: latestAssistantMessage)
                     } label: {
                         Image(systemName: model.speakingMessageID == latestAssistantMessage.id ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                            .font(.subheadline.weight(.semibold))
+                            .font(RoachType.subheadline(.semibold))
                             .foregroundStyle(model.speakingMessageID == latestAssistantMessage.id ? RoachTheme.secondary : RoachTheme.tertiary)
                             .frame(width: 38, height: 38)
                             .background(
@@ -289,11 +289,11 @@ struct ChatView: View {
 
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("What can RoachClaw help with?")
-                                        .font(.headline.weight(.semibold))
+                                        .font(RoachType.headline(.semibold))
                                         .foregroundStyle(RoachTheme.text)
 
                                     Text("Threads stay with your account, not this one phone session. Start with one clean ask or drop straight into the composer.")
-                                        .font(.subheadline)
+                                        .font(RoachType.subheadline())
                                         .foregroundStyle(RoachTheme.subduedText)
                                 }
                             }
@@ -363,10 +363,10 @@ struct ChatView: View {
                         .tint(RoachTheme.primary)
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Loading the RoachClaw lane")
-                            .font(.headline)
+                            .font(RoachType.headline())
                             .foregroundStyle(RoachTheme.text)
                         Text("Pulling the paired desktop thread state.")
-                            .font(.subheadline)
+                            .font(RoachType.subheadline())
                             .foregroundStyle(RoachTheme.subduedText)
                     }
                     Spacer()
@@ -376,11 +376,11 @@ struct ChatView: View {
             RoachPanel {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Start a thread from the phone.")
-                        .font(.headline.weight(.semibold))
+                        .font(RoachType.headline(.semibold))
                         .foregroundStyle(RoachTheme.text)
 
                     Text("RoachClaw keeps the hosted lane open while the private desktop route stays opt-in.")
-                        .font(.subheadline)
+                        .font(RoachType.subheadline())
                         .foregroundStyle(RoachTheme.subduedText)
 
                     quickPromptRail
@@ -389,9 +389,9 @@ struct ChatView: View {
                         Task { await model.newChat() }
                     } label: {
                         Label("New chat", systemImage: "square.and.pencil")
-                            .font(.subheadline.weight(.bold))
+                            .font(RoachType.subheadline(.bold))
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(RoachButtonStyle(kind: .primary, size: .compact))
                     .tint(RoachTheme.primary)
                 }
             }
@@ -408,11 +408,11 @@ struct ChatView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 8) {
                             Label("Quick start", systemImage: "sparkles")
-                                .font(.caption.weight(.bold))
+                                .font(RoachType.caption(.bold))
                                 .foregroundStyle(RoachTheme.secondary)
 
                             Text(suggestion)
-                                .font(.subheadline.weight(.semibold))
+                                .font(RoachType.subheadline(.semibold))
                                 .foregroundStyle(RoachTheme.text)
                                 .multilineTextAlignment(.leading)
                                 .frame(width: horizontalSizeClass == .compact ? 220 : 248, alignment: .leading)
@@ -439,7 +439,7 @@ struct ChatView: View {
             VStack(alignment: .leading, spacing: horizontalSizeClass == .compact ? 10 : 12) {
                 if horizontalSizeClass != .compact {
                     Text("Reply")
-                        .font(.caption.weight(.bold))
+                        .font(RoachType.caption(.bold))
                         .foregroundStyle(RoachTheme.secondary)
                         .textCase(.uppercase)
                 }
@@ -471,7 +471,7 @@ struct ChatView: View {
                     Text(model.connection.isConfigured
                          ? "Hosted lane stays open from the phone. Pair the desktop runtime when you want the private lane."
                          : "Phone lane is local cache until you pair the desktop runtime.")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
                 }
             }
@@ -524,7 +524,7 @@ struct ChatView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 7) {
                     Text(model.voiceEngineTitle)
-                        .font(.caption.weight(.black))
+                        .font(RoachType.caption(.black))
                         .foregroundStyle(RoachTheme.secondary)
                         .textCase(.uppercase)
 
@@ -534,7 +534,7 @@ struct ChatView: View {
                 }
 
                 Text(model.voiceEngineDetail)
-                    .font(.caption.weight(.semibold))
+                    .font(RoachType.caption(.semibold))
                     .foregroundStyle(RoachTheme.subduedText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.74)
@@ -589,9 +589,9 @@ struct ChatView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "slider.horizontal.2.square")
-                        .font(.caption.weight(.black))
+                        .font(RoachType.caption(.black))
                     Text("Voice")
-                        .font(.caption.weight(.black))
+                        .font(RoachType.caption(.black))
                 }
                 .foregroundStyle(RoachTheme.text)
                 .padding(.horizontal, 10)
@@ -646,6 +646,7 @@ struct ChatView: View {
     private var composerField: some View {
         TextField("Message RoachClaw or the offline cache", text: $model.draft, axis: .vertical)
             .focused($composerFocused)
+            .accessibilityIdentifier("chat.composer")
             .textInputAutocapitalization(.sentences)
             .lineLimit(horizontalSizeClass == .compact ? 1...4 : 1...5)
             .padding(horizontalSizeClass == .compact ? 12 : 14)
@@ -676,23 +677,19 @@ struct ChatView: View {
                 }
 
                 Text(model.isSending ? "Sending" : "Send")
-                    .font(.subheadline.weight(.bold))
+                    .font(RoachType.subheadline(.bold))
             }
             .foregroundStyle(Color.white)
             .padding(.horizontal, 15)
             .padding(.vertical, 12)
             .background(
                 Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [RoachTheme.primary, RoachTheme.secondary.opacity(0.76)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
+                    .fill(RoachTheme.primary)
+                    .shadow(color: RoachTheme.primary.opacity(0.35), radius: 16, x: 0, y: 12)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(RoachPressableButtonStyle(scale: 0.972))
+        .accessibilityIdentifier("chat.send")
         .disabled(model.isSending || !model.canSendDraft)
         .opacity(model.isSending || !model.canSendDraft ? 0.62 : 1)
     }
@@ -709,7 +706,7 @@ struct ChatView: View {
                         .fill(RoachTheme.primary.opacity(0.18))
                         .overlay(
                             Image(systemName: "sparkles.tv")
-                                .font(.title3.weight(.semibold))
+                                .font(RoachType.title3(.semibold))
                                 .foregroundStyle(RoachTheme.primary)
                         )
                 }
@@ -725,7 +722,7 @@ struct ChatView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(attachment.filename)
-                            .font(.subheadline.weight(.semibold))
+                            .font(RoachType.subheadline(.semibold))
                             .foregroundStyle(RoachTheme.text)
                             .lineLimit(1)
 
@@ -741,12 +738,12 @@ struct ChatView: View {
                         model.clearDraftVisionAttachment()
                     }
                     .buttonStyle(.plain)
-                    .font(.caption.weight(.semibold))
+                    .font(RoachType.caption(.semibold))
                     .foregroundStyle(RoachTheme.secondary)
                 }
 
                 Text(attachment.summary)
-                    .font(.caption)
+                    .font(RoachType.caption)
                     .foregroundStyle(RoachTheme.subduedText)
                     .lineLimit(3)
             }
@@ -780,7 +777,7 @@ struct ChatView: View {
     private func headerIconButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.subheadline.weight(.semibold))
+                .font(RoachType.subheadline(.semibold))
                 .foregroundStyle(RoachTheme.text)
                 .frame(width: 38, height: 38)
                 .background(
@@ -841,7 +838,7 @@ private struct ComposerUtilityGlyph: View {
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(.subheadline.weight(.semibold))
+            .font(RoachType.subheadline(.semibold))
             .foregroundStyle(accent)
             .frame(width: 38, height: 38)
             .background(
@@ -872,12 +869,12 @@ private struct MessageBubble: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     Text(isUser ? "You" : "RoachClaw")
-                        .font(.caption.weight(.semibold))
+                        .font(RoachType.caption(.semibold))
                         .foregroundStyle(RoachTheme.subduedText)
 
                     if !isUser {
                         Image(systemName: "bolt.fill")
-                            .font(.caption2)
+                            .font(RoachType.caption2)
                             .foregroundStyle(RoachTheme.secondary)
                     }
 
@@ -886,7 +883,7 @@ private struct MessageBubble: View {
                     if let onSpeak {
                         Button(action: onSpeak) {
                             Image(systemName: isSpeaking ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                                .font(.caption.weight(.semibold))
+                                .font(RoachType.caption(.semibold))
                                 .foregroundStyle(isSpeaking ? RoachTheme.secondary : RoachTheme.tertiary)
                         }
                         .buttonStyle(.plain)
@@ -894,12 +891,12 @@ private struct MessageBubble: View {
                 }
 
                 Text(message.content)
-                    .font(.body)
+                    .font(RoachType.body)
                     .foregroundStyle(RoachTheme.text)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Text(formattedRelativeDate(message.createdAt))
-                    .font(.caption2)
+                    .font(RoachType.caption2)
                     .foregroundStyle(RoachTheme.subduedText)
             }
             .padding(14)
@@ -915,9 +912,8 @@ private struct MessageBubble: View {
                                         RoachTheme.surface.opacity(0.96),
                                     ]
                                     : [
-                                        RoachTheme.surface.opacity(0.98),
-                                        RoachTheme.elevatedSurface.opacity(0.92),
-                                        Color.black.opacity(0.10),
+                                        RoachTheme.elevatedSurface.opacity(0.82),
+                                        Color.black.opacity(0.74),
                                     ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -928,9 +924,8 @@ private struct MessageBubble: View {
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    (isUser ? RoachTheme.primary : RoachTheme.secondary).opacity(0.16),
+                                    (isUser ? RoachTheme.primary : RoachTheme.cyan).opacity(isUser ? 0.16 : 0.05),
                                     Color.clear,
-                                    RoachTheme.tertiary.opacity(0.06),
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -984,12 +979,12 @@ private struct SessionHistorySheet: View {
                                         .foregroundStyle(RoachTheme.text)
 
                                     Text(session.model ?? "Default model")
-                                        .font(.caption)
+                                        .font(RoachType.caption)
                                         .foregroundStyle(RoachTheme.subduedText)
 
                                     if let timestamp = session.timestamp {
                                         Text(formattedRelativeDate(timestamp))
-                                            .font(.caption2)
+                                            .font(RoachType.caption2)
                                             .foregroundStyle(RoachTheme.secondary)
                                     }
                                 }

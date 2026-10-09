@@ -154,6 +154,7 @@ final class CompanionSpeechController: NSObject {
             "RoachTail",
             "RoachSync",
             "Ollama",
+            "RoachInference",
             "OpenClaw",
             "Homebrew",
             "SideStore",
@@ -404,10 +405,22 @@ enum CompanionVisionController {
 }
 
 enum CompanionTab: Hashable {
+    case home
     case chat
     case vault
     case apps
     case runtime
+
+    /// Stable id for accessibility identifiers and UI tests (`tab.home`, ...).
+    var identifier: String {
+        switch self {
+        case .home: return "home"
+        case .chat: return "roachclaw"
+        case .vault: return "vault"
+        case .apps: return "apps"
+        case .runtime: return "runtime"
+        }
+    }
 }
 
 @MainActor
@@ -421,7 +434,7 @@ final class CompanionAppModel {
         didSet { connection.save() }
     }
 
-    var selectedTab: CompanionTab = .chat
+    var selectedTab: CompanionTab = .home
     var appsCatalogURL = "https://apps.roachnet.org/app-store-catalog.json"
     var pairedMachineName: String?
     var sessionList: [CompanionChatSessionSummary] = []
@@ -465,6 +478,18 @@ final class CompanionAppModel {
     var errorText: String?
     var historyPresented = false
     var settingsPresented = false
+    var orgPresented = false
+
+    // RoachClaw Org (desktop 1.1+)
+    var orgAvailability: OrgAvailability = .unknown
+    var orgMe: OrgMe?
+    var orgCompanyID: String?
+    var orgDashboard: OrgDashboard?
+    var orgApprovals: [OrgApproval] = []
+    var orgAgents: [OrgAgent] = []
+    var isLoadingOrg = false
+    var orgActingIDs = Set<String>()
+    var orgInviteToken = ""
 
     private static let roachTailPeerStorageKey = "RoachNetCompanionRoachTailPeerID"
     private static let selectedVoiceProfileStorageKey = "RoachNetCompanionSelectedVoiceProfileID"
@@ -855,6 +880,9 @@ final class CompanionAppModel {
 
             lastRefreshAt = Date()
             errorText = nil
+            if connection.isConfigured {
+                await refreshOrg()
+            }
         } catch {
             errorText = error.localizedDescription
             if connection.isConfigured, let roachTailStatus = try? await client.roachTail(using: connection) {
@@ -1215,6 +1243,7 @@ final class CompanionAppModel {
             } ?? runtime
             bannerText = response.message ?? "RoachTail pairing is ready."
             errorText = nil
+            settingsPresented = false
             await refreshAll()
         } catch {
             errorText = error.localizedDescription
@@ -1398,6 +1427,121 @@ final class CompanionAppModel {
         return components.url
     }
 
+    // MARK: RoachClaw Org
+
+    var pendingOrgApprovals: [OrgApproval] { orgApprovals.filter(\.isOpen) }
+
+    var orgCanDecide: Bool {
+        guard let orgMe else { return false }
+        if orgMe.isOwner { return true }
+        return orgMe.companies.first { $0.id == orgCompanyID }?.board ?? false
+    }
+
+    func refreshOrg() async {
+        if forceDemoMode || !connection.isConfigured {
+            applyDemoOrg()
+            return
+        }
+        isLoadingOrg = true
+        defer { isLoadingOrg = false }
+        do {
+            let me = try await client.orgMe(using: connection)
+            orgMe = me
+            guard let company = me.companies.first(where: { $0.id == orgCompanyID }) ?? me.companies.first else {
+                orgAvailability = .ready
+                orgDashboard = nil
+                orgApprovals = []
+                orgAgents = []
+                return
+            }
+            orgCompanyID = company.id
+            async let dashboard = client.orgDashboard(companyID: company.id, using: connection)
+            async let approvals = client.orgApprovals(companyID: company.id, using: connection)
+            async let agents = client.orgAgents(companyID: company.id, using: connection)
+            orgDashboard = try await dashboard
+            orgApprovals = try await approvals
+            orgAgents = (try? await agents) ?? []
+            orgAvailability = .ready
+        } catch let error as RoachNetAPIError {
+            switch error.statusCode {
+            case 404: orgAvailability = .unsupported
+            case 403: if case .pendingApproval = orgAvailability {} else { orgAvailability = .needsInvite }
+            default: break
+            }
+        } catch {
+            // Org is optional; the rest of the app keeps working.
+        }
+    }
+
+    func selectOrgCompany(_ id: String) async {
+        orgCompanyID = id
+        await refreshOrg()
+    }
+
+    /// `decision` is approve, reject or request-revision.
+    func decideApproval(_ approval: OrgApproval, decision: String, note: String?) async {
+        guard let companyID = orgCompanyID else { return }
+        orgActingIDs.insert(approval.id)
+        defer { orgActingIDs.remove(approval.id) }
+        if forceDemoMode {
+            orgApprovals = orgApprovals.filter { $0.id != approval.id }
+            bannerText = decision == "approve" ? "Approved." : decision == "reject" ? "Rejected." : "Sent back for changes."
+            return
+        }
+        do {
+            try await client.decideOrgApproval(companyID: companyID, approvalID: approval.id, decision: decision, note: note, using: connection)
+            bannerText = decision == "approve" ? "Approved. The agent can carry on." : decision == "reject" ? "Rejected. The agent has been told." : "Sent back for changes."
+            errorText = nil
+            await refreshOrg()
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    /// `action` is pause or resume.
+    func setOrgAgentStatus(_ agent: OrgAgent, action: String) async {
+        guard let companyID = orgCompanyID, !forceDemoMode else { return }
+        orgActingIDs.insert(agent.id)
+        defer { orgActingIDs.remove(agent.id) }
+        do {
+            try await client.setOrgAgentStatus(companyID: companyID, agentID: agent.id, action: action, using: connection)
+            bannerText = action == "pause" ? "\(agent.name) paused." : "\(agent.name) is back to work."
+            await refreshOrg()
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    func acceptOrgInvite(name: String, email: String?) async {
+        let token = orgInviteToken.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !token.isEmpty else { errorText = "Paste the Org invite from your Mac first."; return }
+        guard !trimmedName.isEmpty else { errorText = "Add your name so the owner knows who's asking."; return }
+        isLoadingOrg = true
+        defer { isLoadingOrg = false }
+        do {
+            let result = try await client.acceptOrgInvite(token: token, userName: trimmedName, email: email, using: connection)
+            orgInviteToken = ""
+            let company = result.companyName ?? "the company"
+            orgAvailability = .pendingApproval(company)
+            bannerText = "Asked to join \(company). The owner approves it on the Mac."
+            errorText = nil
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    private func applyDemoOrg() {
+        let json = Data(CompanionDemoOrg.json.utf8)
+        let decoder = JSONDecoder()
+        orgMe = try? decoder.decode(OrgMe.self, from: Data(CompanionDemoOrg.me.utf8))
+        orgDashboard = try? decoder.decode(OrgDashboard.self, from: json)
+        orgApprovals = (try? decoder.decode(OrgApprovalList.self, from: Data(CompanionDemoOrg.approvals.utf8)))?.approvals ?? []
+        orgAgents = (try? decoder.decode(OrgAgentList.self, from: Data(CompanionDemoOrg.agents.utf8)))?.agents ?? []
+        orgCompanyID = orgDashboard?.company.id
+        orgAvailability = forceDemoMode ? .ready : .unknown
+    }
+
     func clearConnection() {
         connection = CompanionConnectionSettings(
             baseURL: CompanionConnectionSettings.recommendedBaseURL,
@@ -1409,6 +1553,11 @@ final class CompanionAppModel {
         vault = nil
         sessionList = []
         currentSession = nil
+        orgMe = nil
+        orgDashboard = nil
+        orgApprovals = []
+        orgAgents = []
+        orgAvailability = .unknown
         clearBanner()
         applyDemoStateIfNeeded()
         settingsPresented = false
@@ -1432,6 +1581,18 @@ final class CompanionAppModel {
             selectedTab = .vault
         case "open-chat":
             selectedTab = .chat
+        case "open-home":
+            selectedTab = .home
+        case "org", "open-org":
+            selectedTab = .home
+            orgPresented = true
+        case "org-invite", "join-org":
+            if let token = queryValues(from: url)["token"], !token.isEmpty {
+                orgInviteToken = token
+                selectedTab = .home
+                orgPresented = true
+                bannerText = "Org invite loaded. Add your name to join."
+            }
         default:
             break
         }
@@ -1707,6 +1868,7 @@ final class CompanionAppModel {
 
     private func applyDemoState() {
         pairedMachineName = nil
+        applyDemoOrg()
         if catalogItems.isEmpty {
             catalogItems = CompanionDemoState.catalogItems
         }

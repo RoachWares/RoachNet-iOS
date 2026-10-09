@@ -5,7 +5,14 @@ enum RoachNetAPIError: LocalizedError {
     case invalidBaseURL
     case notConfigured
     case requestFailed(String)
+    case http(status: Int, message: String)
+    case unreachable(String)
     case decodingFailed(String)
+
+    var statusCode: Int? {
+        if case .http(let status, _) = self { return status }
+        return nil
+    }
 
     var errorDescription: String? {
         switch self {
@@ -15,6 +22,10 @@ enum RoachNetAPIError: LocalizedError {
             return "Add the Mac companion URL and token first."
         case .requestFailed(let message):
             return message
+        case .http(_, let message):
+            return message
+        case .unreachable(let host):
+            return "Can't reach your Mac at \(host). Check RoachNet is open on it and this phone is on the same network or RoachTail."
         case .decodingFailed(let message):
             return message
         }
@@ -272,7 +283,8 @@ struct CompanionConnectionSettings: Codable, Hashable, Sendable {
     }
 
     var usesRoachTailPeerToken: Bool {
-        token.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("rtp_")
+        let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.hasPrefix("rtp_") || trimmed.hasPrefix("rtpeer_")
     }
 
     var resolvedBaseURL: URL? {
@@ -359,7 +371,13 @@ struct RoachNetAPIClient {
             "tags": tags,
         ])
 
-        let (data, response) = try await session.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let error as URLError where Self.isUnreachable(error) {
+            throw RoachNetAPIError.unreachable(baseURL.host ?? baseURL.absoluteString)
+        }
         guard let httpResponse = response as? HTTPURLResponse else {
             throw RoachNetAPIError.requestFailed("The RoachTail pair lane did not return an HTTP response.")
         }
@@ -619,7 +637,13 @@ struct RoachNetAPIClient {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
 
-        let (data, response) = try await session.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch let error as URLError where Self.isUnreachable(error) {
+            throw RoachNetAPIError.unreachable(baseURL.host ?? baseURL.absoluteString)
+        }
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw RoachNetAPIError.requestFailed("The companion runtime did not return an HTTP response.")
@@ -627,13 +651,70 @@ struct RoachNetAPIClient {
 
         guard (200..<300).contains(httpResponse.statusCode) else {
             if let envelope = try? decoder.decode(APIErrorEnvelope.self, from: data) {
-                throw RoachNetAPIError.requestFailed(envelope.error)
+                throw RoachNetAPIError.http(status: httpResponse.statusCode, message: envelope.error)
             }
 
-            throw RoachNetAPIError.requestFailed("The companion runtime returned \(httpResponse.statusCode).")
+            throw RoachNetAPIError.http(status: httpResponse.statusCode, message: "The companion runtime returned \(httpResponse.statusCode).")
         }
 
         return try decode(T.self, from: data)
+    }
+
+    static func isUnreachable(_ error: URLError) -> Bool {
+        [.cannotConnectToHost, .cannotFindHost, .timedOut, .networkConnectionLost, .notConnectedToInternet, .dnsLookupFailed]
+            .contains(error.code)
+    }
+
+    // MARK: RoachClaw Org (desktop 1.1+)
+
+    func orgMe(using connection: CompanionConnectionSettings) async throws -> OrgMe {
+        try await request("/api/org/me", using: connection)
+    }
+
+    func orgDashboard(companyID: String, using connection: CompanionConnectionSettings) async throws -> OrgDashboard {
+        try await request("/api/org/companies/\(Self.pathComponent(companyID))/dashboard", using: connection)
+    }
+
+    func orgApprovals(companyID: String, using connection: CompanionConnectionSettings) async throws -> [OrgApproval] {
+        let list: OrgApprovalList = try await request("/api/org/companies/\(Self.pathComponent(companyID))/approvals", using: connection)
+        return list.approvals
+    }
+
+    func orgAgents(companyID: String, using connection: CompanionConnectionSettings) async throws -> [OrgAgent] {
+        let list: OrgAgentList = try await request("/api/org/companies/\(Self.pathComponent(companyID))/agents", using: connection)
+        return list.agents
+    }
+
+    /// `decision` is approve, reject or request-revision.
+    func decideOrgApproval(companyID: String, approvalID: String, decision: String, note: String?, using connection: CompanionConnectionSettings) async throws {
+        var body: [String: Any] = [:]
+        if let note, !note.isEmpty { body["note"] = note }
+        let _: OrgJSONValue = try await request(
+            "/api/org/companies/\(Self.pathComponent(companyID))/approvals/\(Self.pathComponent(approvalID))/\(decision)",
+            method: "POST",
+            body: body,
+            using: connection
+        )
+    }
+
+    /// `action` is pause or resume.
+    func setOrgAgentStatus(companyID: String, agentID: String, action: String, using connection: CompanionConnectionSettings) async throws {
+        let _: OrgJSONValue = try await request(
+            "/api/org/companies/\(Self.pathComponent(companyID))/agents/\(Self.pathComponent(agentID))/\(action)",
+            method: "POST",
+            body: [:],
+            using: connection
+        )
+    }
+
+    func acceptOrgInvite(token: String, userName: String, email: String?, using connection: CompanionConnectionSettings) async throws -> OrgJoinResult {
+        var body: [String: Any] = ["token": token, "requestType": "human", "userName": userName]
+        if let email, !email.isEmpty { body["email"] = email }
+        return try await request("/api/org/invites/accept", method: "POST", body: body, using: connection)
+    }
+
+    static func pathComponent(_ value: String) -> String {
+        value.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed.subtracting(CharacterSet(charactersIn: "/"))) ?? value
     }
 
     private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {

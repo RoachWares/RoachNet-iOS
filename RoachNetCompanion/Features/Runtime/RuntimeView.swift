@@ -55,7 +55,7 @@ struct RuntimeView: View {
 
                                 if let lastRefreshAt = model.lastRefreshAt {
                                     Text("Last sync \(formattedRelativeDate(lastRefreshAt))")
-                                        .font(.caption)
+                                        .font(RoachType.caption)
                                         .foregroundStyle(RoachTheme.subduedText)
                                 }
                             }
@@ -71,7 +71,7 @@ struct RuntimeView: View {
                             } label: {
                                 Label("Refresh", systemImage: "arrow.clockwise")
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.secondary)
 
                             runtimeSignals
@@ -89,7 +89,7 @@ struct RuntimeView: View {
 
                             if let lastRefreshAt = model.lastRefreshAt {
                                 Text("Last sync \(formattedRelativeDate(lastRefreshAt))")
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                         }
@@ -103,7 +103,7 @@ struct RuntimeView: View {
                             Label("Refresh", systemImage: "arrow.clockwise")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                         .tint(RoachTheme.secondary)
                     }
                 }
@@ -140,7 +140,7 @@ struct RuntimeView: View {
 
                 HStack(spacing: 10) {
                     Image(systemName: phoneGPS.isRunning ? "location.fill" : "location")
-                        .font(.headline)
+                        .font(RoachType.headline())
                         .foregroundStyle(phoneGPS.state.accent)
                         .frame(width: 38, height: 38)
                         .background(
@@ -150,10 +150,10 @@ struct RuntimeView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(phoneGPS.state.detail)
-                            .font(.subheadline.weight(.semibold))
+                            .font(RoachType.subheadline(.semibold))
                             .foregroundStyle(RoachTheme.text)
                         Text(phoneGPS.latestFix.map { "Accuracy \($0.accuracyLabel) · \($0.ageLabel)" } ?? "No location leaves the phone until you start this bridge.")
-                            .font(.caption)
+                            .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
                     }
 
@@ -168,7 +168,7 @@ struct RuntimeView: View {
                             Label(phoneGPS.isRunning ? "Stop GPS" : "Start GPS", systemImage: phoneGPS.isRunning ? "stop.fill" : "antenna.radiowaves.left.and.right")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(RoachButtonStyle(kind: .primary, size: .compact))
                         .tint(phoneGPS.isRunning ? RoachTheme.primary : RoachTheme.secondary)
 
                         Button {
@@ -177,7 +177,7 @@ struct RuntimeView: View {
                             Label("Demo packet", systemImage: "location.north.line")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                         .tint(RoachTheme.tertiary)
                     }
 
@@ -188,7 +188,7 @@ struct RuntimeView: View {
                             Label(phoneGPS.isRunning ? "Stop GPS" : "Start GPS", systemImage: phoneGPS.isRunning ? "stop.fill" : "antenna.radiowaves.left.and.right")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(RoachButtonStyle(kind: .primary, size: .compact))
                         .tint(phoneGPS.isRunning ? RoachTheme.primary : RoachTheme.secondary)
 
                         Button {
@@ -197,7 +197,7 @@ struct RuntimeView: View {
                             Label("Demo packet", systemImage: "location.north.line")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                         .tint(RoachTheme.tertiary)
                     }
                 }
@@ -206,10 +206,10 @@ struct RuntimeView: View {
                     Toggle(isOn: $phoneGPS.highAccuracy) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Precise drive mode")
-                                .font(.subheadline.weight(.semibold))
+                                .font(RoachType.subheadline(.semibold))
                                 .foregroundStyle(RoachTheme.text)
                             Text("Uses the best foreground location accuracy while the bridge is running.")
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
@@ -219,10 +219,10 @@ struct RuntimeView: View {
                     Toggle(isOn: $phoneGPS.includeMotionDetails) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Include speed, heading, altitude")
-                                .font(.subheadline.weight(.semibold))
+                                .font(RoachType.subheadline(.semibold))
                                 .foregroundStyle(RoachTheme.text)
                             Text("RoachAtlas can draw richer traces; turn it off for a lean lat/lon packet.")
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
@@ -233,10 +233,10 @@ struct RuntimeView: View {
                 if let packet = phoneGPS.lastPacket, !packet.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Packet")
-                            .font(.caption.weight(.semibold))
+                            .font(RoachType.caption(.semibold))
                             .foregroundStyle(RoachTheme.secondary)
                         Text(packet)
-                            .font(.caption2.monospaced())
+                            .font(RoachType.mono(11, relativeTo: .caption2))
                             .foregroundStyle(RoachTheme.subduedText)
                             .lineLimit(3)
                             .textSelection(.enabled)
@@ -245,10 +245,10 @@ struct RuntimeView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("BLE contract")
-                        .font(.caption.weight(.semibold))
+                        .font(RoachType.caption(.semibold))
                         .foregroundStyle(RoachTheme.secondary)
                     Text("\(RoachPhoneGPSAdvertiser.gpsServiceUUIDString) · \(RoachPhoneGPSAdvertiser.gpsCharacteristicUUIDString)")
-                        .font(.caption2.monospaced())
+                        .font(RoachType.mono(11, relativeTo: .caption2))
                         .foregroundStyle(RoachTheme.subduedText)
                         .textSelection(.enabled)
                 }
@@ -354,20 +354,20 @@ struct RuntimeView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Alias")
-                            .font(.caption.weight(.semibold))
+                            .font(RoachType.caption(.semibold))
                             .foregroundStyle(RoachTheme.secondary)
                         Text(account.aliasHost)
-                            .font(.caption.monospaced())
+                            .font(RoachType.mono(12, relativeTo: .caption))
                             .foregroundStyle(RoachTheme.text)
                     }
 
                     if let bridgeUrl = account.bridgeUrl, !bridgeUrl.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Bridge")
-                                .font(.caption.weight(.semibold))
+                                .font(RoachType.caption(.semibold))
                                 .foregroundStyle(RoachTheme.secondary)
                             Text(bridgeUrl)
-                                .font(.caption.monospaced())
+                                .font(RoachType.mono(12, relativeTo: .caption))
                                 .foregroundStyle(RoachTheme.text)
                                 .textSelection(.enabled)
                         }
@@ -377,7 +377,7 @@ struct RuntimeView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             ForEach(account.notes.prefix(3), id: \.self) { note in
                                 Text(note)
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                         }
@@ -430,7 +430,7 @@ struct RuntimeView: View {
                                         Text("Refresh code")
                                             .frame(maxWidth: .infinity)
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                     .tint(RoachTheme.tertiary)
                                     .disabled(model.isActingRoachTail || !roachTail.enabled)
                                 }
@@ -446,7 +446,7 @@ struct RuntimeView: View {
                                         Text("Refresh code")
                                             .frame(maxWidth: .infinity)
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                     .tint(RoachTheme.tertiary)
                                     .disabled(model.isActingRoachTail || !roachTail.enabled)
                                 }
@@ -467,7 +467,7 @@ struct RuntimeView: View {
                                     Text(model.roachTailIsLinked ? "Unlink this device" : "Link this device")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .tint(model.roachTailIsLinked ? RoachTheme.primary : RoachTheme.secondary)
                                 .disabled(model.isActingRoachTail || !roachTail.enabled)
 
@@ -478,7 +478,7 @@ struct RuntimeView: View {
                                         Text("Clear peers")
                                             .frame(maxWidth: .infinity)
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                     .tint(RoachTheme.primary)
                                     .disabled(model.isActingRoachTail || roachTail.peers.isEmpty)
                                 }
@@ -497,7 +497,7 @@ struct RuntimeView: View {
                                     Text(model.roachTailIsLinked ? "Unlink this device" : "Link this device")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .tint(model.roachTailIsLinked ? RoachTheme.primary : RoachTheme.secondary)
                                 .disabled(model.isActingRoachTail || !roachTail.enabled)
 
@@ -508,7 +508,7 @@ struct RuntimeView: View {
                                         Text("Clear peers")
                                             .frame(maxWidth: .infinity)
                                     }
-                                    .buttonStyle(.bordered)
+                                    .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                     .tint(RoachTheme.primary)
                                     .disabled(model.isActingRoachTail || roachTail.peers.isEmpty)
                                 }
@@ -519,10 +519,10 @@ struct RuntimeView: View {
                     if let advertisedUrl = roachTail.advertisedUrl, !advertisedUrl.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Bridge")
-                                .font(.caption.weight(.semibold))
+                                .font(RoachType.caption(.semibold))
                                 .foregroundStyle(RoachTheme.secondary)
                             Text(advertisedUrl)
-                                .font(.caption.monospaced())
+                                .font(RoachType.mono(12, relativeTo: .caption))
                                 .foregroundStyle(RoachTheme.text)
                                 .textSelection(.enabled)
                         }
@@ -531,43 +531,43 @@ struct RuntimeView: View {
                     if let joinCode = roachTail.joinCode, !joinCode.isEmpty {
                         HStack(spacing: 8) {
                             Text("Join code")
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
                             Text(joinCode)
-                                .font(.caption.monospaced().weight(.semibold))
+                                .font(RoachType.mono(12, relativeTo: .caption).weight(.semibold))
                                 .foregroundStyle(RoachTheme.text)
                         }
                     } else if model.usingRoachTailPeerToken {
                         Text("Join-code controls stay on the Mac or any device still using the desktop companion token.")
-                            .font(.caption)
+                            .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
                     }
 
                     if !roachTail.peers.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Linked devices")
-                                .font(.headline)
+                                .font(RoachType.headline())
                                 .foregroundStyle(RoachTheme.text)
 
                             ForEach(roachTail.peers.prefix(4)) { peer in
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack {
                                         Text(peer.name)
-                                            .font(.subheadline.weight(.semibold))
+                                            .font(RoachType.subheadline(.semibold))
                                             .foregroundStyle(RoachTheme.text)
                                         Spacer()
                                         Text(peer.status.capitalized)
-                                            .font(.caption)
+                                            .font(RoachType.caption)
                                             .foregroundStyle(RoachTheme.secondary)
                                     }
 
                                     Text("\(peer.platform) · \(peer.endpoint ?? "Peer lane ready")")
-                                        .font(.caption)
+                                        .font(RoachType.caption)
                                         .foregroundStyle(RoachTheme.subduedText)
 
                                     if !peer.tags.isEmpty {
                                         Text(peer.tags.joined(separator: " · "))
-                                            .font(.caption2)
+                                            .font(RoachType.caption2)
                                             .foregroundStyle(RoachTheme.tertiary)
                                     }
                                 }
@@ -580,7 +580,7 @@ struct RuntimeView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             ForEach(roachTail.notes.prefix(3), id: \.self) { note in
                                 Text(note)
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                         }
@@ -634,10 +634,10 @@ struct RuntimeView: View {
                         ) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("RoachSync")
-                                    .font(.subheadline.weight(.semibold))
+                                    .font(RoachType.subheadline(.semibold))
                                     .foregroundStyle(RoachTheme.text)
                                 Text(roachSync.enabled ? "Contained sync lane is armed." : "Contained sync lane is off.")
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                         }
@@ -653,7 +653,7 @@ struct RuntimeView: View {
                                     Text("Refresh sync")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .disabled(model.isActingRoachSync)
 
                                 Button {
@@ -662,7 +662,7 @@ struct RuntimeView: View {
                                     Text("Clear peers")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .disabled(model.isActingRoachSync || roachSync.peers.isEmpty)
                             }
 
@@ -673,7 +673,7 @@ struct RuntimeView: View {
                                     Text("Refresh sync")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .disabled(model.isActingRoachSync)
 
                                 Button {
@@ -682,7 +682,7 @@ struct RuntimeView: View {
                                     Text("Clear peers")
                                         .frame(maxWidth: .infinity)
                                 }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                                 .disabled(model.isActingRoachSync || roachSync.peers.isEmpty)
                             }
                         }
@@ -690,10 +690,10 @@ struct RuntimeView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Folder")
-                            .font(.caption.weight(.semibold))
+                            .font(RoachType.caption(.semibold))
                             .foregroundStyle(RoachTheme.secondary)
                         Text(roachSync.folderPath)
-                            .font(.caption.monospaced())
+                            .font(RoachType.mono(12, relativeTo: .caption))
                             .foregroundStyle(RoachTheme.text)
                             .textSelection(.enabled)
                     }
@@ -701,23 +701,23 @@ struct RuntimeView: View {
                     if !roachSync.peers.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Synced devices")
-                                .font(.headline)
+                                .font(RoachType.headline())
                                 .foregroundStyle(RoachTheme.text)
 
                             ForEach(roachSync.peers.prefix(4)) { peer in
                                 VStack(alignment: .leading, spacing: 4) {
                                     HStack {
                                         Text(peer.name)
-                                            .font(.subheadline.weight(.semibold))
+                                            .font(RoachType.subheadline(.semibold))
                                             .foregroundStyle(RoachTheme.text)
                                         Spacer()
                                         Text(peer.status.capitalized)
-                                            .font(.caption)
+                                            .font(RoachType.caption)
                                             .foregroundStyle(RoachTheme.secondary)
                                     }
 
                                     Text(peer.lastSeenAt.map(formattedRelativeDate) ?? "Contained sync lane ready")
-                                        .font(.caption)
+                                        .font(RoachType.caption)
                                         .foregroundStyle(RoachTheme.subduedText)
                                 }
                                 .padding(.vertical, 2)
@@ -729,7 +729,7 @@ struct RuntimeView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             ForEach(roachSync.notes.prefix(3), id: \.self) { note in
                                 Text(note)
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                         }
@@ -766,17 +766,17 @@ struct RuntimeView: View {
 
                 if model.pairedMachineName != nil {
                     Text("Paired desktop linked.")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
                 } else if !model.connection.isConfigured {
                     Text("Previewing the runtime lane until you pair the Mac.")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
                 }
 
                 if let lastRefreshAt = model.lastRefreshAt {
                     Text("Last sync \(formattedRelativeDate(lastRefreshAt))")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.secondary)
                 }
             }
@@ -812,7 +812,7 @@ struct RuntimeView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         ForEach(notes.prefix(3), id: \.self) { note in
                             Text(note)
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
@@ -847,17 +847,17 @@ struct RuntimeView: View {
                 if let installedModels = model.runtime?.installedModels, !installedModels.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Installed models")
-                            .font(.headline)
+                            .font(RoachType.headline())
                             .foregroundStyle(RoachTheme.text)
 
                         ForEach(installedModels.prefix(6)) { model in
                             HStack {
                                 Text(model.name)
-                                    .font(.caption.monospaced())
+                                    .font(RoachType.mono(12, relativeTo: .caption))
                                     .foregroundStyle(RoachTheme.text)
                                 Spacer()
                                 Text(formattedBytes(model.size))
-                                    .font(.caption2)
+                                    .font(RoachType.caption2)
                                     .foregroundStyle(RoachTheme.subduedText)
                             }
                         }
@@ -1610,17 +1610,17 @@ struct RuntimeView: View {
                     ForEach(downloads.prefix(5)) { job in
                         VStack(alignment: .leading, spacing: 6) {
                             Text(job.filepath ?? job.jobId)
-                                .font(.caption.monospaced())
+                                .font(RoachType.mono(12, relativeTo: .caption))
                                 .foregroundStyle(RoachTheme.text)
                                 .lineLimit(1)
 
                             HStack {
                                 Text(job.status ?? "Queued")
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.subduedText)
                                 Spacer()
                                 Text(job.progress.map { "\($0)%" } ?? "--")
-                                    .font(.caption)
+                                    .font(RoachType.caption)
                                     .foregroundStyle(RoachTheme.secondary)
                             }
                         }
@@ -1644,10 +1644,10 @@ struct RuntimeView: View {
                     ForEach(model.runtimeIssues) { issue in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(issue.path)
-                                .font(.caption.monospaced())
+                                .font(RoachType.mono(12, relativeTo: .caption))
                                 .foregroundStyle(RoachTheme.secondary)
                             Text(issue.error)
-                                .font(.caption)
+                                .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
                         }
                     }
@@ -1662,11 +1662,11 @@ struct RuntimeView: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(service.friendlyName ?? service.serviceName)
-                        .font(.subheadline.weight(.semibold))
+                        .font(RoachType.subheadline(.semibold))
                         .foregroundStyle(RoachTheme.text)
 
                     Text(service.status ?? "Unknown state")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
                 }
 
@@ -1700,7 +1700,7 @@ struct RuntimeView: View {
                 await model.affectService(service, action: action)
             }
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
         .tint(action == "stop" ? RoachTheme.primary : RoachTheme.secondary)
         .disabled(model.actingServiceNames.contains(service))
         .frame(maxWidth: .infinity)
@@ -1719,10 +1719,10 @@ struct RuntimeView: View {
         ) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("RoachTail")
-                    .font(.subheadline.weight(.semibold))
+                    .font(RoachType.subheadline(.semibold))
                     .foregroundStyle(RoachTheme.text)
                 Text(roachTail.enabled ? "Private overlay is armed." : "Private overlay is off.")
-                    .font(.caption)
+                    .font(RoachType.caption)
                     .foregroundStyle(RoachTheme.subduedText)
             }
         }

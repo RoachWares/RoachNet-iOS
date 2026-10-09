@@ -27,10 +27,10 @@ struct VaultView: View {
                                         .tint(RoachTheme.primary)
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("Loading Vault")
-                                            .font(.headline)
+                                            .font(RoachType.headline())
                                             .foregroundStyle(RoachTheme.text)
                                         Text("Pulling RoachBrain, files, atlas packs, and study shelves from the paired Mac.")
-                                            .font(.subheadline)
+                                            .font(RoachType.subheadline())
                                             .foregroundStyle(RoachTheme.subduedText)
                                     }
                                     Spacer()
@@ -80,9 +80,9 @@ struct VaultView: View {
                             model.settingsPresented = true
                         } label: {
                             Image(systemName: "slider.horizontal.3")
-                                .font(.headline)
+                                .font(RoachType.headline())
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                         .tint(RoachTheme.secondary)
                     }
 
@@ -103,14 +103,14 @@ struct VaultView: View {
                             Label("Connection settings", systemImage: "slider.horizontal.3")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                         .tint(RoachTheme.secondary)
                     }
                 }
 
                 if let lastRefreshAt = model.lastRefreshAt {
                     Text("Last sync \(formattedRelativeDate(lastRefreshAt))")
-                        .font(.caption.weight(.semibold))
+                        .font(RoachType.caption(.semibold))
                         .foregroundStyle(RoachTheme.subduedText)
                 }
 
@@ -212,7 +212,7 @@ struct VaultView: View {
 
                 if let lastRefreshAt = model.lastRefreshAt {
                     Text("Last sync \(formattedRelativeDate(lastRefreshAt))")
-                        .font(.caption)
+                        .font(RoachType.caption)
                         .foregroundStyle(RoachTheme.subduedText)
                 }
             }
@@ -230,7 +230,7 @@ struct VaultView: View {
 
                 if vault.roachBrain.isEmpty {
                     Text("No captured memory yet.")
-                        .font(.subheadline)
+                        .font(RoachType.subheadline())
                         .foregroundStyle(RoachTheme.subduedText)
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -283,13 +283,13 @@ struct VaultView: View {
 
                 if !hasShelfContent {
                     Text("No shelf items yet.")
-                        .font(.subheadline)
+                        .font(RoachType.subheadline())
                         .foregroundStyle(RoachTheme.subduedText)
                 } else {
                     if !vault.knowledgeFiles.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Docs and media")
-                                .font(.headline)
+                                .font(RoachType.headline())
                                 .foregroundStyle(RoachTheme.text)
 
                             ScrollView(.horizontal, showsIndicators: false) {
@@ -324,7 +324,7 @@ struct VaultView: View {
 
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Captured web")
-                                .font(.headline)
+                                .font(RoachType.headline())
                                 .foregroundStyle(RoachTheme.text)
 
                             ScrollView(.horizontal, showsIndicators: false) {
@@ -358,7 +358,7 @@ struct VaultView: View {
     private func vaultShelfSection(title: String, items: [CompanionVaultShelfItem], accent: Color) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.headline)
+                .font(RoachType.headline())
                 .foregroundStyle(RoachTheme.text)
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -501,12 +501,12 @@ private struct CompanionVaultShelfCard: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
-                    .font(.headline.weight(.semibold))
+                    .font(RoachType.headline(.semibold))
                     .foregroundStyle(RoachTheme.text)
                     .lineLimit(2)
 
                 Text(detail)
-                    .font(.subheadline)
+                    .font(RoachType.subheadline())
                     .foregroundStyle(RoachTheme.subduedText)
                     .lineLimit(4)
                     .multilineTextAlignment(.leading)

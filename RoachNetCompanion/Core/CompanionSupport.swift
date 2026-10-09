@@ -255,6 +255,8 @@ enum CompanionLaunchOptions {
     static let screenshotTab: CompanionTab? = {
         let value = ProcessInfo.processInfo.environment["ROACHNET_SCREENSHOT_TAB"]?.lowercased()
         switch value {
+        case "home":
+            return .home
         case "chat":
             return .chat
         case "vault":
@@ -1232,7 +1234,7 @@ enum CompanionDemoState {
                         ),
                         CompanionRoachClawOperations.Probe(
                             id: "ollama",
-                            label: "Ollama",
+                            label: "Local model lane",
                             available: true,
                             detail: "Local model runner is reachable."
                         ),
@@ -1248,7 +1250,7 @@ enum CompanionDemoState {
                     drafts: nil,
                     active: 8,
                     route: "roachnet://runtime/service-health",
-                    summaryItems: ["Ollama: ok", "RoachClaw native agent: ok", "Intake policy: ok", "Updates: ok"],
+                    summaryItems: ["Local model lane: ok", "RoachClaw native agent: ok", "Intake policy: ok", "Updates: ok"],
                     detail: "Secret-safe health report for model runner, native agent, memory, embeddings, intake, services, tools, and updates.",
                     actions: ["Run service health", "Inspect degraded lanes", "Copy safe report"]
                 ),
@@ -1781,7 +1783,7 @@ enum CompanionDemoState {
             lastUpdatedAt: Date().addingTimeInterval(-110)
         ),
         services: [
-            CompanionService(serviceName: "ollama", friendlyName: "Ollama", status: "Running", installed: true),
+            CompanionService(serviceName: "roachnet_ollama", friendlyName: "RoachNet Chat (RoachInference)", status: "Running", installed: true),
             CompanionService(serviceName: "openclaw", friendlyName: "OpenClaw", status: "Running", installed: true),
             CompanionService(serviceName: "catalog-sync", friendlyName: "Catalog sync", status: "Idle", installed: true),
         ],

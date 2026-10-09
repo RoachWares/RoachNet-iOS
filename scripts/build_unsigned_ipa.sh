@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROJECT="$ROOT/RoachNetCompanion.xcodeproj"
 SCHEME="RoachNetCompanion"
-VERSION="0.1.5"
+VERSION="0.2.0"
 BUILD_ROOT="$ROOT/build/release"
 DERIVED_DATA_PATH="$BUILD_ROOT/DerivedData"
 DIST_DIR="$ROOT/dist"
@@ -15,7 +15,8 @@ CHECKSUM_PATH="$IPA_PATH.sha256"
 if [[ "${ROACHNET_REGENERATE_XCODEPROJ:-0}" == "1" ]]; then
   ruby "$ROOT/scripts/generate_xcodeproj.rb"
 fi
-rm -rf "$BUILD_ROOT" "$DIST_DIR"
+# Keep earlier versions' IPAs in dist/; only replace this version's outputs.
+rm -rf "$BUILD_ROOT" "$DIST_DIR/Payload" "$IPA_PATH" "$CHECKSUM_PATH"
 mkdir -p "$BUILD_ROOT" "$DIST_DIR/Payload"
 
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
