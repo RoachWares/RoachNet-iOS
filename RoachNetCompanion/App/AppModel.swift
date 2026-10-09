@@ -1883,7 +1883,7 @@ final class CompanionAppModel {
     }
 
     private func applyDemoState() {
-        pairedMachineName = nil
+        pairedMachineName = CompanionLaunchOptions.screenshotMode ? "Studio Mac" : nil
         applyDemoOrg()
         if catalogItems.isEmpty {
             catalogItems = CompanionDemoState.catalogItems
@@ -1898,7 +1898,7 @@ final class CompanionAppModel {
         currentSession = CompanionDemoState.currentSession
         runtime = CompanionDemoState.runtime
         vault = CompanionDemoState.vault
-        bannerText = "Preview mode is ready. Link your Mac to go live."
+        bannerText = CompanionLaunchOptions.screenshotMode ? nil : "Preview mode is ready. Link your Mac to go live."
         persistCache()
     }
 

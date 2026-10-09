@@ -41,7 +41,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C456BDB24CEA7E580248F1A2238245CB"
+               BlueprintIdentifier = "E77DE686A7E78F4FB78395FCCAC5BF83"
                BuildableName = "RoachNetCompanionUITests.xctest"
                BlueprintName = "RoachNetCompanionUITests"
                ReferencedContainer = "container:RoachNetCompanion.xcodeproj">

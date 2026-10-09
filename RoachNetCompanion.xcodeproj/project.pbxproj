@@ -15,17 +15,16 @@
 		21CA11E2EBF1004136AAA58B125B9B8B /* JetBrainsMono-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = B76872EBE2EF703D37F88100AECA6FD8 /* JetBrainsMono-OFL.txt */; };
 		28BA7DBCE3A43F09AF4D87D060D8AA24 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FCEE5E3E66015FFF4DCA7D830102CE0 /* AppModel.swift */; };
 		2C69B9D5DCA2A4CEC55F365E3A8E6BA0 /* CompanionSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C26E88564A63FEA78F0340573103934 /* CompanionSupport.swift */; };
+		3B0DF923666BF225ACBDE385CB6339FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC5B234AA86734318758393E9187DE89 /* Foundation.framework */; };
 		3BAE4C1879B33B00FB3D897290B605B9 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4494E0E08FFF8C817739749A03AA187E /* Inter-Regular.ttf */; };
 		563E3F4E965B5BF59C302895EDC38D27 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D7722075D6CFE9495E91FFE900772D /* HomeView.swift */; };
 		5961DBB4F07E034976A1DF7DCBC896A7 /* RoachNetAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17FB1BAE66D0E6D9F5F7BB0BEA06C86 /* RoachNetAPIClient.swift */; };
-		5AB2ACD6CF1EFA60C727AA14072399E0 /* CompanionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C73BB5E0386DDEC6C692512D0447C62 /* CompanionUITests.swift */; };
 		6D715A842D0731DC4757B71C397A5175 /* AppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA99C682B40978E28B3EDAF01E099103 /* AppsView.swift */; };
 		847F48376E8783F2919096BFBAB53634 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9F7F890FB70724AB145DF987F9069C6 /* Assets.xcassets */; };
 		88B24E3CD3B111212C4F927562BC7EC4 /* OrgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229A556395D8B1C151CBE277D9BC09E5 /* OrgView.swift */; };
 		88E1DD15AB203B8AF8D05530F9D16A30 /* CompanionRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9414B2BB91645654F2D6ACFBEAE7C1E /* CompanionRootView.swift */; };
 		8DA241517DEAA639F94151944D27770F /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2CB10119185A4205460EBCF6E412CA83 /* Inter-Bold.ttf */; };
 		9A6B987C0C7B609C911320AEE9B04CF2 /* RoachType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01615E7BE278DD6C5E45F3687F863CD /* RoachType.swift */; };
-		A9C83218AEA8E5358A4408EAB6FD9456 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC5B234AA86734318758393E9187DE89 /* Foundation.framework */; };
 		B0D265F334F4DD6C54A819E5E581D379 /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F76E2135A708410D93A3B5B598AAE3AA /* JetBrainsMono-Regular.ttf */; };
 		B32694B8DC608C38F7B40AE5890459D7 /* OrgDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3FD386AA8EAF67AA79D417AA88AF5C /* OrgDemo.swift */; };
 		B95D30975D08CB6DA22E1DA9B1D9D1F7 /* Inter-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 967AF1CD20276CC88291A4110ED73A20 /* Inter-OFL.txt */; };
@@ -36,13 +35,15 @@
 		E1B4381A326D159EDE914F04194ADD7B /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6B532155E3774D3ACCFA2AD112F5352E /* Inter-Medium.ttf */; };
 		E21DC2DB48F29DDF49072887BA0E19C9 /* ConnectionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BA82152D45264C13DC49955D067447 /* ConnectionSettingsView.swift */; };
 		E661EA289F6D2CB2F00AE0517FFCA7BB /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 831E41B2EE0B17077A9212940B98FED4 /* JetBrainsMono-Bold.ttf */; };
+		E83F676A9CC9F3103513BD745E6FF76B /* MarketingScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C1622C7CACC51E63B2B999F6728539 /* MarketingScreenshotTests.swift */; };
+		EC182A1173F1AB9E9AF51FE4E0396045 /* CompanionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3E121D638E3C545398C83196CD92C1 /* CompanionUITests.swift */; };
 		F268BC2A0DDE48E12A577ACFE86500BF /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D17C7CA8BA9E517C6587029653A43697 /* Inter-SemiBold.ttf */; };
 		F6E867214BBF21A49AB16E601FBD0660 /* RoachTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E817510CFC856C76B5852726EA565DD /* RoachTheme.swift */; };
 		FA7CC09350C394291C937E096A521369 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC5B234AA86734318758393E9187DE89 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		71B2DD192D54FF359B987BF8E5FA0853 /* PBXContainerItemProxy */ = {
+		9C986B8504B8635190BEFEAF7BFC364B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B30043317F00592525C22ACFA6604C95 /* Project object */;
 			proxyType = 1;
@@ -55,13 +56,13 @@
 		0B1C08AE4C46D53EE224A31C0D0FDCD0 /* JetBrainsMono-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "JetBrainsMono-ExtraBold.ttf"; path = "RoachNetCompanion/Resources/Fonts/JetBrainsMono-ExtraBold.ttf"; sourceTree = "<group>"; };
 		0F6C64967070DFF6731577A6AF9B0AE1 /* RoachNetCompanionApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachNetCompanionApp.swift; path = RoachNetCompanion/App/RoachNetCompanionApp.swift; sourceTree = "<group>"; };
 		0FE169BCC4BAE324A3782A56F52D3DFE /* RoachNetCompanionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoachNetCompanionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		15C1622C7CACC51E63B2B999F6728539 /* MarketingScreenshotTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarketingScreenshotTests.swift; path = RoachNetCompanionUITests/MarketingScreenshotTests.swift; sourceTree = "<group>"; };
 		229A556395D8B1C151CBE277D9BC09E5 /* OrgView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrgView.swift; path = RoachNetCompanion/Features/Org/OrgView.swift; sourceTree = "<group>"; };
 		25AC7F888A71E6A5624A8C67BBB2B656 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = RoachNetCompanion/Info.plist; sourceTree = "<group>"; };
 		2C26E88564A63FEA78F0340573103934 /* CompanionSupport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionSupport.swift; path = RoachNetCompanion/Core/CompanionSupport.swift; sourceTree = "<group>"; };
 		2CB10119185A4205460EBCF6E412CA83 /* Inter-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Inter-Bold.ttf"; path = "RoachNetCompanion/Resources/Fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		2E817510CFC856C76B5852726EA565DD /* RoachTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachTheme.swift; path = RoachNetCompanion/Features/Shared/RoachTheme.swift; sourceTree = "<group>"; };
 		2FCEE5E3E66015FFF4DCA7D830102CE0 /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppModel.swift; path = RoachNetCompanion/App/AppModel.swift; sourceTree = "<group>"; };
-		3C73BB5E0386DDEC6C692512D0447C62 /* CompanionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionUITests.swift; path = RoachNetCompanionUITests/CompanionUITests.swift; sourceTree = "<group>"; };
 		43F22EC9A5C2C6F9287BFDFBA9B1B4AC /* OrgModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrgModels.swift; path = RoachNetCompanion/Core/OrgModels.swift; sourceTree = "<group>"; };
 		4494E0E08FFF8C817739749A03AA187E /* Inter-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Inter-Regular.ttf"; path = "RoachNetCompanion/Resources/Fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
 		567DDB9BBF3C24A578E51CF481F949E3 /* CompanionModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionModels.swift; path = RoachNetCompanion/Core/CompanionModels.swift; sourceTree = "<group>"; };
@@ -80,6 +81,7 @@
 		C01615E7BE278DD6C5E45F3687F863CD /* RoachType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachType.swift; path = RoachNetCompanion/Features/Shared/RoachType.swift; sourceTree = "<group>"; };
 		C54F1EEDB4ADEEDE0DEC31868F66CA65 /* generate_xcodeproj.rb */ = {isa = PBXFileReference; includeInIndex = 1; name = generate_xcodeproj.rb; path = scripts/generate_xcodeproj.rb; sourceTree = "<group>"; };
 		CCA7C3AF2847C89E51E4E4EAA1BD67C6 /* JetBrainsMono-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "JetBrainsMono-Medium.ttf"; path = "RoachNetCompanion/Resources/Fonts/JetBrainsMono-Medium.ttf"; sourceTree = "<group>"; };
+		CD3E121D638E3C545398C83196CD92C1 /* CompanionUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionUITests.swift; path = RoachNetCompanionUITests/CompanionUITests.swift; sourceTree = "<group>"; };
 		CF97828E93B28299C085CE81ED31FD59 /* RoachNetCompanion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoachNetCompanion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D17C7CA8BA9E517C6587029653A43697 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Inter-SemiBold.ttf"; path = "RoachNetCompanion/Resources/Fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		F17FB1BAE66D0E6D9F5F7BB0BEA06C86 /* RoachNetAPIClient.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachNetAPIClient.swift; path = RoachNetCompanion/Core/RoachNetAPIClient.swift; sourceTree = "<group>"; };
@@ -98,17 +100,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2491301718B5BFF48B76A7899DE32E66 /* Frameworks */ = {
+		629D247F7ADB2D03EE3F95527A03231C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9C83218AEA8E5358A4408EAB6FD9456 /* Foundation.framework in Frameworks */,
+				3B0DF923666BF225ACBDE385CB6339FD /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5BBE1763B4C6B40DFB79AC94C71551AF /* RoachNetCompanionUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CD3E121D638E3C545398C83196CD92C1 /* CompanionUITests.swift */,
+				15C1622C7CACC51E63B2B999F6728539 /* MarketingScreenshotTests.swift */,
+			);
+			name = RoachNetCompanionUITests;
+			sourceTree = "<group>";
+		};
 		67681CCB7B9377BD32F8D419FF4433EB /* scripts */ = {
 			isa = PBXGroup;
 			children = (
@@ -178,16 +189,8 @@
 				F605E655FAE1E7A77B1278774CFA2A81 /* Frameworks */,
 				B4A9CD0830AA159027188909020C0EC0 /* RoachNetCompanion */,
 				67681CCB7B9377BD32F8D419FF4433EB /* scripts */,
-				D4ACE0BFAE765C3EA17E1F925108E196 /* RoachNetCompanionUITests */,
+				5BBE1763B4C6B40DFB79AC94C71551AF /* RoachNetCompanionUITests */,
 			);
-			sourceTree = "<group>";
-		};
-		D4ACE0BFAE765C3EA17E1F925108E196 /* RoachNetCompanionUITests */ = {
-			isa = PBXGroup;
-			children = (
-				3C73BB5E0386DDEC6C692512D0447C62 /* CompanionUITests.swift */,
-			);
-			name = RoachNetCompanionUITests;
 			sourceTree = "<group>";
 		};
 		F605E655FAE1E7A77B1278774CFA2A81 /* Frameworks */ = {
@@ -218,18 +221,18 @@
 			productReference = CF97828E93B28299C085CE81ED31FD59 /* RoachNetCompanion.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C456BDB24CEA7E580248F1A2238245CB /* RoachNetCompanionUITests */ = {
+		E77DE686A7E78F4FB78395FCCAC5BF83 /* RoachNetCompanionUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A05D054218A8B0FAE4AB41130CADE672 /* Build configuration list for PBXNativeTarget "RoachNetCompanionUITests" */;
+			buildConfigurationList = 520FCBFE97B9D5014012B953C9AE607C /* Build configuration list for PBXNativeTarget "RoachNetCompanionUITests" */;
 			buildPhases = (
-				52EEF986EB26BE8098BC7BACB7E77FB8 /* Sources */,
-				2491301718B5BFF48B76A7899DE32E66 /* Frameworks */,
-				CB6538171DC923CE1C7B12324E611246 /* Resources */,
+				4B66FD28D6E434F0C39883B3AEFAEF70 /* Sources */,
+				629D247F7ADB2D03EE3F95527A03231C /* Frameworks */,
+				D70FA16202E1CC1B4180AA377B9EE623 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				1E77FC51CA6C407AFCF0604CABF038D8 /* PBXTargetDependency */,
+				5747B7F601C375A420483464669ABC54 /* PBXTargetDependency */,
 			);
 			name = RoachNetCompanionUITests;
 			productName = RoachNetCompanionUITests;
@@ -261,7 +264,7 @@
 			projectRoot = "";
 			targets = (
 				5BCD53BC25A4BC3F80ECE9641998A000 /* RoachNetCompanion */,
-				C456BDB24CEA7E580248F1A2238245CB /* RoachNetCompanionUITests */,
+				E77DE686A7E78F4FB78395FCCAC5BF83 /* RoachNetCompanionUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -286,7 +289,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CB6538171DC923CE1C7B12324E611246 /* Resources */ = {
+		D70FA16202E1CC1B4180AA377B9EE623 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -296,11 +299,12 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		52EEF986EB26BE8098BC7BACB7E77FB8 /* Sources */ = {
+		4B66FD28D6E434F0C39883B3AEFAEF70 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5AB2ACD6CF1EFA60C727AA14072399E0 /* CompanionUITests.swift in Sources */,
+				EC182A1173F1AB9E9AF51FE4E0396045 /* CompanionUITests.swift in Sources */,
+				E83F676A9CC9F3103513BD745E6FF76B /* MarketingScreenshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,31 +335,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		1E77FC51CA6C407AFCF0604CABF038D8 /* PBXTargetDependency */ = {
+		5747B7F601C375A420483464669ABC54 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = RoachNetCompanion;
 			target = 5BCD53BC25A4BC3F80ECE9641998A000 /* RoachNetCompanion */;
-			targetProxy = 71B2DD192D54FF359B987BF8E5FA0853 /* PBXContainerItemProxy */;
+			targetProxy = 9C986B8504B8635190BEFEAF7BFC364B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		45A4D0047102DC7D954D88B095A9C8A3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.roachwares.RoachNetCompanionUITests;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = RoachNetCompanion;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		5282FE196B4AD9F6BEDDB6B9982DC73A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -520,7 +508,7 @@
 			};
 			name = Release;
 		};
-		D1139F7E05943E21DC96C2A504175A43 /* Debug */ = {
+		C9A6C9FC817B2D14838D1B62AD709718 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -535,6 +523,22 @@
 			};
 			name = Debug;
 		};
+		D6329A6456C579E5807122783E89F62F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roachwares.RoachNetCompanionUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = RoachNetCompanion;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -547,20 +551,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		520FCBFE97B9D5014012B953C9AE607C /* Build configuration list for PBXNativeTarget "RoachNetCompanionUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D6329A6456C579E5807122783E89F62F /* Release */,
+				C9A6C9FC817B2D14838D1B62AD709718 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		59BFE9E0477D8B8DB06ECB25BB13455F /* Build configuration list for PBXNativeTarget "RoachNetCompanion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				592A4620CC663E94D8D58A1621F1A3A4 /* Release */,
 				5282FE196B4AD9F6BEDDB6B9982DC73A /* Debug */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A05D054218A8B0FAE4AB41130CADE672 /* Build configuration list for PBXNativeTarget "RoachNetCompanionUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				45A4D0047102DC7D954D88B095A9C8A3 /* Release */,
-				D1139F7E05943E21DC96C2A504175A43 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -210,7 +210,7 @@ struct HomeView: View {
     // MARK: Derived
 
     private var isLive: Bool {
-        model.connection.isConfigured && model.runtime != nil && !CompanionLaunchOptions.forceDemoMode
+        model.connection.isConfigured && model.runtime != nil && (!CompanionLaunchOptions.forceDemoMode || CompanionLaunchOptions.screenshotMode)
     }
 
     private var brainReady: Bool { model.runtime?.roachClaw.ready ?? false }

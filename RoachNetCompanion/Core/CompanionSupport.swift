@@ -270,7 +270,10 @@ enum CompanionLaunchOptions {
         }
     }()
 
-    static let forceDemoMode = ProcessInfo.processInfo.environment["ROACHNET_DEMO_MODE"] == "1"
+    /// Store/website screenshots: demo data, presented as a phone paired to "Studio Mac".
+    static let screenshotMode = ProcessInfo.processInfo.environment["ROACHNET_SCREENSHOT_MODE"] == "1"
+
+    static let forceDemoMode = ProcessInfo.processInfo.environment["ROACHNET_DEMO_MODE"] == "1" || screenshotMode
 }
 
 enum CompanionDemoState {
