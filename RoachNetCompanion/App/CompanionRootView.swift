@@ -26,7 +26,7 @@ struct CompanionRootView: View {
     }
 
     private var bottomAvoidance: CGFloat {
-        model.selectedTab == .chat ? RoachCompanionChrome.tabBarAvoidance : 0
+        RoachCompanionChrome.tabBarAvoidance
     }
 
     var body: some View {
@@ -58,7 +58,7 @@ struct CompanionRootView: View {
         }
         .overlay(alignment: .bottom) {
             RoachBottomChromeScrim(accent: shellAccent)
-                .frame(height: 176)
+                .frame(height: 86)
                 .allowsHitTesting(false)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {

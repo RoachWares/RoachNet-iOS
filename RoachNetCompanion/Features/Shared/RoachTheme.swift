@@ -172,9 +172,10 @@ struct RoachBottomChromeScrim: View {
         LinearGradient(
             colors: [
                 Color.clear,
-                RoachTheme.background.opacity(0.72),
-                RoachTheme.background.opacity(0.98),
-                accent.opacity(0.10),
+                Color.clear,
+                RoachTheme.background.opacity(0.30),
+                RoachTheme.background.opacity(0.78),
+                accent.opacity(0.05),
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -912,6 +913,21 @@ struct RoachSignalTile: View {
     let value: String
     let accent: Color
     let systemImage: String
+    let subtitle: String?
+
+    init(
+        label: String,
+        value: String,
+        accent: Color,
+        systemImage: String,
+        subtitle: String? = nil
+    ) {
+        self.label = label
+        self.value = value
+        self.accent = accent
+        self.systemImage = systemImage
+        self.subtitle = subtitle
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -946,6 +962,13 @@ struct RoachSignalTile: View {
                 .font(.headline.weight(.bold))
                 .foregroundStyle(RoachTheme.text)
                 .lineLimit(2)
+
+            if let subtitle, !subtitle.isEmpty {
+                Text(subtitle)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(accent.opacity(0.9))
+                    .lineLimit(2)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)

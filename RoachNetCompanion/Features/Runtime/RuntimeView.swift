@@ -1,5 +1,6 @@
 @preconcurrency import CoreBluetooth
 import CoreLocation
+import Foundation
 import SwiftUI
 
 struct RuntimeView: View {
@@ -862,7 +863,717 @@ struct RuntimeView: View {
                         }
                     }
                 }
+
+                if let lanes = model.runtime?.roachClaw.playbook?.lanes, !lanes.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        RoachSectionHeader(
+                            eyebrow: "Playbook",
+                            title: "Cookbook, research, compare.",
+                            detail: "RoachClaw-native moves for model fit, research, blind comparison, and RoachBrain cleanup."
+                        )
+
+                        if let capabilities = model.runtime?.roachClaw.playbook?.capabilities, !capabilities.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(capabilities.prefix(6), id: \.self) { capability in
+                                        RoachStatusPill(
+                                            title: playbookCapabilityLabel(capability),
+                                            accent: capability.contains("voice") ? RoachTheme.tertiary : RoachTheme.secondary
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 1)
+                            }
+                        }
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                            ],
+                            alignment: .leading,
+                            spacing: 10
+                        ) {
+                            ForEach(lanes.prefix(4)) { lane in
+                                RoachSignalTile(
+                                    label: lane.title,
+                                    value: playbookStatusLabel(lane.status),
+                                    accent: playbookAccent(lane.accent),
+                                    systemImage: playbookIcon(lane.icon)
+                                )
+                                .accessibilityLabel("\(lane.title), \(playbookStatusLabel(lane.status)). \(lane.summary)")
+                            }
+                        }
+                    }
+                }
+
+                if let featureGroups = model.runtime?.roachClaw.playbook?.featureGroups, !featureGroups.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        RoachSectionHeader(
+                            eyebrow: "Native map",
+                            title: "Every lane gets a RoachNet surface.",
+                            detail: "Chat, agents, docs, memory, mail, calendar, media, voice, security, and iOS stay tracked as native work."
+                        )
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                            ],
+                            alignment: .leading,
+                            spacing: 10
+                        ) {
+                            ForEach(featureGroups) { feature in
+                                RoachSignalTile(
+                                    label: feature.title,
+                                    value: playbookStatusLabel(feature.status),
+                                    accent: featureGroupAccent(feature),
+                                    systemImage: featureGroupIcon(feature.id)
+                                )
+                                .accessibilityLabel("\(feature.title), \(playbookStatusLabel(feature.status)). \(feature.summary)")
+                            }
+                        }
+                    }
+                }
+
+                if let operations = model.runtime?.roachClaw.operations {
+                    VStack(alignment: .leading, spacing: 10) {
+                        RoachSectionHeader(
+                            eyebrow: "Ops",
+                            title: "The useful wires are visible.",
+                            detail: "Diagnostics, hooks, jobs, contacts, reports, and recovery state stay local and inspectable."
+                        )
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                            ],
+                            alignment: .leading,
+                            spacing: 10
+                        ) {
+                            if let commandDeck = operations.commandDeck {
+                                RoachSignalTile(
+                                    label: "Command",
+                                    value: "\(commandDeck.count ?? 0) actions",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "command.circle",
+                                    subtitle: shellSurfaceSubtitle(commandDeck)
+                                )
+                            }
+
+                            if let contextRail = operations.contextRail {
+                                RoachSignalTile(
+                                    label: "Context",
+                                    value: "\(contextRail.count ?? 0) crumbs",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "sidebar.trailing",
+                                    subtitle: shellSurfaceSubtitle(contextRail)
+                                )
+                            }
+
+                            if let vaultNavigator = operations.vaultNavigator {
+                                RoachSignalTile(
+                                    label: "Vault",
+                                    value: "\(vaultNavigator.count ?? 0) local",
+                                    accent: RoachTheme.primary,
+                                    systemImage: "folder.badge.gearshape",
+                                    subtitle: shellSurfaceSubtitle(vaultNavigator)
+                                )
+                            }
+
+                            if let agentMonitor = operations.agentMonitor {
+                                RoachSignalTile(
+                                    label: "Monitor",
+                                    value: "\(agentMonitor.active ?? 0) live",
+                                    accent: (agentMonitor.stalled ?? 0) > 0 ? .orange : RoachTheme.primary,
+                                    systemImage: "waveform.path.ecg.rectangle",
+                                    subtitle: shellSurfaceSubtitle(agentMonitor)
+                                )
+                            }
+
+                            if let orchestration = operations.orchestrationDashboard {
+                                RoachSignalTile(
+                                    label: "Orchestration",
+                                    value: "\(orchestration.open ?? 0) handoffs",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "rectangle.3.group",
+                                    subtitle: shellSurfaceSubtitle(orchestration)
+                                )
+                            }
+                        }
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                            ],
+                            alignment: .leading,
+                            spacing: 10
+                        ) {
+                            if let diagnostics = operations.diagnostics {
+                                RoachSignalTile(
+                                    label: "Diagnostics",
+                                    value: playbookStatusLabel(diagnostics.status),
+                                    accent: diagnostics.warnings?.isEmpty == false ? .orange : RoachTheme.secondary,
+                                    systemImage: "stethoscope"
+                                )
+                            }
+
+                            if let serviceHealth = operations.serviceHealth {
+                                RoachSignalTile(
+                                    label: "Service Health",
+                                    value: playbookStatusLabel(serviceHealth.status),
+                                    accent: serviceHealth.status == "ok" ? RoachTheme.secondary : .orange,
+                                    systemImage: "waveform.path.ecg.rectangle"
+                                )
+                            }
+
+                            if let hooks = operations.hooks {
+                                RoachSignalTile(
+                                    label: "Hooks",
+                                    value: playbookStatusLabel(hooks.status),
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "point.3.connected.trianglepath.dotted"
+                                )
+                            }
+
+                            if let jobs = operations.jobs {
+                                RoachSignalTile(
+                                    label: "Jobs",
+                                    value: "\(jobs.scheduler.pending) queued",
+                                    accent: jobs.status == "idle" ? RoachTheme.subduedText : RoachTheme.secondary,
+                                    systemImage: "clock.arrow.circlepath"
+                                )
+                            }
+
+                            if let contacts = operations.contacts {
+                                RoachSignalTile(
+                                    label: "Contacts",
+                                    value: "\(contacts.recordCount ?? 0) local",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "person.2.wave.2"
+                                )
+                            }
+
+                            if let tasks = operations.notesTasks {
+                                RoachSignalTile(
+                                    label: "Tasks",
+                                    value: "\(tasks.open ?? tasks.count ?? 0) open",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "checklist"
+                                )
+                            }
+
+                            if let calendar = operations.calendar {
+                                RoachSignalTile(
+                                    label: "Calendar",
+                                    value: "\(calendar.count ?? 0) events",
+                                    accent: .orange,
+                                    systemImage: "calendar.badge.clock"
+                                )
+                            }
+
+                            if let reports = operations.reports {
+                                RoachSignalTile(
+                                    label: "Reports",
+                                    value: "\(reports.count ?? 0) saved",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "chart.bar.doc.horizontal"
+                                )
+                            }
+
+                            if let memories = operations.memories {
+                                RoachSignalTile(
+                                    label: "Memories",
+                                    value: "\(memories.count ?? 0) saved",
+                                    accent: .orange,
+                                    systemImage: "brain.head.profile"
+                                )
+                            }
+
+                            if let skills = operations.skills {
+                                RoachSignalTile(
+                                    label: "Skills",
+                                    value: "\(skills.count ?? 0) ready",
+                                    accent: RoachTheme.primary,
+                                    systemImage: "sparkles.square.filled.on.square"
+                                )
+                            }
+
+                            if let drafts = operations.editorDrafts {
+                                RoachSignalTile(
+                                    label: "Drafts",
+                                    value: "\(drafts.open ?? drafts.count ?? 0) open",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "doc.text"
+                                )
+                            }
+
+                            if let migrationTools = operations.migrationDocumentTools {
+                                RoachSignalTile(
+                                    label: "Migration",
+                                    value: playbookStatusLabel(migrationTools.status),
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "doc.badge.gearshape",
+                                    subtitle: shellSurfaceSubtitle(migrationTools)
+                                )
+                            }
+
+                            if let searchCache = operations.searchCache {
+                                RoachSignalTile(
+                                    label: "Search",
+                                    value: "\(searchCache.count ?? 0) cached",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "magnifyingglass.circle"
+                                )
+                            }
+
+                            if let gallery = operations.gallery {
+                                RoachSignalTile(
+                                    label: "Gallery",
+                                    value: "\(gallery.count ?? 0) assets",
+                                    accent: RoachTheme.primary,
+                                    systemImage: "photo.on.rectangle.angled"
+                                )
+                            }
+
+                            if let webhooks = operations.webhooks {
+                                RoachSignalTile(
+                                    label: "Hooks",
+                                    value: "\(webhooks.active ?? 0) armed",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "point.3.connected.trianglepath.dotted"
+                                )
+                            }
+
+                            if let runs = operations.agentRuns {
+                                RoachSignalTile(
+                                    label: "Runs",
+                                    value: "\(runs.active ?? 0) live",
+                                    accent: RoachTheme.primary,
+                                    systemImage: "bolt.badge.clock"
+                                )
+                            }
+
+                            if let compactions = operations.contextCompactions {
+                                RoachSignalTile(
+                                    label: "Context",
+                                    value: "\(compactions.count ?? 0) saved",
+                                    accent: .orange,
+                                    systemImage: "text.badge.checkmark"
+                                )
+                            }
+
+                            if let toolIndex = operations.toolIndex {
+                                RoachSignalTile(
+                                    label: "Tools",
+                                    value: "\(toolIndex.active ?? toolIndex.count ?? 0) armed",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "wrench.and.screwdriver"
+                                )
+                            }
+
+                            if let embeddingLanes = operations.embeddingLanes {
+                                RoachSignalTile(
+                                    label: "Embeddings",
+                                    value: "\(embeddingLanes.active ?? embeddingLanes.count ?? 0) active",
+                                    accent: embeddingLanes.status == "healthy" ? RoachTheme.primary : .orange,
+                                    systemImage: "point.3.filled.connected.trianglepath.dotted",
+                                    subtitle: shellSurfaceSubtitle(embeddingLanes)
+                                )
+                            }
+
+                            if let toolPolicy = operations.toolPolicy {
+                                RoachSignalTile(
+                                    label: "Policy",
+                                    value: playbookStatusLabel(toolPolicy.status),
+                                    accent: toolPolicy.status == "guide-only" ? .orange : RoachTheme.secondary,
+                                    systemImage: "shield.lefthalf.filled",
+                                    subtitle: shellSurfaceSubtitle(toolPolicy)
+                                )
+                            }
+
+                            if let uploadLimits = operations.uploadLimits {
+                                RoachSignalTile(
+                                    label: "Intake",
+                                    value: playbookStatusLabel(uploadLimits.status),
+                                    accent: RoachTheme.primary,
+                                    systemImage: "tray.and.arrow.down.fill",
+                                    subtitle: shellSurfaceSubtitle(uploadLimits)
+                                )
+                            }
+
+                            if let events = operations.events {
+                                RoachSignalTile(
+                                    label: "Events",
+                                    value: "\(events.count ?? 0) counters",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "dot.radiowaves.left.and.right"
+                                )
+                            }
+
+                            if let mail = operations.mail {
+                                RoachSignalTile(
+                                    label: "RoachMail",
+                                    value: "\(mail.messages ?? 0) / \(mail.drafts ?? 0)",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "envelope.badge"
+                                )
+                            }
+
+                            if let presets = operations.presets {
+                                RoachSignalTile(
+                                    label: "Presets",
+                                    value: "\(presets.count ?? 0) saved",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: "slider.horizontal.3"
+                                )
+                            }
+
+                            if let signatures = operations.signatures {
+                                RoachSignalTile(
+                                    label: "Signatures",
+                                    value: "\(signatures.count ?? 0) saved",
+                                    accent: .orange,
+                                    systemImage: "signature"
+                                )
+                            }
+
+                            if let tokens = operations.apiTokens {
+                                RoachSignalTile(
+                                    label: "Tokens",
+                                    value: "\(tokens.active ?? 0) active",
+                                    accent: RoachTheme.primary,
+                                    systemImage: "key.horizontal"
+                                )
+                            }
+
+                            if let backups = operations.backups {
+                                RoachSignalTile(
+                                    label: "Backups",
+                                    value: "\(backups.count ?? 0) snaps",
+                                    accent: RoachTheme.tertiary,
+                                    systemImage: "externaldrive.badge.timemachine"
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if let referenceInventory = model.runtime?.roachClaw.playbook?.referenceInventory {
+                    VStack(alignment: .leading, spacing: 10) {
+                        RoachSectionHeader(
+                            eyebrow: "GitHub upstream",
+                            title: "\(referenceInventory.functionalFileCount) functional files tracked.",
+                            detail: "\(referenceInventory.observedFileCount) files observed. The reference stack stays reference-only while RoachNet owns native rewrites."
+                        )
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                            ],
+                            alignment: .leading,
+                            spacing: 10
+                        ) {
+                            ForEach(referenceInventory.coverageGroups.prefix(8)) { group in
+                                RoachSignalTile(
+                                    label: group.label,
+                                    value: "\(group.fileCount) files",
+                                    accent: RoachTheme.secondary,
+                                    systemImage: inventoryGroupIcon(group.id)
+                                )
+                                .accessibilityLabel("\(group.label), \(group.fileCount) files, \(group.nativeSurface)")
+                            }
+                        }
+                    }
+                }
+
+                if let referenceModules = model.runtime?.roachClaw.playbook?.referenceModules, !referenceModules.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        RoachSectionHeader(
+                            eyebrow: "Coverage",
+                            title: "\(referenceModules.count) modules tracked.",
+                            detail: "The reference surface is mapped into RoachNet-native owners instead of being left as a mystery pile."
+                        )
+
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                                GridItem(.flexible(minimum: 0), spacing: 10),
+                            ],
+                            alignment: .leading,
+                            spacing: 10
+                        ) {
+                            ForEach(referenceModules.prefix(8)) { module in
+                                RoachSignalTile(
+                                    label: moduleName(module.source),
+                                    value: module.nativeSurface,
+                                    accent: module.status.contains("planned") ? .orange : RoachTheme.secondary,
+                                    systemImage: moduleIcon(module.category)
+                                )
+                                .accessibilityLabel("\(module.source), \(module.nativeSurface), \(playbookStatusLabel(module.status))")
+                            }
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    private func playbookCapabilityLabel(_ capability: String) -> String {
+        switch capability {
+        case "roachclaw-cookbook":
+            return "Cookbook"
+        case "roachclaw-quant-aware-fit":
+            return "Quant Fit"
+        case "roachclaw-deep-research":
+            return "Research"
+        case "roachclaw-model-compare":
+            return "Compare"
+        case "roachclaw-assistant-crew":
+            return "Assistant Crew"
+        case "roachclaw-session-history":
+            return "Session History"
+        case "roachclaw-provider-routes":
+            return "Provider Routes"
+        case "roachclaw-backup-restore":
+            return "Backup"
+        case "roachclaw-signatures":
+            return "Signatures"
+        case "roachclaw-local-api-keys":
+            return "Local Keys"
+        case "roachclaw-font-emoji-assets":
+            return "Assets"
+        case "roachclaw-housekeeping":
+            return "Housekeeping"
+        case "roachclaw-upload-limits":
+            return "Intake Policy"
+        case "roachbrain-memory-skills-audit":
+            return "RoachBrain"
+        case "vault-document-assist":
+            return "Vault Docs"
+        case "roachspeech-voice-lane":
+            return "Voice"
+        default:
+            return capability
+                .replacingOccurrences(of: "roachclaw-", with: "")
+                .replacingOccurrences(of: "roachbrain-", with: "")
+                .replacingOccurrences(of: "-", with: " ")
+                .capitalized
+        }
+    }
+
+    private func playbookStatusLabel(_ status: String) -> String {
+        status
+            .replacingOccurrences(of: "-", with: " ")
+            .split(separator: " ")
+            .map { $0.prefix(1).uppercased() + String($0.dropFirst()) }
+            .joined(separator: " ")
+    }
+
+    private func shellSurfaceSubtitle(_ lane: CompanionRoachClawOperations.CollectionLane) -> String? {
+        var parts: [String] = []
+
+        if let priority = lane.priority, !priority.isEmpty {
+            parts.append(playbookStatusLabel(priority))
+        }
+
+        if let hotkey = lane.hotkey, !hotkey.isEmpty {
+            parts.append(hotkey)
+        }
+
+        if let firstSummary = lane.summaryItems?.first, !firstSummary.isEmpty {
+            parts.append(firstSummary)
+        }
+
+        return parts.isEmpty ? nil : parts.prefix(3).joined(separator: " · ")
+    }
+
+    private func playbookIcon(_ icon: String?) -> String {
+        switch icon {
+        case "rectangle.stack.badge.person.crop":
+            return "rectangle.stack.badge.person.crop"
+        case "slider.horizontal.below.rectangle":
+            return "slider.horizontal.below.rectangle"
+        case "cpu":
+            return "cpu.fill"
+        case "doc.text.magnifyingglass":
+            return "doc.text.magnifyingglass"
+        case "rectangle.split.2x1":
+            return "rectangle.split.2x1.fill"
+        case "brain.head.profile":
+            return "brain.head.profile"
+        case "doc.richtext":
+            return "doc.richtext.fill"
+        case "doc.badge.gearshape":
+            return "doc.badge.gearshape"
+        case "waveform":
+            return "waveform"
+        case "paintpalette":
+            return "paintpalette.fill"
+        case "stethoscope":
+            return "wrench.and.screwdriver.fill"
+        case "person.2.wave.2":
+            return "person.2.fill"
+        case "chart.bar.doc.horizontal":
+            return "chart.bar.fill"
+        case "person.3.sequence":
+            return "person.3.sequence.fill"
+        case "externaldrive.badge.timemachine":
+            return "externaldrive.badge.timemachine"
+        case "rectangle.3.group":
+            return "rectangle.3.group.fill"
+        case "bolt.badge.clock":
+            return "bolt.badge.clock.fill"
+        case "waveform.path.ecg.rectangle":
+            return "waveform.path.ecg.rectangle"
+        default:
+            return "sparkles"
+        }
+    }
+
+    private func featureGroupIcon(_ id: String) -> String {
+        switch id {
+        case "chat":
+            return "bubble.left.and.bubble.right.fill"
+        case "session-board":
+            return "rectangle.stack.badge.person.crop.fill"
+        case "agent-tools":
+            return "hammer.fill"
+        case "cookbook":
+            return "cpu.fill"
+        case "deep-research":
+            return "doc.text.magnifyingglass"
+        case "compare":
+            return "rectangle.split.2x1.fill"
+        case "model-bench":
+            return "slider.horizontal.below.rectangle"
+        case "documents":
+            return "doc.richtext.fill"
+        case "memory-skills":
+            return "brain.head.profile"
+        case "email":
+            return "envelope.fill"
+        case "notes-tasks":
+            return "checklist"
+        case "calendar":
+            return "calendar"
+        case "search-rag":
+            return "magnifyingglass.circle.fill"
+        case "voice":
+            return "waveform"
+        case "gallery-editor":
+            return "photo.on.rectangle"
+        case "security":
+            return "lock.shield.fill"
+        case "mobile":
+            return "iphone"
+        case "contacts":
+            return "person.crop.circle.badge.checkmark"
+        case "diagnostics":
+            return "wrench.and.screwdriver.fill"
+        case "preferences":
+            return "slider.horizontal.3"
+        case "session-history":
+            return "clock.arrow.circlepath"
+        case "model-providers":
+            return "network"
+        case "assistant-crew":
+            return "person.3.sequence.fill"
+        case "orchestration":
+            return "rectangle.3.group.fill"
+        case "signatures":
+            return "signature"
+        case "backup-restore":
+            return "externaldrive.badge.timemachine"
+        case "local-api-keys":
+            return "key.horizontal.fill"
+        case "font-emoji-assets":
+            return "textformat.alt"
+        case "housekeeping":
+            return "sparkles.rectangle.stack.fill"
+        case "theme-studio":
+            return "paintpalette.fill"
+        case "uploads-personal-docs":
+            return "tray.and.arrow.down.fill"
+        case "webhooks-integrations":
+            return "point.3.connected.trianglepath.dotted"
+        case "background-jobs":
+            return "clock.arrow.circlepath"
+        case "visual-reports":
+            return "chart.bar.doc.horizontal"
+        case "admin-recovery":
+            return "lock.rotation"
+        default:
+            return "square.grid.2x2.fill"
+        }
+    }
+
+    private func featureGroupAccent(_ feature: CompanionRoachClawFeatureGroup) -> Color {
+        if feature.status.contains("planned") {
+            return .orange
+        }
+        if feature.status.contains("warmup") || feature.status.contains("needs") {
+            return RoachTheme.primary
+        }
+        if feature.id == "voice" || feature.id == "search-rag" || feature.id == "calendar" {
+            return RoachTheme.tertiary
+        }
+        return RoachTheme.secondary
+    }
+
+    private func moduleName(_ source: String) -> String {
+        source.split(separator: "/").last.map(String.init) ?? source
+    }
+
+    private func moduleIcon(_ category: String) -> String {
+        switch category {
+        case "route":
+            return "arrow.triangle.branch"
+        case "web":
+            return "globe"
+        case "source":
+            return "curlybraces"
+        default:
+            return "shippingbox.fill"
+        }
+    }
+
+    private func inventoryGroupIcon(_ id: String) -> String {
+        switch id {
+        case "routes":
+            return "arrow.triangle.branch"
+        case "core":
+            return "cpu.fill"
+        case "source":
+            return "curlybraces"
+        case "services":
+            return "server.rack"
+        case "mcp-servers":
+            return "point.3.connected.trianglepath.dotted"
+        case "scripts":
+            return "terminal.fill"
+        case "companion":
+            return "iphone.gen3"
+        case "static-js":
+            return "rectangle.3.group.bubble.left"
+        default:
+            return "square.stack.3d.up.fill"
+        }
+    }
+
+    private func playbookAccent(_ accent: String?) -> Color {
+        switch accent {
+        case "cyan":
+            return RoachTheme.tertiary
+        case "magenta":
+            return RoachTheme.primary
+        case "bronze":
+            return .orange
+        default:
+            return RoachTheme.secondary
         }
     }
 

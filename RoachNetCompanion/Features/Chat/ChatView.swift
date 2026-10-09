@@ -9,10 +9,10 @@ struct ChatView: View {
 
     private var promptSuggestions: [String] {
         [
-            "Give me the next useful move.",
-            "Summarize what RoachNet is doing right now.",
-            "Turn the latest local context into one clean brief.",
-            "What still works if the Mac goes dark?",
+            "Run a Cookbook check and tell me which model fits this Mac.",
+            "Plan a deep research brief I can save to the vault.",
+            "Compare two model routes on the same prompt.",
+            "Audit memory and skills before they become drawer junk.",
             model.recentInstallItems.first.map { _ in "What did I just send from Apps, and what happens next?" } ?? "What belongs on this shelf next?",
         ]
     }

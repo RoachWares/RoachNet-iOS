@@ -237,6 +237,234 @@ struct CompanionProviderEnvelope: Codable, Hashable, Sendable {
     let providers: [String: CompanionProviderStatus]
 }
 
+struct CompanionRoachClawPlaybookLane: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let title: String
+    let summary: String
+    let status: String
+    let icon: String?
+    let accent: String?
+    let localFirst: Bool?
+    let actions: [String]?
+}
+
+struct CompanionRoachClawFeatureGroup: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let title: String
+    let summary: String
+    let status: String
+    let nativeSurface: String?
+    let capabilities: [String]?
+}
+
+struct CompanionRoachClawReferenceSource: Codable, Hashable, Sendable {
+    let repository: String
+    let commit: String
+    let latestSeenCommit: String?
+    let posture: String?
+    let sourceKind: String?
+}
+
+struct CompanionRoachClawReferenceModule: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let category: String
+    let source: String
+    let nativeSurface: String
+    let status: String
+}
+
+struct CompanionRoachClawReferenceInventoryGroup: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let label: String
+    let prefix: String
+    let fileCount: Int
+    let nativeSurface: String
+    let status: String
+    let notes: String?
+}
+
+struct CompanionRoachClawReferenceInventory: Codable, Hashable, Sendable {
+    let schema: String
+    let repository: String
+    let commit: String
+    let latestSeenCommit: String?
+    let sourceKind: String?
+    let observedFileCount: Int
+    let functionalFileCount: Int
+    let coverageGroups: [CompanionRoachClawReferenceInventoryGroup]
+    let nonShippingPolicy: String?
+}
+
+struct CompanionRoachClawPlaybook: Codable, Hashable, Sendable {
+    let schema: String
+    let source: String?
+    let updatedAt: String?
+    let capabilities: [String]?
+    let referenceSource: CompanionRoachClawReferenceSource?
+    let featureGroups: [CompanionRoachClawFeatureGroup]?
+    let referenceInventory: CompanionRoachClawReferenceInventory?
+    let referenceModules: [CompanionRoachClawReferenceModule]?
+    let lanes: [CompanionRoachClawPlaybookLane]
+}
+
+struct CompanionRoachClawOperations: Codable, Hashable, Sendable {
+    struct Probe: Codable, Identifiable, Hashable, Sendable {
+        let id: String
+        let label: String
+        let available: Bool
+        let detail: String?
+    }
+
+    struct Diagnostics: Codable, Hashable, Sendable {
+        let status: String
+        let probes: [Probe]
+        let warnings: [String]?
+    }
+
+    struct Contacts: Codable, Hashable, Sendable {
+        let status: String
+        let storagePath: String?
+        let recordCount: Int?
+        let scopes: [String]
+        let notes: [String]?
+    }
+
+    struct HookEndpoint: Codable, Identifiable, Hashable, Sendable {
+        let id: String
+        let method: String
+        let path: String
+        let scope: String
+    }
+
+    struct Hooks: Codable, Hashable, Sendable {
+        let status: String
+        let storagePath: String?
+        let endpoints: [HookEndpoint]
+        let secretsPolicy: String?
+    }
+
+    struct Scheduler: Codable, Hashable, Sendable {
+        let status: String
+        let storagePath: String?
+        let pending: Int
+    }
+
+    struct Jobs: Codable, Hashable, Sendable {
+        let status: String
+        let scheduler: Scheduler
+    }
+
+    struct Reports: Codable, Hashable, Sendable {
+        let status: String
+        let root: String?
+        let formats: [String]
+        let templates: [String]
+        let count: Int?
+    }
+
+    struct CollectionLane: Codable, Hashable, Sendable {
+        let status: String
+        let storagePath: String?
+        let count: Int?
+        let open: Int?
+        let messages: Int?
+        let drafts: Int?
+        let active: Int?
+        let queued: Int?
+        let stalled: Int?
+        let priority: String?
+        let route: String?
+        let hotkey: String?
+        let summaryItems: [String]?
+        let detail: String?
+        let actions: [String]?
+
+        init(
+            status: String,
+            storagePath: String?,
+            count: Int?,
+            open: Int?,
+            messages: Int?,
+            drafts: Int?,
+            active: Int?,
+            queued: Int? = nil,
+            stalled: Int? = nil,
+            priority: String? = nil,
+            route: String? = nil,
+            hotkey: String? = nil,
+            summaryItems: [String]? = nil,
+            detail: String? = nil,
+            actions: [String]? = nil
+        ) {
+            self.status = status
+            self.storagePath = storagePath
+            self.count = count
+            self.open = open
+            self.messages = messages
+            self.drafts = drafts
+            self.active = active
+            self.queued = queued
+            self.stalled = stalled
+            self.priority = priority
+            self.route = route
+            self.hotkey = hotkey
+            self.summaryItems = summaryItems
+            self.detail = detail
+            self.actions = actions
+        }
+    }
+
+    struct AdminRecovery: Codable, Hashable, Sendable {
+        let status: String
+        let actions: [String]
+        let remoteAccess: Bool
+    }
+
+    let schema: String
+    let updatedAt: String?
+    let diagnostics: Diagnostics?
+    let serviceHealth: CollectionLane?
+    let contacts: Contacts?
+    let hooks: Hooks?
+    let jobs: Jobs?
+    let notesTasks: CollectionLane?
+    let calendar: CollectionLane?
+    let reports: Reports?
+    let memories: CollectionLane?
+    let skills: CollectionLane?
+    let editorDrafts: CollectionLane?
+    let migrationDocumentTools: CollectionLane?
+    let searchCache: CollectionLane?
+    let gallery: CollectionLane?
+    let webhooks: CollectionLane?
+    let agentRuns: CollectionLane?
+    let contextCompactions: CollectionLane?
+    let toolIndex: CollectionLane?
+    let events: CollectionLane?
+    let commandDeck: CollectionLane?
+    let contextRail: CollectionLane?
+    let vaultNavigator: CollectionLane?
+    let agentMonitor: CollectionLane?
+    let orchestrationDashboard: CollectionLane?
+    let mail: CollectionLane?
+    let presets: CollectionLane?
+    let signatures: CollectionLane?
+    let apiTokens: CollectionLane?
+    let cloudProviders: CollectionLane?
+    let workspaceBrowser: CollectionLane?
+    let userTime: CollectionLane?
+    let cookbookServeLifecycle: CollectionLane?
+    let scopedToolBridge: CollectionLane?
+    let tlsOverrides: CollectionLane?
+    let uploadLimits: CollectionLane?
+    let memoryProvider: CollectionLane?
+    let providerOAuth: CollectionLane?
+    let embeddingLanes: CollectionLane?
+    let toolPolicy: CollectionLane?
+    let backups: CollectionLane?
+    let adminRecovery: AdminRecovery?
+}
+
 struct CompanionRoachClawStatus: Codable, Hashable, Sendable {
     let label: String
     let ready: Bool?
@@ -246,6 +474,8 @@ struct CompanionRoachClawStatus: Codable, Hashable, Sendable {
     let installedModels: [String]?
     let ollama: CompanionProviderStatus?
     let openclaw: CompanionProviderStatus?
+    let playbook: CompanionRoachClawPlaybook?
+    let operations: CompanionRoachClawOperations?
 }
 
 struct CompanionRoachTailPeer: Codable, Identifiable, Hashable, Sendable {
