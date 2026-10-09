@@ -31,6 +31,7 @@ xcodebuild \
   -derivedDataPath "$DERIVED_DATA_PATH" \
   BUILD_DIR="$BUILD_ROOT" \
   SYMROOT="$BUILD_ROOT" \
+  OBJROOT="$BUILD_ROOT/Intermediates" \
   build
 
 if [[ ! -d "$APP_PATH" ]]; then

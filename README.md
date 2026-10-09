@@ -5,9 +5,18 @@ Phone lane for RoachClaw, vault reads, runtime control, and RoachNet Apps instal
 RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls back to cached RoachBrain replies when the desktop or internet drops away.
 
 [RoachNet iOS page](https://roachnet.org/ios/)<br>
-[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.1.5-unsigned.ipa)<br>
+[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.2.0-unsigned.ipa)<br>
 [SideStore / AltStore source](https://raw.githubusercontent.com/RoachWares/RoachNet-SideStore/main/apps.json)<br>
 [Sideload notes](./docs/sidestore.md)
+
+## What's new in 0.2.0
+
+- A Home tab: your paired Mac's vital signs, quick actions and Org at a glance
+- RoachClaw Org on the phone (desktop 1.1+): approve, reject or send back board approvals with a note, pause and resume agents, and join an Org from a `roachnet://org-invite` link
+- RoachTail pairing that matches the 1.0.6 desktop (`rtp_` peer tokens), and a pair link that opens straight to "Pair with RoachTail"
+- The v4 look: Inter and JetBrains Mono, the floating capsule tab bar, purple for actions and green for live state
+- RoachClaw's composer stays above the tab bar and the keyboard, and a paired phone never falls back to preview data when the web catalog is offline
+- UI tests that run the app in demo mode and capture every screen
 
 ## What It Does
 
@@ -30,8 +39,8 @@ Builds are shipped as unsigned IPAs for SideStore or AltStore, and the preferred
 
 Artifacts:
 
-- `dist/RoachNetiOS-v0.1.5-unsigned.ipa`
-- `dist/RoachNetiOS-v0.1.5-unsigned.ipa.sha256`
+- `dist/RoachNetiOS-v0.2.0-unsigned.ipa`
+- `dist/RoachNetiOS-v0.2.0-unsigned.ipa.sha256`
 
 Install flow:
 
@@ -85,10 +94,22 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
   build
 ```
 
+## Tests
+
+```bash
+xcodebuild -project RoachNetCompanion.xcodeproj -scheme RoachNetCompanion \
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  CODE_SIGNING_ALLOWED=NO test
+```
+
+The UI tests launch the app with `ROACHNET_DEMO_MODE=1`, so no desktop is needed. The live check against a real desktop runtime (pairing, RoachClaw chat, Org join and approval) lives in the RoachNet repo as `npm run smoke:ios-simulator-pairing`.
+
 ## Repo Layout
 
 - `RoachNetCompanion/`
   Native SwiftUI app, offline RoachBrain lane, chat, Apps, vault, and runtime views
+- `RoachNetCompanionUITests/`
+  Demo-mode UI tests with a screenshot of every screen
 - `scripts/`
   Xcode project generation and unsigned IPA packaging
 - `docs/`
