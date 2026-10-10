@@ -533,6 +533,17 @@ struct CompanionRoachTailPeer: Codable, Identifiable, Hashable, Sendable {
 }
 
 struct CompanionRoachTailStatus: Codable, Hashable, Sendable {
+    /// The same status with the Mac's live join code and pairing payload
+    /// removed, for anything that outlives the session (the defaults cache).
+    func withoutPairingSecrets() -> CompanionRoachTailStatus {
+        CompanionRoachTailStatus(
+            enabled: enabled, networkName: networkName, deviceName: deviceName, deviceId: deviceId, status: status,
+            transportMode: transportMode, secureOverlay: secureOverlay, relayHost: relayHost, advertisedUrl: advertisedUrl,
+            runtimeOrigin: runtimeOrigin, runtimeTunnelUrl: runtimeTunnelUrl, joinCode: nil, joinCodeExpiresAt: nil,
+            pairingPayload: nil, pairingIssuedAt: pairingIssuedAt, lastUpdatedAt: lastUpdatedAt, notes: notes, peers: peers
+        )
+    }
+
     let enabled: Bool
     let networkName: String
     let deviceName: String
@@ -1043,6 +1054,14 @@ struct CompanionRuntimeSummary: Codable, Hashable, Sendable {
     let downloads: [CompanionDownloadJob]
     let installedModels: [CompanionInstalledModel]
     let issues: [CompanionIssue]
+
+    func withoutPairingSecrets() -> CompanionRuntimeSummary {
+        CompanionRuntimeSummary(
+            systemInfo: systemInfo, providers: providers, roachClaw: roachClaw, account: account,
+            roachTail: roachTail?.withoutPairingSecrets(), roachSync: roachSync, services: services,
+            downloads: downloads, installedModels: installedModels, issues: issues
+        )
+    }
 }
 
 struct CompanionSiteArchive: Codable, Identifiable, Hashable, Sendable {

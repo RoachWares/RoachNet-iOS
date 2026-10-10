@@ -493,6 +493,12 @@ final class CompanionAppModel {
     var orgActingIDs = Set<String>()
     var orgInviteToken = ""
 
+    /// A deep link that changes where the phone sends its credentials, or asks
+    /// the Mac to do something, waits here until the person confirms it. Any
+    /// app on the phone can open a `roachnet://` URL, so nothing in the link is
+    /// trusted on its own.
+    var pendingDeepLink: PendingDeepLink?
+
     private static let roachTailPeerStorageKey = "RoachNetCompanionRoachTailPeerID"
     private static let selectedVoiceProfileStorageKey = "RoachNetCompanionSelectedVoiceProfileID"
     private static let speechLocaleStorageKey = "RoachNetCompanionSpeechLocaleIdentifier"
@@ -918,7 +924,14 @@ final class CompanionAppModel {
             return
         }
 
-        guard let url = URL(string: routePath, relativeTo: baseURL)?.absoluteURL else {
+        // Shelf routes are paths on the paired Mac, never absolute URLs; a
+        // compromised payload must not be able to open an arbitrary scheme.
+        let trimmedRoute = routePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmedRoute.hasPrefix("/"), !trimmedRoute.hasPrefix("//"),
+              URLComponents(string: trimmedRoute)?.scheme == nil,
+              let url = URL(string: trimmedRoute, relativeTo: baseURL)?.absoluteURL,
+              url.scheme == baseURL.scheme, url.host == baseURL.host, url.port == baseURL.port
+        else {
             errorText = "Could not open that paired shelf."
             return
         }
@@ -1586,9 +1599,9 @@ final class CompanionAppModel {
 
         switch normalizedRoute(from: url) {
         case "install-content":
-            handleInstallDeepLink(queryValues(from: url))
+            stageInstallDeepLink(queryValues(from: url))
         case "pair", "pair-roachtail", "roachtail":
-            applyRoachTailPairingQuery(from: url)
+            stageRoachTailPairingQuery(from: url)
         case "open-apps":
             selectedTab = .apps
         case "open-runtime":
@@ -1854,7 +1867,7 @@ final class CompanionAppModel {
             pairedMachineName: pairedMachineName,
             sessionList: sessionList,
             currentSession: currentSession,
-            runtime: runtime,
+            runtime: runtime?.withoutPairingSecrets(),
             vault: vault,
             catalogItems: catalogItems,
             favoriteItemIDs: Array(favoriteItemIDs).sorted(),
@@ -1987,14 +2000,65 @@ final class CompanionAppModel {
         }
     }
 
-    private func applyRoachTailPairingQuery(from url: URL) {
+    private func stageInstallDeepLink(_ values: [String: String]) {
+        guard !values.isEmpty else {
+            errorText = "That install link did not include a RoachNet app payload."
+            return
+        }
+        guard let action = values["action"]?.trimmingCharacters(in: .whitespacesAndNewlines), !action.isEmpty else {
+            errorText = "That install link was missing its RoachNet install action."
+            return
+        }
+        let title = values["title"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+            ?? values["name"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+            ?? values["id"]?.trimmingCharacters(in: .whitespacesAndNewlines)
+            ?? "RoachNet app"
+        pendingDeepLink = .install(title: title, action: action, values: values)
+    }
+
+    private func stageRoachTailPairingQuery(from url: URL) {
         let values = queryValues(from: url)
         guard !values.isEmpty else {
             errorText = "That RoachTail link did not include pairing details."
             return
         }
+        let linkedBase = values["bridgeUrl"] ?? values["baseURL"] ?? values["runtimeTunnelUrl"] ?? values["runtimeOrigin"]
+        let currentHost = CompanionConnectionSettings.originLabel(for: connection.baseURL)
+        let linkedHost = linkedBase.map(CompanionConnectionSettings.originLabel(for:))
+        let changesHost = linkedHost != nil && linkedHost != currentHost
+        let carriesToken = !(values["token"] ?? "").isEmpty
+        // Only a join code for the Mac the phone already talks to needs no
+        // confirmation: it cannot move the stored token anywhere else.
+        if !changesHost && !carriesToken {
+            applyRoachTailPairingQuery(values)
+            return
+        }
+        pendingDeepLink = .pairing(host: linkedHost ?? currentHost, changesHost: changesHost, carriesToken: carriesToken, values: values)
+    }
 
+    /// Runs the deep link the person just confirmed.
+    func confirmPendingDeepLink() {
+        guard let pending = pendingDeepLink else { return }
+        pendingDeepLink = nil
+        switch pending {
+        case .pairing(_, _, _, let values):
+            applyRoachTailPairingQuery(values)
+        case .install(_, _, let values):
+            handleInstallDeepLink(values)
+        }
+    }
+
+    func dismissPendingDeepLink() {
+        pendingDeepLink = nil
+    }
+
+    private func applyRoachTailPairingQuery(_ values: [String: String]) {
         if let bridgeURL = values["bridgeUrl"] ?? values["baseURL"] ?? values["runtimeTunnelUrl"] ?? values["runtimeOrigin"] {
+            // Moving to a different Mac means the old peer token must not
+            // follow: it would be sent to whoever answers at the new address.
+            if CompanionConnectionSettings.originLabel(for: bridgeURL) != CompanionConnectionSettings.originLabel(for: connection.baseURL) {
+                connection.token = ""
+            }
             connection.baseURL = bridgeURL
         }
 
@@ -2017,6 +2081,46 @@ final class CompanionAppModel {
             settingsPresented = true
         } else {
             bannerText = "RoachTail pairing data loaded."
+        }
+    }
+}
+
+/// Deep links that wait for a tap before they act. The host shown to the
+/// person is the normalized origin of the link, never raw query text.
+enum PendingDeepLink: Equatable, Identifiable {
+    case pairing(host: String, changesHost: Bool, carriesToken: Bool, values: [String: String])
+    case install(title: String, action: String, values: [String: String])
+
+    var id: String {
+        switch self {
+        case .pairing(let host, _, _, _): return "pairing:\(host)"
+        case .install(let title, let action, _): return "install:\(action):\(title)"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .pairing(_, let changesHost, _, _): return changesHost ? "Pair with a different Mac?" : "Use this pairing link?"
+        case .install: return "Send this install to your Mac?"
+        }
+    }
+
+    var message: String {
+        switch self {
+        case .pairing(let host, let changesHost, let carriesToken, _):
+            var lines = ["This link points RoachNet at \(host)."]
+            if changesHost { lines.append("Your current Mac link and its token will be dropped.") }
+            if carriesToken { lines.append("The link also carries a token, so the phone would be paired without a join code. Only continue if you created this link on your own Mac.") }
+            return lines.joined(separator: " ")
+        case .install(let title, let action, _):
+            return "\u{201C}\(title)\u{201D} (\(action)) will be queued on your linked Mac. Only continue if you asked for it."
+        }
+    }
+
+    var confirmLabel: String {
+        switch self {
+        case .pairing: return "Continue"
+        case .install: return "Send to Mac"
         }
     }
 }

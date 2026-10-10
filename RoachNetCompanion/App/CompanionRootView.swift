@@ -128,6 +128,20 @@ struct CompanionRootView: View {
         .onOpenURL { url in
             model.handleIncomingURL(url)
         }
+        .alert(
+            model.pendingDeepLink?.title ?? "",
+            isPresented: Binding(
+                get: { model.pendingDeepLink != nil },
+                set: { if !$0 { model.dismissPendingDeepLink() } }
+            ),
+            presenting: model.pendingDeepLink
+        ) { pending in
+            Button(pending.confirmLabel) { model.confirmPendingDeepLink() }
+                .accessibilityIdentifier("deeplink.confirm")
+            Button("Cancel", role: .cancel) { model.dismissPendingDeepLink() }
+        } message: { pending in
+            Text(pending.message)
+        }
         .sensoryFeedback(.selection, trigger: model.selectedTab)
         .sensoryFeedback(.success, trigger: model.bannerText ?? "")
         .sensoryFeedback(.error, trigger: model.errorText ?? "")

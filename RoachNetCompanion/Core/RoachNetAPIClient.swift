@@ -203,6 +203,18 @@ struct CompanionConnectionSettings: Codable, Hashable, Sendable {
     static let storageKey = "RoachNetCompanionConnection"
     static let recommendedBaseURL = "http://RoachNet:38111"
 
+    /// `scheme://host:port` for a lane, lowercased, or the trimmed raw text when
+    /// it does not parse. Two links to the same Mac compare equal; a link to
+    /// anywhere else does not.
+    static func originLabel(for rawValue: String) -> String {
+        let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let components = URLComponents(string: trimmed), let scheme = components.scheme?.lowercased(),
+              let host = components.host?.lowercased(), !host.isEmpty
+        else { return trimmed.lowercased() }
+        let port = components.port.map { ":\($0)" } ?? ""
+        return "\(scheme)://\(host)\(port)"
+    }
+
     private enum CodingKeys: String, CodingKey {
         case baseURL
         case token

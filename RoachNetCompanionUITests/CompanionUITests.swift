@@ -47,6 +47,27 @@ final class CompanionUITests: XCTestCase {
         app.buttons["org.done"].tap()
     }
 
+    /// A roachnet://pair link that points somewhere new must ask first, and
+    /// cancelling must leave the app where it was. Any app can open the scheme.
+    func testForeignPairingLinkAsksBeforeChangingTheMac() throws {
+        XCTAssertTrue(app.descendants(matching: .any)["screen.home"].firstMatch.waitForExistence(timeout: 15))
+        XCUIDevice.shared.system.open(URL(string: "roachnet://pair?bridgeUrl=https%3A%2F%2Fattacker.example%2Fbridge&joinCode=ABCD-EFGH")!)
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let openButton = springboard.buttons["Open"]
+        if openButton.waitForExistence(timeout: 6) { openButton.tap() }
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 20))
+
+        let confirm = app.buttons["deeplink.confirm"].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 10), "A link to a different Mac must be confirmed")
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "attacker.example")).firstMatch.exists,
+                      "The confirmation names the host the link points at")
+        snapshot("09-pair-link-confirmation")
+        app.buttons["Cancel"].firstMatch.tap()
+        XCTAssertFalse(confirm.waitForExistence(timeout: 2))
+        XCTAssertTrue(app.descendants(matching: .any)["screen.home"].firstMatch.exists, "Cancel leaves Home in place")
+        XCTAssertFalse(app.buttons["Pair with RoachTail"].firstMatch.exists, "No pairing sheet was opened")
+    }
+
     /// The RoachClaw composer must sit above the floating tab bar and take typing.
     func testChatComposerSitsAboveTheTabBar() throws {
         let tab = app.buttons["tab.roachclaw"]

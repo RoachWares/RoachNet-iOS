@@ -1959,11 +1959,13 @@ final class RoachPhoneGPSAdvertiser: NSObject, ObservableObject {
 
         switch peripheralManager.state {
         case .poweredOn:
+            // Position fixes leave the phone only over an encrypted (bonded)
+            // link, so a nearby central cannot read them without pairing first.
             let characteristic = CBMutableCharacteristic(
                 type: Self.gpsCharacteristicUUID,
-                properties: [.read, .notify],
+                properties: [.read, .notifyEncryptionRequired],
                 value: nil,
-                permissions: [.readable]
+                permissions: [.readEncryptionRequired]
             )
             let service = CBMutableService(type: Self.gpsServiceUUID, primary: true)
             service.characteristics = [characteristic]

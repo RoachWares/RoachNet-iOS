@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F1E2D3C4B5A69788796A5B4C3D2E1F0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C6D7E8F90 /* PrivacyInfo.xcprivacy */; };
 		03506F218675E840D14A99012AC5B27F /* JetBrainsMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CCA7C3AF2847C89E51E4E4EAA1BD67C6 /* JetBrainsMono-Medium.ttf */; };
 		13BE11E4EBB18D1A92BF12E680225A10 /* RoachNetCompanionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6C64967070DFF6731577A6AF9B0AE1 /* RoachNetCompanionApp.swift */; };
 		14241C06E4579A4E87F6B4B7E1AABD5C /* VaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0AB06326B44BAC68A81C29174FAD33 /* VaultView.swift */; };
@@ -59,6 +60,7 @@
 		15C1622C7CACC51E63B2B999F6728539 /* MarketingScreenshotTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MarketingScreenshotTests.swift; path = RoachNetCompanionUITests/MarketingScreenshotTests.swift; sourceTree = "<group>"; };
 		229A556395D8B1C151CBE277D9BC09E5 /* OrgView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OrgView.swift; path = RoachNetCompanion/Features/Org/OrgView.swift; sourceTree = "<group>"; };
 		25AC7F888A71E6A5624A8C67BBB2B656 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = RoachNetCompanion/Info.plist; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C6D7E8F90 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = RoachNetCompanion/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2C26E88564A63FEA78F0340573103934 /* CompanionSupport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CompanionSupport.swift; path = RoachNetCompanion/Core/CompanionSupport.swift; sourceTree = "<group>"; };
 		2CB10119185A4205460EBCF6E412CA83 /* Inter-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "Inter-Bold.ttf"; path = "RoachNetCompanion/Resources/Fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		2E817510CFC856C76B5852726EA565DD /* RoachTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RoachTheme.swift; path = RoachNetCompanion/Features/Shared/RoachTheme.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				C01615E7BE278DD6C5E45F3687F863CD /* RoachType.swift */,
 				AF0AB06326B44BAC68A81C29174FAD33 /* VaultView.swift */,
 				25AC7F888A71E6A5624A8C67BBB2B656 /* Info.plist */,
+				A1B2C3D4E5F60718293A4B5C6D7E8F90 /* PrivacyInfo.xcprivacy */,
 				2CB10119185A4205460EBCF6E412CA83 /* Inter-Bold.ttf */,
 				826161E5BCCD5F5CD8C2DE8C8D1EB19A /* Inter-ExtraBold.ttf */,
 				6B532155E3774D3ACCFA2AD112F5352E /* Inter-Medium.ttf */,
@@ -274,6 +277,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0F1E2D3C4B5A69788796A5B4C3D2E1F0 /* PrivacyInfo.xcprivacy in Resources */,
 				8DA241517DEAA639F94151944D27770F /* Inter-Bold.ttf in Resources */,
 				B96C1643CD6C8714C2B4CA5DE232C2F1 /* Inter-ExtraBold.ttf in Resources */,
 				E1B4381A326D159EDE914F04194ADD7B /* Inter-Medium.ttf in Resources */,
@@ -351,7 +355,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RoachNetCompanion/Info.plist;
@@ -375,7 +379,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = RoachNetCompanion/Info.plist;
