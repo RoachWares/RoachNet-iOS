@@ -17,6 +17,7 @@ RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls b
 - The v4 look: Inter and JetBrains Mono, the floating capsule tab bar, purple for actions and green for live state
 - RoachClaw's composer stays above the tab bar and the keyboard, and a paired phone never falls back to preview data when the web catalog is offline
 - UI tests that run the app in demo mode and capture every screen
+- Security: a `roachnet://pair` link that points at a different Mac, or that carries a token, is confirmed before it is applied and the old token is dropped; install links are confirmed before they reach the Mac; the GPS bridge requires an encrypted Bluetooth link; a privacy manifest is included (build 6)
 
 ## What It Does
 
@@ -59,7 +60,7 @@ The phone app talks to the desktop over the token-gated companion lane and the R
 Desktop runtime values:
 
 - `ROACHNET_COMPANION_ENABLED=1`
-- `ROACHNET_COMPANION_HOST=0.0.0.0`
+- `ROACHNET_COMPANION_HOST=127.0.0.1` (the bridge binds to loopback only; RoachTail or your overlay network carries it to the phone)
 - `ROACHNET_COMPANION_PORT=38111`
 - `ROACHNET_COMPANION_TOKEN=<long random token>`
 
