@@ -115,3 +115,7 @@ The UI tests launch the app with `ROACHNET_DEMO_MODE=1`, so no desktop is needed
   Xcode project generation and unsigned IPA packaging
 - `docs/`
   SideStore, AltStore, and pairing guidance
+
+## License
+
+Apache License 2.0, the same as the RoachNet Mac app. See [LICENSE](LICENSE).
