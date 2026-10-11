@@ -865,6 +865,7 @@ final class CompanionAppModel {
                 runtime = bootstrap.runtime
                 vault = bootstrap.vault
                 sessionList = bootstrap.sessions
+                await refreshMacTheme()
 
                 if currentSession == nil || sessionList.contains(where: { $0.id == currentSession?.id }) == false {
                     if let firstSession = bootstrap.sessions.first {
@@ -917,6 +918,19 @@ final class CompanionAppModel {
         }
     }
 
+    /// Picks up the Mac's active theme (RoachNet 1.1+). An older Mac has no
+    /// theme route; the companion then keeps its own palette.
+    func refreshMacTheme() async {
+        guard connection.isConfigured else { return }
+        do {
+            CompanionThemeRuntime.shared.receive(try await client.theme(using: connection))
+        } catch let error as RoachNetAPIError where error.statusCode == 404 {
+            CompanionThemeRuntime.shared.receive(nil)
+        } catch {
+            // Keep the last theme; the next refresh tries again.
+        }
+    }
+
     func openPairedRoute(_ routePath: String) {
         guard let baseURL = connection.resolvedBaseURL else {
             settingsPresented = true
@@ -929,7 +943,8 @@ final class CompanionAppModel {
         let trimmedRoute = routePath.trimmingCharacters(in: .whitespacesAndNewlines)
         guard trimmedRoute.hasPrefix("/"), !trimmedRoute.hasPrefix("//"),
               URLComponents(string: trimmedRoute)?.scheme == nil,
-              let url = URL(string: trimmedRoute, relativeTo: baseURL)?.absoluteURL,
+              // Relative to the bridge, so a path-prefixed relay keeps its prefix.
+              let url = URL(string: String(trimmedRoute.dropFirst()), relativeTo: baseURL)?.absoluteURL,
               url.scheme == baseURL.scheme, url.host == baseURL.host, url.port == baseURL.port
         else {
             errorText = "Could not open that paired shelf."
@@ -1227,7 +1242,7 @@ final class CompanionAppModel {
 
     func pairWithRoachTail() async {
         guard connection.resolvedBaseURL != nil else {
-            errorText = "Add the companion URL before pairing with RoachTail."
+            errorText = CompanionEndpointPolicy.refusalReason(for: connection.baseURL) ?? "Add the companion URL before pairing with RoachTail."
             return
         }
 
@@ -1300,8 +1315,13 @@ final class CompanionAppModel {
             connection.pairCode = payload.joinCode
             connection.token = ""
             connection.save()
-            bannerText = "RoachTail pairing data loaded."
-            errorText = nil
+            if let refusal = CompanionEndpointPolicy.refusalReason(for: connection.baseURL) {
+                bannerText = nil
+                errorText = refusal
+            } else {
+                bannerText = "RoachTail pairing data loaded."
+                errorText = nil
+            }
         } catch {
             errorText = "That QR code was not a valid RoachTail pairing payload."
         }
@@ -1513,8 +1533,14 @@ final class CompanionAppModel {
         orgActingIDs.insert(approval.id)
         defer { orgActingIDs.remove(approval.id) }
         if forceDemoMode {
+            // Sample data: nothing reaches a Mac, so there is nothing to unlock.
             orgApprovals = orgApprovals.filter { $0.id != approval.id }
             bannerText = decision == "approve" ? "Approved." : decision == "reject" ? "Rejected." : "Sent back for changes."
+            return
+        }
+        let verb = decision == "approve" ? "Approve" : decision == "reject" ? "Reject" : "Send back"
+        guard await CompanionLocalAuth.confirm("\(verb) “\(approval.typeTitle)” for your Org.") else {
+            bannerText = "Nothing was sent. Unlock to decide."
             return
         }
         do {

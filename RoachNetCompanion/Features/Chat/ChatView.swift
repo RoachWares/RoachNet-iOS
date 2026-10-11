@@ -165,7 +165,7 @@ struct ChatView: View {
             bannerShell(accent: RoachTheme.primary) {
                 Text(errorText)
                     .font(RoachType.subheadline())
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(RoachTheme.text)
             }
         } else if let bannerText = model.bannerText, horizontalSizeClass != .compact {
             HStack(spacing: 10) {
@@ -657,7 +657,7 @@ struct ChatView: View {
                         colors: [
                             RoachTheme.elevatedSurface.opacity(0.96),
                             RoachTheme.surface.opacity(0.90),
-                            Color.black.opacity(0.12),
+                            RoachTheme.void.opacity(0.12),
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -956,7 +956,7 @@ private struct MessageBubble: View {
                                     ]
                                     : [
                                         RoachTheme.elevatedSurface.opacity(0.82),
-                                        Color.black.opacity(0.74),
+                                        RoachTheme.void.opacity(0.74),
                                     ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing

@@ -17,7 +17,7 @@ enum RoachNetAPIError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidBaseURL:
-            return "The companion URL must be HTTPS or a trusted local RoachNet lane."
+            return "The companion URL must be your Mac's https:// relay or its tailnet address."
         case .notConfigured:
             return "Add the Mac companion URL and token first."
         case .requestFailed(let message):
@@ -32,34 +32,71 @@ enum RoachNetAPIError: LocalizedError {
     }
 }
 
-private enum CompanionEndpointPolicy {
-    static func normalizedBaseURL(from rawValue: String) -> URL? {
+/// Which bridge URLs this app will send a companion token to.
+///
+/// HTTPS is always fine: the system checks the certificate. Plain HTTP is
+/// only allowed where nobody else on the network can pose as the Mac
+/// (security review finding I2):
+/// - loopback, which never leaves the device;
+/// - a tailnet (Tailscale's 100.64.0.0/10 and fd7a:115c:a1e0::/48 ranges, and
+///   `*.ts.net` names), which WireGuard encrypts and authenticates end to end;
+/// - in the iOS Simulator only, the `RoachNet` alias, which resolves to the
+///   Mac itself through its hosts file.
+/// `RoachNet`, `*.local` and private LAN addresses on a real phone are
+/// refused: anything on the same Wi-Fi can answer for those names and would
+/// receive the token.
+enum CompanionEndpointPolicy {
+    enum Verdict: Equatable {
+        case allowed
+        case notAURL
+        case unsupportedScheme(String)
+        case plaintextOnSharedNetwork(host: String)
+    }
+
+    static func verdict(for rawValue: String, simulator: Bool = isSimulator) -> Verdict {
         let trimmed = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, var components = URLComponents(string: trimmed) else {
-            return nil
-        }
-
-        guard let scheme = components.scheme?.lowercased(), let host = components.host?.lowercased(), !host.isEmpty else {
-            return nil
-        }
-
+        guard !trimmed.isEmpty, let components = URLComponents(string: trimmed),
+              let scheme = components.scheme?.lowercased(), let host = components.host?.lowercased(), !host.isEmpty
+        else { return .notAURL }
         switch scheme {
         case "https":
-            break
+            return .allowed
         case "http":
-            guard isTrustedPlaintextHost(host) else { return nil }
+            return isTrustedPlaintextHost(host, simulator: simulator) ? .allowed : .plaintextOnSharedNetwork(host: host)
         default:
-            return nil
+            return .unsupportedScheme(scheme)
         }
+    }
+
+    static func normalizedBaseURL(from rawValue: String, simulator: Bool = isSimulator) -> URL? {
+        guard verdict(for: rawValue, simulator: simulator) == .allowed,
+              var components = URLComponents(string: rawValue.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let scheme = components.scheme?.lowercased()
+        else { return nil }
 
         components.scheme = scheme
         components.fragment = nil
-
-        if components.path.isEmpty {
-            components.path = "/"
+        components.query = nil
+        // A path-prefixed bridge (https://relay.example/roachnet) needs a
+        // trailing slash, or `URL(string:relativeTo:)` drops its last segment.
+        if !components.path.hasSuffix("/") {
+            components.path += "/"
         }
-
         return components.url
+    }
+
+    /// Why a link was refused, in words for the settings screen; nil when it is fine.
+    static func refusalReason(for rawValue: String, simulator: Bool = isSimulator) -> String? {
+        switch verdict(for: rawValue, simulator: simulator) {
+        case .allowed:
+            return nil
+        case .notAURL:
+            return "Enter the bridge address your Mac shows, starting with https://."
+        case .unsupportedScheme(let scheme):
+            return "\(scheme):// links aren't supported. Use the https:// bridge address your Mac shows."
+        case .plaintextOnSharedNetwork(let host):
+            return "Plain http:// to \(host) isn't allowed: another device on this network could pose as your Mac and take its token. Use your Mac's RoachTail relay (https://…) or its tailnet address."
+        }
     }
 
     static func securityLabel(for connection: CompanionConnectionSettings) -> String {
@@ -75,62 +112,71 @@ private enum CompanionEndpointPolicy {
             return "Secure relay"
         }
 
-        return "Local bridge"
+        return isTailnetHost(url.host?.lowercased() ?? "") ? "Tailnet" : "Local bridge"
     }
 
     static func securityDetail(for connection: CompanionConnectionSettings) -> String {
         guard let url = connection.resolvedBaseURL else {
-            return "Use HTTPS or a trusted local RoachNet bridge URL."
+            return refusalReason(for: connection.baseURL) ?? "Use your Mac's https:// relay address or its tailnet address."
         }
 
         if connection.usesRoachTailPeerToken {
-            return "This phone is paired over a peer-scoped RoachTail token instead of a shared desktop token."
+            return url.scheme?.lowercased() == "https"
+                ? "This phone has its own RoachTail token, sent only over HTTPS."
+                : "This phone has its own RoachTail token, sent only inside your tailnet or to this device."
         }
 
         if url.scheme?.lowercased() == "https" {
-            return "Traffic is pinned to an HTTPS relay lane."
+            return "Traffic goes over HTTPS to your relay."
         }
 
-        return "Traffic stays on a trusted local companion lane."
+        return isTailnetHost(url.host?.lowercased() ?? "")
+            ? "Traffic stays inside your tailnet, which encrypts it end to end."
+            : "Traffic stays on this device."
     }
 
-    private static func isTrustedPlaintextHost(_ host: String) -> Bool {
-        if ["roachnet", "localhost", "127.0.0.1", "::1"].contains(host) {
+    static var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        return false
+        #endif
+    }
+
+    static func isTrustedPlaintextHost(_ host: String, simulator: Bool) -> Bool {
+        let host = host.trimmingCharacters(in: CharacterSet(charactersIn: "[]")).lowercased()
+        if ["localhost", "127.0.0.1", "::1"].contains(host) || host.hasPrefix("127.") && isIPv4(host) {
             return true
         }
-
-        if host.hasSuffix(".local") || host.hasSuffix(".home.arpa") || host.hasSuffix(".internal") || host.hasSuffix(".roachtail") || host.hasSuffix(".roachtail.local") {
+        if isTailnetHost(host) {
             return true
         }
-
-        if isPrivateIPv4(host) || isPrivateIPv6(host) {
+        if simulator, host == "roachnet" {
             return true
         }
-
         return false
     }
 
-    private static func isPrivateIPv4(_ host: String) -> Bool {
-        let octets = host.split(separator: ".").compactMap { Int($0) }
-        guard octets.count == 4 else { return false }
-
-        switch (octets[0], octets[1]) {
-        case (10, _), (127, _):
+    /// Tailscale addresses and MagicDNS names.
+    static func isTailnetHost(_ host: String) -> Bool {
+        let host = host.trimmingCharacters(in: CharacterSet(charactersIn: "[]")).lowercased()
+        if host.hasSuffix(".ts.net") {
             return true
-        case (169, 254):
-            return true
-        case (192, 168):
-            return true
-        case (172, 16...31):
-            return true
-        default:
-            return false
         }
+        if isIPv4(host) {
+            let octets = host.split(separator: ".").compactMap { Int($0) }
+            // 100.64.0.0/10
+            return octets[0] == 100 && (64...127).contains(octets[1])
+        }
+        return host.hasPrefix("fd7a:115c:a1e0:")
     }
 
-    private static func isPrivateIPv6(_ host: String) -> Bool {
-        let lowered = host.lowercased()
-        return lowered == "::1" || lowered.hasPrefix("fe80:") || lowered.hasPrefix("fd") || lowered.hasPrefix("fc")
+    private static func isIPv4(_ host: String) -> Bool {
+        let parts = host.split(separator: ".", omittingEmptySubsequences: false)
+        return parts.count == 4 && parts.allSatisfy { part in
+            guard let value = Int(part), String(value) == part else { return false }
+            return (0...255).contains(value)
+        }
     }
 }
 
@@ -349,6 +395,11 @@ struct RoachNetAPIClient {
 
     func roachTail(using connection: CompanionConnectionSettings) async throws -> CompanionRoachTailStatus {
         try await request("/api/companion/roachtail", using: connection)
+    }
+
+    /// The Mac's active theme (desktop 1.1+; older desktops answer 404).
+    func theme(using connection: CompanionConnectionSettings) async throws -> CompanionMacTheme {
+        try await request("/api/companion/theme", using: connection)
     }
 
     func account(using connection: CompanionConnectionSettings) async throws -> CompanionAccountStatus {

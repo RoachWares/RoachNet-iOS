@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 
 struct CompanionCacheSnapshot: Codable, Sendable {
     let appsCatalogURL: String
@@ -1885,4 +1886,27 @@ enum CompanionDemoState {
         ],
         issues: []
     )
+}
+
+
+/// Face ID, Touch ID or the device passcode before actions that act for the
+/// person on their Mac: Org decisions, forgetting the Mac, changing the token
+/// (security review finding I8). A device with no passcode at all cannot
+/// authenticate anyone, so the action goes ahead there; the UI tests run on
+/// such simulators.
+enum CompanionLocalAuth {
+    static func confirm(_ reason: String) async -> Bool {
+        let context = LAContext()
+        context.localizedCancelTitle = "Cancel"
+        var availability: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &availability) else {
+            let code = (availability as? LAError)?.code ?? LAError.Code(rawValue: availability?.code ?? 0)
+            return code == .passcodeNotSet
+        }
+        do {
+            return try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
+        } catch {
+            return false
+        }
+    }
 }

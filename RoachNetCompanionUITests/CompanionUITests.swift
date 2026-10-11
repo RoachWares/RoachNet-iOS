@@ -33,6 +33,7 @@ final class CompanionUITests: XCTestCase {
     func testOrgApprovalCanBeApprovedFromHome() throws {
         let openOrg = app.buttons["home.openOrg"]
         XCTAssertTrue(openOrg.waitForExistence(timeout: 15))
+        openOrg.scrollAboveTabBar(in: app)
         openOrg.tap()
 
         let approve = app.buttons["org.approve.apr_demo_1"]
@@ -93,6 +94,28 @@ final class CompanionUITests: XCTestCase {
         connection.tap()
         XCTAssertTrue(app.buttons["Pair with RoachTail"].firstMatch.waitForExistence(timeout: 10))
         snapshot("09-connection")
+    }
+
+    /// Security review I2: on a phone the token must not go over plain HTTP
+    /// to a Wi-Fi address, where another device could answer for the Mac.
+    func testPlainHTTPToAWiFiAddressIsRefused() throws {
+        let connection = app.buttons["home.connection"]
+        XCTAssertTrue(connection.waitForExistence(timeout: 15))
+        connection.tap()
+
+        let field = app.textFields["settings.bridge.url"].firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 10), "Bridge URL field missing")
+        field.tap()
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 60))
+        field.typeText("http://192.168.1.20:38111")
+        let refusal = app.staticTexts["settings.bridge.refusal"].firstMatch
+        XCTAssertTrue(refusal.waitForExistence(timeout: 5), "A plain-HTTP Wi-Fi address must be refused")
+        XCTAssertTrue(refusal.label.contains("isn't allowed"), "The refusal says why: \(refusal.label)")
+        snapshot("11-plain-http-refused")
+
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 60))
+        field.typeText("https://relay.example/roachnet")
+        XCTAssertFalse(refusal.waitForExistence(timeout: 2), "An HTTPS relay is accepted")
     }
 
     private func snapshot(_ name: String) {

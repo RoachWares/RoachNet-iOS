@@ -48,6 +48,8 @@ struct CompanionRootView: View {
                 ))
                 .animation(.spring(response: 0.36, dampingFraction: 0.86), value: model.selectedTab)
         }
+        // Follows the Mac's theme when it is a light one (Settings › Appearance on the Mac).
+        .preferredColorScheme(RoachTheme.isDark ? .dark : .light)
         .overlay(alignment: .top) {
             RoachTopChromeScrim(accent: shellAccent)
         }

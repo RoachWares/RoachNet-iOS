@@ -5,9 +5,17 @@ Phone lane for RoachClaw, vault reads, runtime control, and RoachNet Apps instal
 RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls back to cached RoachBrain replies when the desktop or internet drops away.
 
 [RoachNet iOS page](https://roachnet.org/ios/)<br>
-[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.2.0-unsigned.ipa)<br>
+[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.3.0-unsigned.ipa)<br>
 [SideStore / AltStore source](https://raw.githubusercontent.com/RoachWares/RoachNet-SideStore/main/apps.json)<br>
 [Sideload notes](./docs/sidestore.md)
+
+## What's new in 0.3.0
+
+- Wears your Mac's theme: with RoachNet 1.1, the companion picks up the theme you chose in Settings › Appearance on the Mac, light themes included. Turn it off under Connection › Appearance.
+- The token stays off shared networks: it only travels over HTTPS, inside a tailnet (Tailscale addresses and `*.ts.net` names), or to this device. Plain `http://` to `RoachNet`, a `.local` name or a Wi-Fi address is refused with a note that says why (security review finding I2). The `RoachNet` alias still works in the Simulator on the Mac it points at.
+- Face ID, Touch ID or your passcode before Org decisions, changing the token, or forgetting the Mac (finding I8).
+- The RoachTail join code on the Runtime tab is hidden until you tap it.
+- Bridge URLs with a path (`https://relay.example/roachnet`) keep their path on every request.
 
 ## What's new in 0.2.0
 
@@ -40,8 +48,8 @@ Builds are shipped as unsigned IPAs for SideStore or AltStore, and the preferred
 
 Artifacts:
 
-- `dist/RoachNetiOS-v0.2.0-unsigned.ipa`
-- `dist/RoachNetiOS-v0.2.0-unsigned.ipa.sha256`
+- `dist/RoachNetiOS-v0.3.0-unsigned.ipa`
+- `dist/RoachNetiOS-v0.3.0-unsigned.ipa.sha256`
 
 Install flow:
 
@@ -60,14 +68,14 @@ The phone app talks to the desktop over the token-gated companion lane and the R
 Desktop runtime values:
 
 - `ROACHNET_COMPANION_ENABLED=1`
-- `ROACHNET_COMPANION_HOST=127.0.0.1` (the bridge binds to loopback only; RoachTail or your overlay network carries it to the phone)
+- `ROACHNET_COMPANION_HOST=127.0.0.1` (the bridge binds to loopback only; an HTTPS relay or your tailnet carries it to the phone)
 - `ROACHNET_COMPANION_PORT=38111`
 - `ROACHNET_COMPANION_TOKEN=<long random token>`
 
 Device values:
 
-- Desktop alias: `http://RoachNet:38111`
-- Real device: pair over RoachTail or use the companion bridge URL the Mac advertises
+- Simulator on the same Mac: `http://RoachNet:38111`
+- Real device: the Mac's RoachTail relay (`https://…`) or its tailnet address. 0.3.0 refuses plain `http://` to anything else.
 
 The same install intents used on `apps.roachnet.org` are forwarded through the companion lane into the desktop app.
 

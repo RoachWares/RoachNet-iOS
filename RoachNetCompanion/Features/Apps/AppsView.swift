@@ -162,7 +162,7 @@ struct AppsView: View {
                 )
         }
         .buttonStyle(RoachPressableButtonStyle())
-        .foregroundStyle(Color.white)
+        .foregroundStyle(RoachTheme.text)
     }
 
     private var storeHeader: some View {
@@ -366,7 +366,7 @@ struct AppsView: View {
                                     )
                             )
                     )
-                    .foregroundStyle(model.selectedCategory == category ? Color.white : RoachTheme.subduedText)
+                    .foregroundStyle(model.selectedCategory == category ? RoachTheme.text : RoachTheme.subduedText)
                 }
             }
         }
@@ -860,7 +860,7 @@ private struct AppDetailSheet: View {
                                 )
                                 .overlay(
                                     Capsule(style: .continuous)
-                                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                                        .strokeBorder(RoachTheme.neutralInk.opacity(0.16), lineWidth: 1)
                                 )
                                 .buttonStyle(.plain)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -972,7 +972,7 @@ private struct StoreActionStrip: View {
                 )
                 .overlay(
                     Capsule(style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                        .strokeBorder(RoachTheme.neutralInk.opacity(0.16), lineWidth: 1)
                 )
         }
         .buttonStyle(.plain)
@@ -1021,7 +1021,7 @@ private struct StoreActionStrip: View {
             Circle()
                 .strokeBorder((model.isFavorite(item) ? RoachTheme.primary : RoachTheme.secondary).opacity(0.34), lineWidth: 1)
         )
-        .foregroundStyle(model.isFavorite(item) ? Color.white : RoachTheme.text)
+        .foregroundStyle(model.isFavorite(item) ? RoachTheme.text : RoachTheme.text)
         .buttonStyle(RoachPressableButtonStyle(scale: 0.92))
     }
 }

@@ -1,43 +1,339 @@
+import Observation
+import os
 import SwiftUI
 
-/// RoachNet v4 colour tokens (RoachNet Design System v4, `tokens.css`, dark theme).
-/// Purple acts, green lives: `primary` is the one thing to do next, `secondary`
-/// (signal green) is for things that are on, current or live.
+/// RoachNet colour tokens. The defaults are the companion's own RoachNet v4
+/// palette (Design System v4, `tokens.css`, dark theme): purple acts, green
+/// lives. `primary` is the one thing to do next, `secondary` (signal green) is
+/// for things that are on, current or live.
+///
+/// With "Match my Mac" on (the default) and a Mac running RoachNet 1.1 or
+/// later, the tokens follow the Mac's active theme (`GET /api/companion/theme`,
+/// schema org.roachnet.active-theme.v1), light themes included.
 enum RoachTheme {
-    static let void = Color.black
-    static let background = Color(hex: 0x05060A)
-    static let backgroundRaised = Color(hex: 0x090A0F)
-    static let surface = Color(hex: 0x0C0D13)
-    static let elevatedSurface = Color(hex: 0x13141C)
-    static let panelSoft = Color(hex: 0x1B1C26)
-    static let panelGlass = Color.white.opacity(0.04)
-    static let glassHighlight = Color.white.opacity(0.055)
-    static let border = Color.white.opacity(0.08)
-    static let elevatedBorder = Color.white.opacity(0.14)
+    private static var palette: CompanionPalette { CompanionThemeRuntime.shared.palette }
 
-    static let primary = Color(hex: 0x9138D8)
-    static let purpleInk = Color(hex: 0xB06CF0)
-    static let purpleDeep = Color(hex: 0x1C0D2E)
-    static let secondary = Color(hex: 0x36FF84)
-    static let signalDeep = Color(hex: 0x0A2817)
-    static let onSignal = Color(hex: 0x03140A)
-    static let cyan = Color(hex: 0x48E6FF)
-    static let tertiary = Color(hex: 0x4D8DFF)
-    static let amber = Color(hex: 0xFF9A45)
-    static let warning = Color(hex: 0xEDBA42)
-    static let hazard = Color(hex: 0xFF5A36)
+    static var void: Color { palette.void }
+    static var background: Color { palette.background }
+    static var backgroundRaised: Color { palette.backgroundRaised }
+    static var surface: Color { palette.surface }
+    static var elevatedSurface: Color { palette.elevatedSurface }
+    static var panelSoft: Color { palette.panelSoft }
+    static var panelGlass: Color { palette.panelGlass }
+    static var glassHighlight: Color { palette.glassHighlight }
+    static var border: Color { palette.border }
+    static var elevatedBorder: Color { palette.elevatedBorder }
 
-    static let text = Color(hex: 0xF0F0F0)
-    static let subduedText = Color(hex: 0x9A9AA2)
-    static let softText = Color(hex: 0x6F6F78)
+    static var primary: Color { palette.primary }
+    static var purpleInk: Color { palette.purpleInk }
+    static var purpleDeep: Color { palette.purpleDeep }
+    static var secondary: Color { palette.secondary }
+    static var signalDeep: Color { palette.signalDeep }
+    static var onSignal: Color { palette.onSignal }
+    static var cyan: Color { palette.cyan }
+    static var tertiary: Color { palette.tertiary }
+    static var amber: Color { palette.amber }
+    static var warning: Color { palette.warning }
+    static var hazard: Color { palette.hazard }
 
-    static let radiusCard: CGFloat = 18
-    static let radiusHero: CGFloat = 24
-    static let radiusButton: CGFloat = 10
+    static var text: Color { palette.text }
+    static var subduedText: Color { palette.subduedText }
+    static var softText: Color { palette.softText }
 
-    /// The readable ink for an accent on near-black (purple is too dark for small text).
+    /// Neutral tint for hairlines and washes: white on dark themes, near-black on light ones.
+    static var neutralInk: Color { palette.neutralInk }
+    static var isDark: Bool { palette.isDark }
+
+    static var radiusCard: CGFloat { 18 * palette.radiusScale }
+    static var radiusHero: CGFloat { 24 * palette.radiusScale }
+    static var radiusButton: CGFloat { 10 * palette.radiusScale }
+
+    /// The readable ink for an accent on the page (purple is too dark for small text).
     static func ink(for accent: Color) -> Color {
         accent == primary ? purpleInk : accent
+    }
+}
+
+/// Every colour the companion draws with, resolved once per theme change.
+struct CompanionPalette: Sendable, Equatable {
+    var void: Color
+    var background: Color
+    var backgroundRaised: Color
+    var surface: Color
+    var elevatedSurface: Color
+    var panelSoft: Color
+    var panelGlass: Color
+    var glassHighlight: Color
+    var border: Color
+    var elevatedBorder: Color
+    var primary: Color
+    var purpleInk: Color
+    var purpleDeep: Color
+    var secondary: Color
+    var signalDeep: Color
+    var onSignal: Color
+    var cyan: Color
+    var tertiary: Color
+    var amber: Color
+    var warning: Color
+    var hazard: Color
+    var text: Color
+    var subduedText: Color
+    var softText: Color
+    var neutralInk: Color
+    var isDark: Bool
+    var radiusScale: CGFloat
+    /// The Mac theme this palette came from, or nil for the companion's own.
+    var sourceName: String?
+
+    /// RoachNet v4, the companion's own look.
+    static let companionDefault = CompanionPalette(
+        void: .black,
+        background: Color(hex: 0x05060A),
+        backgroundRaised: Color(hex: 0x090A0F),
+        surface: Color(hex: 0x0C0D13),
+        elevatedSurface: Color(hex: 0x13141C),
+        panelSoft: Color(hex: 0x1B1C26),
+        panelGlass: Color.white.opacity(0.04),
+        glassHighlight: Color.white.opacity(0.055),
+        border: Color.white.opacity(0.08),
+        elevatedBorder: Color.white.opacity(0.14),
+        primary: Color(hex: 0x9138D8),
+        purpleInk: Color(hex: 0xB06CF0),
+        purpleDeep: Color(hex: 0x1C0D2E),
+        secondary: Color(hex: 0x36FF84),
+        signalDeep: Color(hex: 0x0A2817),
+        onSignal: Color(hex: 0x03140A),
+        cyan: Color(hex: 0x48E6FF),
+        tertiary: Color(hex: 0x4D8DFF),
+        amber: Color(hex: 0xFF9A45),
+        warning: Color(hex: 0xEDBA42),
+        hazard: Color(hex: 0xFF5A36),
+        text: Color(hex: 0xF0F0F0),
+        subduedText: Color(hex: 0x9A9AA2),
+        softText: Color(hex: 0x6F6F78),
+        neutralInk: .white,
+        isDark: true,
+        radiusScale: 1,
+        sourceName: nil
+    )
+
+}
+
+// In an extension so the struct keeps its memberwise initializer.
+extension CompanionPalette {
+    /// Maps a Mac theme's 22 tokens onto the companion's tokens.
+    init?(macTheme theme: CompanionMacTheme) {
+        func token(_ key: String) -> CompanionRGBA? { theme.palette[key].flatMap(CompanionRGBA.init(hex:)) }
+        guard let background = token("background"), let text = token("text"), let accent = token("accent") else { return nil }
+        let window = background.composited(over: .black)
+        let panel = (token("panel") ?? window).composited(over: window)
+        let panelRaised = (token("panelRaised") ?? panel).composited(over: window)
+        let second = token("accentSecondary") ?? accent
+        let info = token("accentInfo") ?? accent
+        let third = token("accentTertiary") ?? token("warning") ?? accent
+        let ink = token("ink") ?? text.opaque
+        let muted = (token("muted") ?? text.withAlpha(0.68))
+        let textOpaque = text.composited(over: panel)
+        let isDark = theme.mode != "light"
+
+        // Small purple text needs 4.5:1 on panels; lift (or darken) it toward the text colour until it gets there.
+        var readable = second.composited(over: panel)
+        var step = 0.0
+        while CompanionRGBA.contrast(readable, panel) < 4.5 && step < 1 {
+            step += 0.1
+            readable = second.composited(over: panel).mixed(with: textOpaque, amount: step)
+        }
+
+        self.init(
+            void: (token("shade") ?? .black).color,
+            background: window.color,
+            backgroundRaised: (token("backgroundRaised") ?? window).composited(over: window).color,
+            surface: panel.color,
+            elevatedSurface: panelRaised.color,
+            panelSoft: (token("panelSoft") ?? panelRaised).composited(over: window).color,
+            panelGlass: (token("glass") ?? ink.withAlpha(0.04)).color,
+            glassHighlight: (token("specular") ?? ink.withAlpha(0.055)).color,
+            border: (token("border") ?? ink.withAlpha(0.08)).color,
+            elevatedBorder: (token("borderStrong") ?? ink.withAlpha(0.14)).color,
+            primary: second.opaque.color,
+            purpleInk: readable.color,
+            purpleDeep: second.opaque.mixed(with: window, amount: 0.82).color,
+            secondary: accent.opaque.color,
+            signalDeep: accent.opaque.mixed(with: window, amount: 0.82).color,
+            onSignal: (token("onAccent") ?? (isDark ? .black : .white)).color,
+            cyan: info.opaque.color,
+            tertiary: info.opaque.color,
+            amber: third.opaque.color,
+            warning: (token("warning") ?? third).opaque.color,
+            hazard: (token("danger") ?? CompanionRGBA(red: 1, green: 0.35, blue: 0.21)).opaque.color,
+            text: textOpaque.color,
+            subduedText: muted.composited(over: panel).color,
+            softText: muted.multiplyingAlpha(by: 0.75).composited(over: panel).color,
+            neutralInk: ink.opaque.color,
+            isDark: isDark,
+            radiusScale: CGFloat(min(2, max(0, theme.shape?.radiusScale ?? 1))),
+            sourceName: theme.name
+        )
+    }
+}
+
+/// The Mac's active theme as `GET /api/companion/theme` returns it.
+struct CompanionMacTheme: Codable, Sendable, Equatable {
+    struct Shape: Codable, Sendable, Equatable {
+        var radiusScale: Double?
+    }
+
+    var schema: String
+    var id: String
+    var name: String
+    var mode: String
+    var revision: Int?
+    var palette: [String: String]
+    var shape: Shape?
+
+    static let schemaID = "org.roachnet.active-theme.v1"
+}
+
+/// An sRGB colour with alpha, for theme maths.
+struct CompanionRGBA: Sendable, Equatable {
+    var red: Double
+    var green: Double
+    var blue: Double
+    var alpha: Double
+
+    static let black = CompanionRGBA(red: 0, green: 0, blue: 0)
+    static let white = CompanionRGBA(red: 1, green: 1, blue: 1)
+
+    init(red: Double, green: Double, blue: Double, alpha: Double = 1) {
+        self.red = min(1, max(0, red))
+        self.green = min(1, max(0, green))
+        self.blue = min(1, max(0, blue))
+        self.alpha = min(1, max(0, alpha))
+    }
+
+    /// `#RRGGBB` or `#RRGGBBAA`.
+    init?(hex: String) {
+        var text = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        if text.hasPrefix("#") { text.removeFirst() }
+        guard text.count == 6 || text.count == 8, let value = UInt64(text, radix: 16) else { return nil }
+        if text.count == 6 {
+            self.init(red: Double((value >> 16) & 0xFF) / 255, green: Double((value >> 8) & 0xFF) / 255, blue: Double(value & 0xFF) / 255)
+        } else {
+            self.init(
+                red: Double((value >> 24) & 0xFF) / 255,
+                green: Double((value >> 16) & 0xFF) / 255,
+                blue: Double((value >> 8) & 0xFF) / 255,
+                alpha: Double(value & 0xFF) / 255
+            )
+        }
+    }
+
+    var color: Color { Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha) }
+    var opaque: CompanionRGBA { withAlpha(1) }
+    func withAlpha(_ value: Double) -> CompanionRGBA { CompanionRGBA(red: red, green: green, blue: blue, alpha: value) }
+    func multiplyingAlpha(by factor: Double) -> CompanionRGBA { withAlpha(alpha * factor) }
+
+    func mixed(with other: CompanionRGBA, amount: Double) -> CompanionRGBA {
+        let t = min(1, max(0, amount))
+        return CompanionRGBA(
+            red: red + (other.red - red) * t,
+            green: green + (other.green - green) * t,
+            blue: blue + (other.blue - blue) * t,
+            alpha: alpha + (other.alpha - alpha) * t
+        )
+    }
+
+    func composited(over base: CompanionRGBA) -> CompanionRGBA {
+        CompanionRGBA(
+            red: red * alpha + base.red * (1 - alpha),
+            green: green * alpha + base.green * (1 - alpha),
+            blue: blue * alpha + base.blue * (1 - alpha)
+        )
+    }
+
+    var luminance: Double {
+        func channel(_ value: Double) -> Double { value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4) }
+        return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue)
+    }
+
+    static func contrast(_ a: CompanionRGBA, _ b: CompanionRGBA) -> Double {
+        let x = a.luminance, y = b.luminance
+        return (max(x, y) + 0.05) / (min(x, y) + 0.05)
+    }
+}
+
+/// Holds the palette the companion draws with. Observation re-renders the
+/// views that read a token when the palette changes. Reads are lock-protected
+/// so background renderers can use the tokens too.
+final class CompanionThemeRuntime: Observable, @unchecked Sendable {
+    static let shared = CompanionThemeRuntime()
+
+    private static let followsMacKey = "roachnet.companion.theme.followsMac"
+    private static let lastThemeKey = "roachnet.companion.theme.lastMacTheme.v1"
+
+    private let registrar = ObservationRegistrar()
+    private let state: OSAllocatedUnfairLock<State>
+
+    private struct State: Sendable {
+        var palette: CompanionPalette
+        var followsMac: Bool
+        var macTheme: CompanionMacTheme?
+    }
+
+    init(defaults: UserDefaults = .standard) {
+        let follows = defaults.object(forKey: Self.followsMacKey) as? Bool ?? true
+        let saved = defaults.data(forKey: Self.lastThemeKey).flatMap { try? JSONDecoder().decode(CompanionMacTheme.self, from: $0) }
+        let palette = follows ? saved.flatMap(CompanionPalette.init(macTheme:)) ?? .companionDefault : .companionDefault
+        state = OSAllocatedUnfairLock(initialState: State(palette: palette, followsMac: follows, macTheme: saved))
+    }
+
+    var palette: CompanionPalette {
+        registrar.access(self, keyPath: \.palette)
+        return state.withLock { $0.palette }
+    }
+
+    var followsMac: Bool {
+        registrar.access(self, keyPath: \.followsMac)
+        return state.withLock { $0.followsMac }
+    }
+
+    /// The Mac theme last fetched, whether or not it is applied.
+    var macTheme: CompanionMacTheme? {
+        registrar.access(self, keyPath: \.macTheme)
+        return state.withLock { $0.macTheme }
+    }
+
+    func setFollowsMac(_ follows: Bool, defaults: UserDefaults = .standard) {
+        defaults.set(follows, forKey: Self.followsMacKey)
+        registrar.withMutation(of: self, keyPath: \.followsMac) {
+            state.withLock { $0.followsMac = follows }
+        }
+        applyPalette()
+    }
+
+    /// Records the Mac's theme (nil when the Mac has none to share) and applies it if following.
+    func receive(_ theme: CompanionMacTheme?, defaults: UserDefaults = .standard) {
+        let usable = theme.flatMap { $0.schema == CompanionMacTheme.schemaID ? $0 : nil }
+        if let usable, let data = try? JSONEncoder().encode(usable) {
+            defaults.set(data, forKey: Self.lastThemeKey)
+        }
+        guard usable != state.withLock({ $0.macTheme }) else { return }
+        registrar.withMutation(of: self, keyPath: \.macTheme) {
+            state.withLock { $0.macTheme = usable ?? $0.macTheme }
+        }
+        applyPalette()
+    }
+
+    private func applyPalette() {
+        let next = state.withLock { current -> CompanionPalette in
+            guard current.followsMac, let theme = current.macTheme else { return .companionDefault }
+            return CompanionPalette(macTheme: theme) ?? .companionDefault
+        }
+        guard next != state.withLock({ $0.palette }) else { return }
+        registrar.withMutation(of: self, keyPath: \.palette) {
+            state.withLock { $0.palette = next }
+        }
     }
 }
 
@@ -189,7 +485,7 @@ struct RoachCardBackground: View {
         shape
             .fill(
                 LinearGradient(
-                    colors: [RoachTheme.elevatedSurface.opacity(0.82), Color.black.opacity(0.74)],
+                    colors: [RoachTheme.elevatedSurface.opacity(0.82), RoachTheme.void.opacity(0.74)],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -443,7 +739,7 @@ struct RoachSignalCore: View {
             let breathe = 1 + 0.03 * sin(t * 2 * .pi / 4.6)
             ZStack {
                 Capsule(style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                    .strokeBorder(RoachTheme.neutralInk.opacity(0.10), lineWidth: 1)
                     .frame(width: size * 1.7, height: size * 0.92)
                 Capsule(style: .continuous)
                     .strokeBorder(RoachTheme.purpleInk.opacity(0.28), lineWidth: 1)
@@ -583,7 +879,7 @@ struct RoachFloatingTabBar: View {
                 .overlay(Capsule(style: .continuous).strokeBorder(RoachTheme.border, lineWidth: 1))
                 .overlay(alignment: .top) {
                     Capsule(style: .continuous)
-                        .strokeBorder(LinearGradient(colors: [Color.white.opacity(0.09), .clear], startPoint: .top, endPoint: .center), lineWidth: 1)
+                        .strokeBorder(LinearGradient(colors: [RoachTheme.neutralInk.opacity(0.09), .clear], startPoint: .top, endPoint: .center), lineWidth: 1)
                 }
                 .shadow(color: .black.opacity(0.5), radius: 29, x: 0, y: 20)
         )
@@ -626,7 +922,7 @@ private struct RoachButtonBody: View {
                     shape.fill(RoachTheme.primary)
                         .shadow(color: RoachTheme.primary.opacity(isEnabled ? 0.35 : 0), radius: 16, x: 0, y: 12)
                 case .secondary:
-                    shape.fill(Color.black).overlay(shape.strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
+                    shape.fill(RoachTheme.void).overlay(shape.strokeBorder(RoachTheme.neutralInk.opacity(0.14), lineWidth: 1))
                 case .signal:
                     shape.fill(RoachTheme.signalDeep).overlay(shape.strokeBorder(RoachTheme.secondary.opacity(0.32), lineWidth: 1))
                 case .ghost:

@@ -24,6 +24,7 @@ final class MarketingScreenshotTests: XCTestCase {
         app.buttons["tab.home"].tap()
         let openOrg = app.buttons["home.openOrg"]
         XCTAssertTrue(openOrg.waitForExistence(timeout: 10))
+        openOrg.scrollAboveTabBar(in: app)
         openOrg.tap()
         XCTAssertTrue(app.buttons["org.done"].waitForExistence(timeout: 10))
         sleep(2)
@@ -35,5 +36,19 @@ final class MarketingScreenshotTests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+}
+
+extension XCUIElement {
+    /// The floating tab bar sits over the bottom of each scroll view, so a tap on
+    /// a control behind it lands on a tab instead. Scroll until it clears the bar.
+    func scrollAboveTabBar(in app: XCUIApplication) {
+        let tab = app.buttons["tab.home"]
+        guard tab.exists else { return }
+        var swipes = 0
+        while frame.maxY > tab.frame.minY - 8, swipes < 4 {
+            app.swipeUp(velocity: .slow)
+            swipes += 1
+        }
     }
 }

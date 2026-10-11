@@ -6,6 +6,18 @@ struct ConnectionSettingsView: View {
     @Bindable var model: CompanionAppModel
     @State private var scannerPresented = false
     @State private var scannerError: String?
+    @State private var tokenUnlocked = false
+
+    private var themeTitle: String {
+        let runtime = CompanionThemeRuntime.shared
+        if runtime.followsMac, let name = runtime.palette.sourceName {
+            return "Matching your Mac: \(name)"
+        }
+        if runtime.followsMac {
+            return runtime.macTheme == nil ? "RoachNet colours until your Mac shares a theme" : "RoachNet colours"
+        }
+        return "RoachNet colours"
+    }
 
     var body: some View {
         ZStack {
@@ -60,11 +72,21 @@ struct ConnectionSettingsView: View {
                                     .font(RoachType.caption(.semibold))
                                     .foregroundStyle(RoachTheme.subduedText)
 
-                                TextField("http://RoachNet:38111", text: $model.connection.baseURL)
+                                TextField("https://your-relay.example", text: $model.connection.baseURL)
                                     .textInputAutocapitalization(.never)
                                     .autocorrectionDisabled()
+                                    .keyboardType(.URL)
                                     .padding(12)
                                     .background(RoachTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .accessibilityIdentifier("settings.bridge.url")
+
+                                if let refusal = CompanionEndpointPolicy.refusalReason(for: model.connection.baseURL) {
+                                    Text(refusal)
+                                        .font(RoachType.caption)
+                                        .foregroundStyle(RoachTheme.primary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .accessibilityIdentifier("settings.bridge.refusal")
+                                }
                             }
 
                             VStack(alignment: .leading, spacing: 8) {
@@ -90,11 +112,32 @@ struct ConnectionSettingsView: View {
                                     .font(RoachType.caption(.semibold))
                                     .foregroundStyle(RoachTheme.subduedText)
 
-                                SecureField("Paste the RoachNet companion token", text: $model.connection.token)
-                                    .textInputAutocapitalization(.never)
-                                    .autocorrectionDisabled()
+                                if tokenUnlocked || model.connection.token.isEmpty {
+                                    SecureField("Paste the RoachNet companion token", text: $model.connection.token)
+                                        .textInputAutocapitalization(.never)
+                                        .autocorrectionDisabled()
+                                        .padding(12)
+                                        .background(RoachTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .accessibilityIdentifier("settings.token.field")
+                                } else {
+                                    HStack(spacing: 10) {
+                                        Text(model.usingRoachTailPeerToken ? "This phone's RoachTail token is in the Keychain." : "A companion token is in the Keychain.")
+                                            .font(RoachType.caption)
+                                            .foregroundStyle(RoachTheme.subduedText)
+                                        Spacer(minLength: 8)
+                                        Button("Change…") {
+                                            Task {
+                                                if await CompanionLocalAuth.confirm("Change the token this phone uses for your Mac.") {
+                                                    tokenUnlocked = true
+                                                }
+                                            }
+                                        }
+                                        .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
+                                        .accessibilityIdentifier("settings.token.change")
+                                    }
                                     .padding(12)
                                     .background(RoachTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                }
                             }
                         }
                     }
@@ -115,8 +158,8 @@ struct ConnectionSettingsView: View {
                             )
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("Desktop alias: http://RoachNet:38111")
-                                Text("Phone lane: pair over RoachTail instead of targeting a raw IP.")
+                                Text("On a phone: your Mac's RoachTail relay (https://…) or its tailnet address.")
+                                Text("In the Simulator on that Mac: http://RoachNet:38111.")
                                 Text(
                                     model.usingRoachTailPeerToken
                                         ? "This iPhone is already using its own RoachTail peer token."
@@ -125,6 +168,27 @@ struct ConnectionSettingsView: View {
                             }
                             .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
+                        }
+                    }
+
+                    RoachPanel {
+                        VStack(alignment: .leading, spacing: 12) {
+                            RoachSectionHeader(
+                                eyebrow: "Appearance",
+                                title: themeTitle,
+                                detail: "With this on, the companion wears the theme you picked on your Mac (RoachNet 1.1 or later, Settings › Appearance), light themes included."
+                            )
+
+                            Toggle(isOn: Binding(
+                                get: { CompanionThemeRuntime.shared.followsMac },
+                                set: { CompanionThemeRuntime.shared.setFollowsMac($0) }
+                            )) {
+                                Text("Match my Mac's theme")
+                                    .font(RoachType.subheadline(.semibold))
+                                    .foregroundStyle(RoachTheme.text)
+                            }
+                            .tint(RoachTheme.secondary)
+                            .accessibilityIdentifier("settings.theme.followMac")
                         }
                     }
 
@@ -144,7 +208,8 @@ struct ConnectionSettingsView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("RoachNetiOS keeps the chat lane native. There is no embedded browser surface inside the app.")
                                 Text("Companion tokens live in the iOS Keychain instead of plain user defaults.")
-                                Text("Remote bridges must be HTTPS. Plain HTTP is limited to trusted local RoachNet lanes such as RoachTail, localhost, and private network hosts.")
+                                Text("The token only travels over HTTPS, inside a tailnet, or to this device. Plain http:// to RoachNet, a .local name or a Wi-Fi address is refused: anything else on that network could answer for it.")
+                                Text("Approving Org decisions, changing the token and forgetting the Mac ask for Face ID, Touch ID or your passcode.")
                             }
                             .font(RoachType.caption)
                             .foregroundStyle(RoachTheme.subduedText)
@@ -300,8 +365,11 @@ struct ConnectionSettingsView: View {
                             )
 
                             Button("Forget linked Mac") {
-                                model.clearConnection()
-                                dismiss()
+                                Task {
+                                    guard await CompanionLocalAuth.confirm("Forget the Mac this phone is linked to.") else { return }
+                                    model.clearConnection()
+                                    dismiss()
+                                }
                             }
                             .buttonStyle(RoachButtonStyle(kind: .secondary, size: .compact))
                             .tint(RoachTheme.primary)

@@ -6,6 +6,7 @@ import SwiftUI
 struct RuntimeView: View {
     @Bindable var model: CompanionAppModel
     @StateObject private var phoneGPS = RoachPhoneGPSAdvertiser()
+    @State private var joinCodeRevealed = false
 
     var body: some View {
         NavigationStack {
@@ -531,9 +532,20 @@ struct RuntimeView: View {
                             Text("Join code")
                                 .font(RoachType.caption)
                                 .foregroundStyle(RoachTheme.subduedText)
-                            Text(joinCode)
-                                .font(RoachType.mono(12, relativeTo: .caption).weight(.semibold))
-                                .foregroundStyle(RoachTheme.text)
+                            Button {
+                                joinCodeRevealed.toggle()
+                            } label: {
+                                Text(joinCodeRevealed ? joinCode : String(repeating: "•", count: min(max(joinCode.count, 8), 14)))
+                                    .font(RoachType.mono(12, relativeTo: .caption).weight(.semibold))
+                                    .foregroundStyle(RoachTheme.text)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(joinCodeRevealed ? "Join code \(joinCode)" : "Join code hidden")
+                            .accessibilityHint(joinCodeRevealed ? "Tap to hide" : "Tap to show")
+                            .accessibilityIdentifier("runtime.joinCode")
+                            Text(joinCodeRevealed ? "Tap to hide" : "Tap to show")
+                                .font(RoachType.caption)
+                                .foregroundStyle(RoachTheme.subduedText)
                         }
                     } else if model.usingRoachTailPeerToken {
                         Text("Join-code controls stay on the Mac or any device still using the desktop companion token.")

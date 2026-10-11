@@ -164,7 +164,7 @@ struct OrgView: View {
                     ), axis: .vertical)
                     .font(RoachType.bodySmall)
                     .padding(10)
-                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.black.opacity(0.6)))
+                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(RoachTheme.void.opacity(0.6)))
                     .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(RoachTheme.border, lineWidth: 1))
                     .accessibilityIdentifier("org.note.\(approval.id)")
 
@@ -302,7 +302,7 @@ struct OrgView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .padding(12)
-                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color.black.opacity(0.6)))
+                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(RoachTheme.void.opacity(0.6)))
                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(RoachTheme.border, lineWidth: 1))
                 .accessibilityIdentifier(id)
         }
