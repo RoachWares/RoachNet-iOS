@@ -16,6 +16,7 @@ RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls b
 - Face ID, Touch ID or your passcode before Org decisions, changing the token, or forgetting the Mac (finding I8).
 - The RoachTail join code on the Runtime tab is hidden until you tap it.
 - Bridge URLs with a path (`https://relay.example/roachnet`) keep their path on every request.
+- An install the Mac refuses (a pack sent to 1.0.x, an unknown pack, a refused host) shows the Mac's reason instead of sitting in the offline queue. With RoachNet 1.1, theme and speech packs from RoachNet Apps install from the phone.
 
 ## What's new in 0.2.0
 
