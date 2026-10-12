@@ -1892,8 +1892,9 @@ enum CompanionDemoState {
 /// Face ID, Touch ID or the device passcode before actions that act for the
 /// person on their Mac: Org decisions, forgetting the Mac, changing the token
 /// (security review finding I8). A device with no passcode at all cannot
-/// authenticate anyone, so the action goes ahead there; the UI tests run on
-/// such simulators.
+/// authenticate anyone, so the action goes ahead there. Demo mode never gets
+/// here; RoachNet's live simulator check enrolls Face ID on its throwaway
+/// simulator and answers with a matching face.
 enum CompanionLocalAuth {
     static func confirm(_ reason: String) async -> Bool {
         let context = LAContext()
