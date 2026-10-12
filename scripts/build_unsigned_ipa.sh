@@ -41,6 +41,24 @@ fi
 
 cp -R "$APP_PATH" "$DIST_DIR/Payload/"
 
+# Drop the debug map from every executable: it holds absolute paths from the
+# build Mac (its volume and workspace folders). dSYMs stay in $BUILD_ROOT.
+find "$DIST_DIR/Payload" -type f -perm +111 | while IFS= read -r binary; do
+  if /usr/bin/file -b "$binary" | grep -q "Mach-O"; then
+    xcrun strip -S "$binary" 2>/dev/null
+  fi
+done
+
+# Refuse to package anything that still names this Mac's folders or host name.
+LOCAL_HOST="$(scutil --get LocalHostName 2>/dev/null || true)"
+NEEDLES=(-e "$ROOT" -e "$HOME/")
+if (( ${#LOCAL_HOST} >= 4 )) && [[ "${LOCAL_HOST:l}" != *roach* ]]; then NEEDLES+=(-e "$LOCAL_HOST"); fi
+if LC_ALL=C grep -rqaiF "${NEEDLES[@]}" "$DIST_DIR/Payload"; then
+  echo "The app still carries this Mac's paths or host name; not packaging it." >&2
+  rm -rf "$DIST_DIR/Payload"
+  exit 1
+fi
+
 (
   cd "$DIST_DIR"
   /usr/bin/zip -qry "$(basename "$IPA_PATH")" Payload
