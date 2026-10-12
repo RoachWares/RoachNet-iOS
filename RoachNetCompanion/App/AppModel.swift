@@ -1758,11 +1758,27 @@ final class CompanionAppModel {
             bannerText = "\(title) was sent to RoachNet."
             errorText = nil
             persistCache()
+        } catch let error as RoachNetAPIError where error.isRefusal {
+            // The Mac answered and said no (an older RoachNet without that kind of
+            // install, an unknown pack, a refused host). Retrying won't change the
+            // answer, so say it instead of queueing it forever.
+            bannerText = nil
+            errorText = Self.installRefusalText(title: title, error: error)
         } catch {
             queueInstall(title, intent: intent)
             bannerText = "\(title) is queued until the desktop comes back."
             errorText = nil
         }
+    }
+
+    /// What to say when the Mac answered an install with a 4xx.
+    static func installRefusalText(title: String, error: RoachNetAPIError) -> String {
+        let reason = error.localizedDescription
+        // 1.0.6 doesn't know the action; 1.0.7 says packs need 1.1.
+        if reason.contains("Unsupported App Store install action") || reason.contains("RoachNet 1.1 or later") {
+            return "\(title) needs RoachNet 1.1 or later on your Mac. Update it, then try again."
+        }
+        return "RoachNet on your Mac couldn't install \(title): \(reason)"
     }
 
     private func queueInstall(_ title: String, intent: StoreInstallIntent) {
@@ -1794,12 +1810,17 @@ final class CompanionAppModel {
 
         var remaining = pendingInstallQueue
         var flushedTitles: [String] = []
+        var refused: [(title: String, error: RoachNetAPIError)] = []
 
         for item in pendingInstallQueue {
             do {
                 try await flushQueuedInstall(item)
                 remaining.removeAll { $0.id == item.id }
                 flushedTitles.append(item.title)
+            } catch let error as RoachNetAPIError where error.isRefusal {
+                // The Mac refused this one; it would block the rest of the queue forever.
+                remaining.removeAll { $0.id == item.id }
+                refused.append((item.title, error))
             } catch {
                 break
             }
@@ -1810,6 +1831,10 @@ final class CompanionAppModel {
 
         if !flushedTitles.isEmpty {
             bannerText = "\(flushedTitles.count) queued install\(flushedTitles.count == 1 ? "" : "s") reached RoachNet."
+        }
+        if let first = refused.first {
+            errorText = Self.installRefusalText(title: first.title, error: first.error)
+                + (refused.count > 1 ? " \(refused.count - 1) more queued install\(refused.count == 2 ? " was" : "s were") refused too." : "")
         }
     }
 

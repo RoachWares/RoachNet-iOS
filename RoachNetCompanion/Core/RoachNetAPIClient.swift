@@ -14,6 +14,13 @@ enum RoachNetAPIError: LocalizedError {
         return nil
     }
 
+    /// The Mac answered and said no. Retrying the same request won't help
+    /// (timeouts and rate limits excepted).
+    var isRefusal: Bool {
+        guard let status = statusCode else { return false }
+        return (400..<500).contains(status) && status != 408 && status != 429
+    }
+
     var errorDescription: String? {
         switch self {
         case .invalidBaseURL:
