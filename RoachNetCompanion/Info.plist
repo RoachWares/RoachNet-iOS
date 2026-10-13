@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>$(DEVELOPMENT_LANGUAGE)</string>
+  <key>CFBundleExecutable</key>
+  <string>$(EXECUTABLE_NAME)</string>
+  <key>CFBundleIdentifier</key>
+  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>$(PRODUCT_NAME)</string>
+  <key>CFBundleDisplayName</key>
+  <string>RoachNetiOS</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+  <key>CFBundleShortVersionString</key>
+  <string>0.3.1</string>
+  <key>CFBundleVersion</key>
+  <string>8</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
+      <key>CFBundleURLName</key>
+      <string>org.roachnet.ios</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>roachnet</string>
+      </array>
+    </dict>
+  </array>
+  <key>LSRequiresIPhoneOS</key>
+  <true/>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+  </dict>
+  <key>NSCameraUsageDescription</key>
+  <string>RoachNetiOS uses the camera to scan RoachTail pairing QR codes from your Mac.</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>RoachNetiOS uses Bluetooth only when you start the RoachAtlas GPS bridge, so your Mac can read a local foreground GPS packet.</string>
+  <key>NSBluetoothPeripheralUsageDescription</key>
+  <string>RoachNetiOS advertises a local RoachAtlas GPS packet over Bluetooth while the foreground bridge is running.</string>
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>RoachNetiOS uses your location only while the foreground RoachAtlas GPS bridge is running for your paired Mac.</string>
+  <key>NSFaceIDUsageDescription</key>
+  <string>RoachNetiOS asks for Face ID before it approves Org decisions, changes its token or forgets your Mac.</string>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>RoachNet iOS connects to your Mac companion runtime so you can keep using chats, vault data, and installs from your phone.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>RoachNetiOS uses the microphone for local voice prompts in RoachClaw.</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>RoachNetiOS turns speech into prompts so RoachClaw can stay hands-free when you need it.</string>
+  <key>UIApplicationSceneManifest</key>
+  <dict>
+    <key>UIApplicationSupportsMultipleScenes</key>
+    <true/>
+  </dict>
+  <key>UISupportedInterfaceOrientations</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+  </array>
+  <key>UISupportedInterfaceOrientations~ipad</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+  </array>
+  <key>UILaunchScreen</key>
+  <dict/>
+  <key>UIAppFonts</key>
+  <array>
+    <string>Inter-Regular.ttf</string>
+    <string>Inter-Medium.ttf</string>
+    <string>Inter-SemiBold.ttf</string>
+    <string>Inter-Bold.ttf</string>
+    <string>Inter-ExtraBold.ttf</string>
+    <string>JetBrainsMono-Regular.ttf</string>
+    <string>JetBrainsMono-Medium.ttf</string>
+    <string>JetBrainsMono-Bold.ttf</string>
+    <string>JetBrainsMono-ExtraBold.ttf</string>
+  </array>
+</dict>
+</plist>
