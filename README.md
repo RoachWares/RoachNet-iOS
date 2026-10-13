@@ -5,9 +5,14 @@ Phone lane for RoachClaw, vault reads, runtime control, and RoachNet Apps instal
 RoachNetiOS keeps the chat surface close, carries RoachTail pairing, and falls back to cached RoachBrain replies when the desktop or internet drops away.
 
 [RoachNet iOS page](https://roachnet.org/ios/)<br>
-[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/latest/download/RoachNetiOS-v0.3.0-unsigned.ipa)<br>
+[IPA release](https://github.com/RoachWares/RoachNet-iOS/releases/download/v0.3.1/RoachNetiOS-v0.3.1-unsigned.ipa)<br>
 [SideStore / AltStore source](https://raw.githubusercontent.com/RoachWares/RoachNet-SideStore/main/apps.json)<br>
 [Sideload notes](./docs/sidestore.md)
+
+## What's new in 0.3.1
+
+- The IPA no longer carries the build Mac's folder paths. The debug map is stripped from the app binary, and the build refuses to produce an IPA that still names the build machine's volume or home folder.
+- Nothing else changes: 0.3.1 works with the same Macs as 0.3.0 (RoachNet 1.0.6 or later, 1.1 for themes, theme packs and the Org).
 
 ## What's new in 0.3.0
 
@@ -49,8 +54,8 @@ Builds are shipped as unsigned IPAs for SideStore or AltStore, and the preferred
 
 Artifacts:
 
-- `dist/RoachNetiOS-v0.3.0-unsigned.ipa`
-- `dist/RoachNetiOS-v0.3.0-unsigned.ipa.sha256`
+- `dist/RoachNetiOS-v0.3.1-unsigned.ipa`
+- `dist/RoachNetiOS-v0.3.1-unsigned.ipa.sha256`
 
 Install flow:
 
